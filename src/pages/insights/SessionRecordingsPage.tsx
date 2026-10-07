@@ -8,6 +8,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  CircleHelp,
   Download,
   EllipsisVertical,
   Funnel,
@@ -31,7 +32,6 @@ import {
 import StatusBadge from "@/components/ui/StatusBadge";
 import { cn } from "@/lib/utils";
 import {
-  ACTIVE_REPORT,
   RECORDING_STATS,
   RECORDING_VIEWS,
   SESSION_ROWS,
@@ -67,6 +67,65 @@ function FilterSegment({
   );
 }
 
+function AllDataStats() {
+  return (
+    <div className="rounded-lg border border-border bg-background">
+      <div className="flex items-center justify-between gap-2 px-3 pt-3">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <p className="truncate text-sm font-semibold text-foreground">
+            All Data
+          </p>
+          <CircleHelp
+            className="size-3.5 shrink-0 text-muted-foreground"
+            aria-hidden
+          />
+        </div>
+        <div className="flex shrink-0 items-center gap-0.5">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-7 text-muted-foreground hover:text-foreground"
+            aria-label="Export"
+          >
+            <Download className="size-3.5" aria-hidden />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-7 text-muted-foreground hover:text-foreground"
+            aria-label="Share"
+          >
+            <Share2 className="size-3.5" aria-hidden />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-7 text-muted-foreground hover:text-foreground"
+            aria-label="Settings"
+          >
+            <Settings className="size-3.5" aria-hidden />
+          </Button>
+        </div>
+      </div>
+      <div className="m-3 mt-2 grid grid-cols-3 gap-2 rounded-md bg-[var(--info-bg)] px-3 py-2.5">
+        {RECORDING_STATS.map((stat) => (
+          <div key={stat.label} className="min-w-0">
+            <p className="truncate text-[11px] leading-tight text-muted-foreground">
+              {stat.label}
+            </p>
+            <p className="mt-0.5 truncate text-sm font-semibold tabular-nums leading-tight text-foreground">
+              {stat.value}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ViewsRail({
   views,
   activeId,
@@ -90,7 +149,7 @@ function ViewsRail({
   }, [views, query]);
 
   return (
-    <aside className="flex w-[300px] shrink-0 flex-col self-start rounded-lg border border-border bg-background">
+    <aside className="flex min-h-0 flex-1 flex-col rounded-lg border border-border bg-background">
       <Tabs defaultValue="views" className="flex min-h-0 flex-1 flex-col">
         <div className="border-b border-border px-4">
           <TabsList
@@ -180,7 +239,7 @@ function ViewsRail({
 }
 
 export default function SessionRecordingsPage() {
-  const [activeViewId, setActiveViewId] = useState("agency");
+  const [activeViewId, setActiveViewId] = useState("signup");
   const [viewQuery, setViewQuery] = useState("");
   const [listMode, setListMode] = useState<"all" | "saved">("all");
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -223,64 +282,8 @@ export default function SessionRecordingsPage() {
 
   return (
     <div className="flex min-h-full flex-col">
-      {/* Stats + configuration (page title header removed) */}
-      <div className="flex flex-wrap items-center justify-end gap-x-8 gap-y-4 px-12 pb-4 pt-10">
-        <div className="flex flex-wrap items-center gap-5">
-          <div className="flex flex-wrap items-center gap-3">
-            {RECORDING_STATS.map((stat, i) => (
-              <div key={stat.label} className="flex items-center gap-3">
-                {i > 0 && (
-                  <span className="text-muted-foreground" aria-hidden>
-                    ·
-                  </span>
-                )}
-                <div>
-                  <p className="text-xs leading-tight text-muted-foreground">
-                    {stat.label}
-                  </p>
-                  <p className="text-sm font-medium leading-tight tabular-nums text-foreground">
-                    {stat.value}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="hidden h-8 w-px bg-border sm:block" aria-hidden />
-          <Button variant="outline" size="sm" className="gap-2">
-            <Settings className="size-3.5" aria-hidden />
-            Configuration
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex items-start gap-6 px-12 pb-10 pt-2">
+      <div className="flex items-start gap-6 px-12 pb-10 pt-10">
         <div className="flex min-w-0 flex-1 flex-col gap-4">
-          {/* Active report meta */}
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-base font-semibold text-foreground">
-                  {ACTIVE_REPORT.name}
-                </h2>
-                <StatusBadge status={ACTIVE_REPORT.status} />
-              </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Created by {ACTIVE_REPORT.createdBy} on {ACTIVE_REPORT.createdAt}
-              </p>
-            </div>
-            <div className="flex items-center gap-0.5">
-              <Button variant="ghost" size="icon" className="size-8" aria-label="Export CSV">
-                <Download className="size-4" aria-hidden />
-              </Button>
-              <Button variant="ghost" size="icon" className="size-8" aria-label="Share">
-                <Share2 className="size-4" aria-hidden />
-              </Button>
-              <Button variant="ghost" size="icon" className="size-8" aria-label="Settings">
-                <Settings className="size-4" aria-hidden />
-              </Button>
-            </div>
-          </div>
-
           {/* Filter bar */}
           <div className="flex overflow-hidden rounded-md border border-border bg-background">
             <div className="flex h-[52px] shrink-0 items-center border-r border-border px-4">
@@ -496,13 +499,16 @@ export default function SessionRecordingsPage() {
           </div>
         </div>
 
-        <ViewsRail
-          views={RECORDING_VIEWS}
-          activeId={activeViewId}
-          onSelect={setActiveViewId}
-          query={viewQuery}
-          onQueryChange={setViewQuery}
-        />
+        <div className="flex w-[300px] shrink-0 flex-col gap-4 self-start">
+          <AllDataStats />
+          <ViewsRail
+            views={RECORDING_VIEWS}
+            activeId={activeViewId}
+            onSelect={setActiveViewId}
+            query={viewQuery}
+            onQueryChange={setViewQuery}
+          />
+        </div>
       </div>
     </div>
   );
