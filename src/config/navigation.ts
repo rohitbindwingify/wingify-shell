@@ -198,6 +198,12 @@ export const NAV: NavItem[] = [
       { label: "Holdout", path: "/feature-management/holdout", hideCreate: true },
     ]},
     { items: [
+      { label: "Feature Rollout", path: "/feature-management/flag-rollout" },
+      { label: "Feature Experimentation", path: "/feature-management/flag-testing" },
+      { label: "Feature Multivariate", path: "/feature-management/flag-multivariate" },
+      { label: "Feature Personalization", path: "/feature-management/flag-personalize" },
+    ]},
+    { items: [
       { label: "Tech Debt", path: "/feature-management/tech-debt", hideCreate: true },
     ]},
   ]},
