@@ -162,7 +162,7 @@ function MascotMark({
  * - Active route sets the pose
  * - Product-row hover previews that product's pose
  * - Logo hover keeps the same mark and plays a subtle quirky idle motion
- * - `showWordmark` adds the wingify wordmark beside a smaller bird (open rails)
+ * - `showWordmark` adds the wingify wordmark beside the same-size bird
  */
 export default function WingifyLogoButton({
   className,
@@ -202,20 +202,19 @@ export default function WingifyLogoButton({
       onFocus={() => setLogoHover(true)}
       onBlur={() => setLogoHover(false)}
       className={cn(
-        "flex shrink-0 items-center overflow-visible rounded-lg",
-        showWordmark
-          ? "h-9 gap-2 px-0.5"
-          : "h-8 w-8 justify-center",
+        "flex h-10 shrink-0 items-center overflow-visible rounded-lg",
+        showWordmark && "gap-2",
         className
       )}
     >
-      <MascotMark
-        id={mascotId}
-        alt={`Wingify — ${pose}`}
-        colorMode={colorMode}
-        lively={logoHover}
-        compact={showWordmark}
-      />
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center">
+        <MascotMark
+          id={mascotId}
+          alt={`Wingify — ${pose}`}
+          colorMode={colorMode}
+          lively={logoHover}
+        />
+      </span>
       {showWordmark ? (
         <img
           src={wordmarkUrl}
