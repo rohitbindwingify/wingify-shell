@@ -196,6 +196,8 @@ export const NAV: NavItem[] = [
     { items: [
       { label: "Feature Flags", path: "/feature-management/feature-flags" },
       { label: "Holdout", path: "/feature-management/holdout", hideCreate: true },
+    ]},
+    { items: [
       { label: "Tech Debt", path: "/feature-management/tech-debt", hideCreate: true },
     ]},
   ]},
@@ -323,9 +325,13 @@ export const NAV: NavItem[] = [
       { label: "Attributes", path: "/data-360/attributes" },
       { label: "Events", path: "/data-360/events" },
       { label: "Segments", path: "/data-360/segments" },
+    ]},
+    { heading: "Measurement", items: [
       { label: "Metrics", path: "/data-360/metrics" },
       { label: "Funnels", path: "/data-360/funnels" },
       { label: "Data Studio", path: "/data-360/data-studio" },
+    ]},
+    { heading: "Operations", items: [
       { label: "Triggers", path: "/data-360/triggers" },
       { label: "Audit", path: "/data-360/audit", hideCreate: true },
     ]},
