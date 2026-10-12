@@ -25,3 +25,35 @@
 .flag-rule-toolbar .flag-rule-split-button > button { border-radius: 0; }
 
 .flag-impact-panel, .flag-impact-panel:hover { background: transparent; border-color: var(--border-strong); color: var(--card-foreground); }
+
+.flag-rule-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition: grid-template-rows 220ms ease, opacity 180ms ease, visibility 0s 220ms;
+}
+.flag-rule-collapse[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.flag-rule-collapse-inner { min-height: 0; overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .flag-rule-collapse { transition: none; }
+}
+
+.flag-section-transition { animation: flag-section-enter 180ms ease-out; }
+@keyframes flag-section-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flag-section-transition { animation: none; }
+}
+
+.flag-rule-tab-transition { animation: flag-section-enter 220ms ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .flag-rule-tab-transition { animation: none; }
+}

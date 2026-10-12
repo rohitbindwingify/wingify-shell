@@ -1,7 +1,8 @@
+import AnimatedRuleContent from './AnimatedRuleContent';
 import { useId, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, Copy, Info } from '@/components/icons/protoLucide';
+import { ChevronRight, Copy, Info } from '@/components/icons/protoLucide';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { FlagRule } from '@/data/featureFlagRules';
 
@@ -11,9 +12,9 @@ function Section({ label, heading, children }: { label?: string; heading: string
   return <section className="space-y-2">
     {label && <p className="text-muted-foreground">{label}</p>}
     <Button variant="ghost" className="h-auto justify-start gap-1 p-0 font-normal hover:bg-transparent" aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>
-      {open ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}{heading}
+      <ChevronRight className={`size-4 transition-transform duration-200 motion-reduce:transition-none ${open ? 'rotate-90' : ''}`} />{heading}
     </Button>
-    {open && <div id={id} className="ml-5">{children}</div>}
+    <AnimatedRuleContent open={open} id={id}><div className="ml-5">{children}</div></AnimatedRuleContent>
   </section>;
 }
 

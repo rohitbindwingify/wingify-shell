@@ -700,6 +700,7 @@ function ReportsChrome({
   tabsBarRef,
   tabsBarHeight,
   leadingControls,
+  reportHeader,
   emptyMessage,
   featureFlagReport = false,
   resultsTable,
@@ -707,6 +708,7 @@ function ReportsChrome({
   resultsTable?: ReactNode;
   featureFlagReport?: boolean;
   leadingControls?: ReactNode;
+  reportHeader?: ReactNode;
   emptyMessage?: string;
   activeTab: string;
   setActiveTab: (value: string) => void;
@@ -733,16 +735,16 @@ function ReportsChrome({
       >
         <div
           ref={tabsBarRef}
-          className={cn("z-40 flex shrink-0 justify-between gap-4 border-b border-border bg-background px-4", featureFlagReport ? "h-10 items-center" : "h-[52px] items-end")}
+          className={cn("z-40 flex shrink-0 justify-between gap-4 border-b border-border bg-background px-4", featureFlagReport ? "h-14 items-center" : "h-[52px] items-end")}
         >
           <div className={cn("flex min-w-0 gap-4 overflow-x-auto", featureFlagReport ? "h-full items-center overflow-y-hidden" : "items-end")}>
           {leadingControls}
-          <TabsList className={cn("gap-5 rounded-none bg-transparent p-0", featureFlagReport ? "h-full" : "h-auto")}>
+          <TabsList className={featureFlagReport ? "h-8 shrink-0 gap-1 rounded-sm bg-muted p-1" : "h-auto gap-5 rounded-none bg-transparent p-0"}>
             {TABS.filter(tab => !featureFlagReport || tab !== "Overview").map((tab) => (
               <TabsTrigger
                 key={tab}
                 value={tabValue(tab)}
-                className={cn("relative rounded-none border-0 bg-transparent px-1 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:font-medium data-[state=active]:text-foreground data-[state=active]:shadow-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:bg-foreground after:transition-transform data-[state=active]:after:scale-x-100", featureFlagReport ? "h-full py-0" : "pb-3 pt-2")}
+                className={featureFlagReport ? "h-6 rounded-sm px-2 py-0 text-sm font-normal shadow-none data-[state=active]:bg-background" : cn("relative rounded-none border-0 bg-transparent px-1 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:font-medium data-[state=active]:text-foreground data-[state=active]:shadow-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:bg-foreground after:transition-transform data-[state=active]:after:scale-x-100", featureFlagReport ? "h-full py-0" : "pb-3 pt-2")}
               >
                 {tab}
               </TabsTrigger>
@@ -750,14 +752,14 @@ function ReportsChrome({
           </TabsList>
           </div>
 
-          <div className={cn("flex shrink-0 items-center gap-2", !featureFlagReport && "pb-2.5")}>
+          {featureFlagReport ? reportHeader : <div className={cn("flex shrink-0 items-center gap-2", !featureFlagReport && "pb-2.5")}>
             <span className="whitespace-nowrap text-sm text-muted-foreground">
               Last updated {overview.lastUpdated}
             </span>
             <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Refresh report">
               <RefreshCw className="h-4 w-4" />
             </Button>
-          </div>
+          </div>}
         </div>
 
         <div
@@ -1503,7 +1505,7 @@ function LiveHitsComingSoon() {
   );
 }
 
-export default function ReportsPage({ campaignOverride, leadingControls, emptyMessage, featureFlagReport = false, resultsTable }: { campaignOverride?: Campaign; leadingControls?: ReactNode; emptyMessage?: string; featureFlagReport?: boolean; resultsTable?: ReactNode } = {}) {
+export default function ReportsPage({ campaignOverride, leadingControls, reportHeader, emptyMessage, featureFlagReport = false, resultsTable }: { campaignOverride?: Campaign; leadingControls?: ReactNode; reportHeader?: ReactNode; emptyMessage?: string; featureFlagReport?: boolean; resultsTable?: ReactNode } = {}) {
   const { entityId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const campaigns = useVisibleCampaigns();
@@ -1558,6 +1560,7 @@ export default function ReportsPage({ campaignOverride, leadingControls, emptyMe
         tabsBarRef={tabsBarRef}
         tabsBarHeight={tabsBarHeight}
         leadingControls={leadingControls}
+        reportHeader={reportHeader}
         emptyMessage={emptyMessage}
         featureFlagReport={featureFlagReport}
         resultsTable={resultsTable}

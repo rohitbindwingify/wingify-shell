@@ -1,16 +1,21 @@
+import AnimatedRuleContent from './AnimatedRuleContent';
 import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, Clock, TrendingUp, Copy, CheckCircle2 } from '@/components/icons/protoLucide';
+import { ChevronRight, Clock, TrendingUp, Copy, CheckCircle2 } from '@/components/icons/protoLucide';
 import { isGradualRollout, type FlagRule } from '@/data/featureFlagRules';
+
+function CurrentValue() {
+  return <span className="inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-[var(--success-fg)]"><span className="size-1.5 rounded-full bg-current" aria-hidden="true" />Current value</span>;
+}
 
 function SetupSection({ label, heading, children }: { label?: string; heading: ReactNode; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return <section className="space-y-1">
     {label && <p className="text-muted-foreground">{label}</p>}
-    <Button variant="ghost" className="h-auto justify-start gap-1 p-0 font-normal hover:bg-transparent" aria-expanded={open} onClick={() => setOpen(!open)}>{open ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}{heading}</Button>
-    {open && <div className="ml-5">{children}</div>}
+    <Button variant="ghost" className="h-auto justify-start gap-1 p-0 font-normal hover:bg-transparent" aria-expanded={open} onClick={() => setOpen(!open)}><ChevronRight className={`size-4 transition-transform duration-200 motion-reduce:transition-none ${open ? 'rotate-90' : ''}`} />{heading}</Button>
+    <AnimatedRuleContent open={open}><div className="ml-5">{children}</div></AnimatedRuleContent>
   </section>;
 }
 
@@ -27,11 +32,11 @@ export default function RolloutRuleSetup({ rule, onCopy }: { rule: FlagRule; onC
     </SetupSection>
     <SetupSection label="Traffic allocation" heading={<span>Current value – <strong className="text-[var(--success-fg)]">{rule.trafficAllocation ?? 100}%</strong>{gradual && ' · Gradual'}</span>}>
       <Card className="rounded-sm shadow-none"><CardContent className="space-y-3 px-4 py-3">
-        {gradual ? <><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Clock className="size-4" />Control exposure in time based increments</p><ol className="ml-5 space-y-3">{rule.rolloutSteps!.map((step,index) => <li key={index} className="flex flex-wrap items-center gap-2"><Badge tone="neutral" size="sm">{index+1}</Badge><span>{step.afterDays === 0 ? 'At launch' : `After ${step.afterDays} days`}</span><span className="text-muted-foreground">set Rollout % to</span><strong className="font-medium">{step.trafficAllocation}%</strong></li>)}</ol></> : <p>{rule.trafficAllocation ?? 100}% of qualifying visitors receive the rollout experience.</p>}
+        {gradual ? <><p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Clock className="size-4" />Control exposure in time based increments</p><ol className="ml-5 space-y-3">{rule.rolloutSteps!.map((step,index) => <li key={index} className={`flex w-fit max-w-full flex-wrap items-center gap-2 rounded-sm border px-1 py-1 ${step.trafficAllocation === rule.trafficAllocation ? 'border-[var(--success-fg)]' : 'border-transparent'}`}><Badge tone="neutral" size="sm">{index+1}</Badge><span>{step.afterDays === 0 ? 'At launch' : `After ${step.afterDays} days`}</span><span className="text-muted-foreground">set Rollout % to</span><strong className="font-medium">{step.trafficAllocation}%</strong>{step.trafficAllocation === rule.trafficAllocation && <CurrentValue />}</li>)}</ol></> : <p>{rule.trafficAllocation ?? 100}% of qualifying visitors receive the rollout experience.</p>}
         {!!conditions.length && <>
           {gradual && <div className="flex items-center gap-2 text-xs text-muted-foreground"><span className="flex-1 border-t border-dashed border-border" />OR<span className="flex-1 border-t border-dashed border-border" /></div>}
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><TrendingUp className="size-4" />Control exposure based on metric performance: any of the following conditions</p>
-          <div className="ml-5 space-y-2">{conditions.map((condition,index) => <Card key={index} className="w-fit max-w-full rounded-sm shadow-none"><CardContent className="space-y-2 px-3 py-2"><p><span className="text-muted-foreground">For </span>{condition.metric}<span className="text-muted-foreground">, when conversion rate is </span>&gt; {condition.conversionRate}%<span className="text-muted-foreground"> after </span>{condition.visitors}</p><div className="flex flex-wrap items-center gap-2"><span><span className="text-muted-foreground">visitors change </span>Rollout %<span className="text-muted-foreground"> to </span>{condition.trafficAllocation}%</span>{condition.trafficAllocation === rule.trafficAllocation && <Badge tone="green" size="sm">Current value</Badge>}</div></CardContent></Card>)}</div>
+          <div className="ml-5 space-y-2">{conditions.map((condition,index) => <Card key={index} className={`w-fit max-w-full rounded-sm shadow-none ${condition.trafficAllocation === rule.trafficAllocation ? 'border-[var(--success-fg)]' : ''}`}><CardContent className="space-y-2 px-3 py-2"><p><span className="text-muted-foreground">For </span>{condition.metric}<span className="text-muted-foreground">, when conversion rate is </span>&gt; {condition.conversionRate}%<span className="text-muted-foreground"> after </span>{condition.visitors}</p><div className="flex flex-wrap items-center gap-2"><span><span className="text-muted-foreground">visitors change </span>Rollout %<span className="text-muted-foreground"> to </span>{condition.trafficAllocation}%</span>{condition.trafficAllocation === rule.trafficAllocation && <CurrentValue />}</div></CardContent></Card>)}</div>
         </>}
       </CardContent></Card>
     </SetupSection>

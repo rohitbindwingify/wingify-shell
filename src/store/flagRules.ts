@@ -24,9 +24,11 @@ export const useFlagRulesStore = create<RuleStore>()(persist((set) => ({
     [rules[index], rules[target]] = [rules[target], rules[index]];
     return { rules };
   }),
-}), { name: 'wingify-flag-rules-v1', version: 4, migrate: persisted => {
+}), { name: 'wingify-flag-rules-v1', version: 5, migrate: persisted => {
   const state = persisted as RuleStore;
-  return { ...state, rules: state.rules.map(rule => {
+  const draft = FLAG_RULES.find(rule => rule.id === 'production-draft-rollout')!;
+  const rules = state.rules.some(rule => rule.id === draft.id) ? state.rules : [...state.rules, draft];
+  return { ...state, rules: rules.map(rule => {
     const seed = FLAG_RULES.find(item => item.id === rule.id);
     return { personalizationSetup: seed?.personalizationSetup, testingSetup: seed?.testingSetup, rolloutSetup: seed?.rolloutSetup, uniqueConversions: seed?.uniqueConversions, audience: seed?.audience, trafficAllocation: seed?.trafficAllocation, rolloutSteps: seed?.rolloutSteps, ...rule };
   }) };

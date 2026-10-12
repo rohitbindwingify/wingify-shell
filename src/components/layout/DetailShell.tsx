@@ -2351,7 +2351,7 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
           </div>
           {onReports ? (
             <div
-              className="absolute bottom-0 right-0 top-14 z-30"
+              className={cn("absolute bottom-0 right-0 z-30", "top-14")}
               style={{ width: UTILITY_RAIL_WIDTH }}
             >
               <UtilityRail entityId={entityId} />

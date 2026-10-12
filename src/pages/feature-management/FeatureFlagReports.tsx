@@ -1,11 +1,14 @@
-import { Layers, ArrowRight, FlaskConical, UserRound } from '@/components/icons/protoLucide';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useWingzStore } from '@/store/wingz';
+import { Sparkles, Layers, ArrowRight, FlaskConical, UserRound } from '@/components/icons/protoLucide';
 import FlagGroupedResults from "./FlagGroupedResults";
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ReportsPage from '@/pages/reports/ReportsPage';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CAMPAIGNS, type Campaign } from '@/data/campaigns';
-import { FLAG_ENVIRONMENTS, type FlagRule } from '@/data/featureFlagRules';
+import { FLAG_ENVIRONMENTS, ruleStatus, type FlagRule } from '@/data/featureFlagRules';
 import { useFlagEnvironmentsStore } from '@/store/flagEnvironments';
 import { useFlagRulesStore } from '@/store/flagRules';
 import { useVisibleFeatureFlags } from '@/store/flagRows';
@@ -16,7 +19,9 @@ export default function FeatureFlagReports({ flagId }: { flagId: string }) {
   const allRules = useFlagRulesStore(state => state.rules);
   const flag = useVisibleFeatureFlags().find(item => item.id === flagId);
   const environment = FLAG_ENVIRONMENTS.find(item => item === params.get('environment')) ?? 'Production';
-  const environmentEnabled = useFlagEnvironmentsStore(state => state.enabled[`${flagId}:${environment}`]) ?? `${flagId}:${environment}` !== '30:LocalTest';
+  const enabledEnvironments = useFlagEnvironmentsStore(state => state.enabled);
+  const isEnvironmentEnabled = (name: string) => enabledEnvironments[`${flagId}:${name}`] ?? `${flagId}:${name}` !== '30:LocalTest';
+  const environmentEnabled = isEnvironmentEnabled(environment);
   const rules = allRules.filter(rule => rule.flagId === flagId && rule.environment === environment);
   const linkedRule = rules.find(rule => rule.id === params.get('rule'));
   const type = linkedRule?.type ?? TYPES.find(item => item === params.get('ruleType')) ?? 'Rollout';
@@ -40,9 +45,34 @@ export default function FeatureFlagReports({ flagId }: { flagId: string }) {
       return next;
     });
   }
-  const controls = <div className="flex shrink-0 items-center gap-2 border-r border-border pr-4">
-    <Select value={environment} onValueChange={value => update('environment', value)}><SelectTrigger aria-label={`Report environment: ${environment}, flag ${environmentEnabled ? 'on' : 'off'}`} className="h-8 w-auto gap-2 border-0 text-sm shadow-none"><Layers className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" /><SelectValue /><span aria-hidden="true" title={`Flag is ${environmentEnabled ? 'on' : 'off'} for ${environment}`} className={`size-1.5 shrink-0 rounded-full ${environmentEnabled ? 'bg-[var(--success-fg)]' : 'bg-[var(--warning-fg)]'}`} /></SelectTrigger><SelectContent>{FLAG_ENVIRONMENTS.map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select>
-    <Select value={selection} onValueChange={value => update('rule', value)}><SelectTrigger aria-label="Report rule" className="h-8 w-auto max-w-[270px] gap-2 border-0 text-sm shadow-none"><span className="shrink-0 text-muted-foreground" aria-hidden="true">{type === 'Rollout' ? <ArrowRight className="size-4" /> : type === 'Testing' ? <FlaskConical className="size-4" /> : <UserRound className="size-4" />}</span><SelectValue /></SelectTrigger><SelectContent>{TYPES.filter(item => item !== 'Testing').map(item => <SelectItem key={item} value={item}>{item}</SelectItem>)}{rules.filter(rule => rule.type === 'Testing').map(rule => <SelectItem key={rule.id} value={`rule:${rule.id}`}>{rule.type} · {rule.name}</SelectItem>)}</SelectContent></Select>
+  const isLive = (items: FlagRule[]) => items.some(rule => ruleStatus(rule, environmentEnabled) === 'Active');
+  const trackingStatus = (items: FlagRule[]) => isLive(items) ? 'Tracking data' : items.some(rule => rule.visitors > 0) ? 'Tracking paused' : 'No data';
+  const status = trackingStatus(selected);
+  const statusLabel = (items: FlagRule[]) => {
+    const label = trackingStatus(items);
+    return <span className={`shrink-0 whitespace-nowrap text-xs font-medium ${label === 'Tracking data' ? 'text-[var(--success-fg)]' : label === 'Tracking paused' ? 'text-[var(--warning-fg)]' : 'text-muted-foreground'}`}>{label}</span>;
+  };
+  const environmentDot = (on: boolean) => <span aria-hidden="true" className={`inline-block size-1.5 shrink-0 rounded-full ${on ? 'bg-[var(--success-fg)]' : 'bg-[var(--warning-fg)]'}`} />;
+  const controls = <div className="flex shrink-0 items-center gap-2.5">
+    <Select value={environment} onValueChange={value => update('environment', value)}>
+      <SelectTrigger aria-label={`Report environment: ${environment}, flag ${environmentEnabled ? 'on' : 'off'}`} className="h-8 w-auto max-w-[180px] shrink-0 gap-1.5 rounded-sm border bg-background text-sm shadow-none">
+        <Layers className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <SelectValue><span className="flex items-center gap-2">{environment}{environmentDot(environmentEnabled)}</span></SelectValue>
+      </SelectTrigger>
+      <SelectContent className="w-[180px]">{FLAG_ENVIRONMENTS.map(item => <SelectItem key={item} value={item} textValue={item} aria-label={`${item}, flag ${isEnvironmentEnabled(item) ? 'on' : 'off'}`}><span className="flex items-center gap-2">{item}{environmentDot(isEnvironmentEnabled(item))}</span></SelectItem>)}</SelectContent>
+    </Select>
+    <Select value={selection} onValueChange={value => update('rule', value)}>
+      <SelectTrigger aria-label={`Report rule: ${selectedRule?.name ?? type}, ${status}`} className="h-8 w-auto max-w-[200px] shrink-0 gap-1 rounded-sm border bg-background text-sm shadow-none [&>span]:min-w-0 [&>span]:truncate [&>span]:text-left">
+        <div className="shrink-0 text-muted-foreground" aria-hidden="true">{type === 'Rollout' ? <ArrowRight className="size-4" /> : type === 'Testing' ? <FlaskConical className="size-4" /> : <UserRound className="size-4" />}</div>
+        <SelectValue><span className="flex min-w-0 items-center gap-2"><span className="min-w-0 flex-1 truncate" title={selectedRule ? `Testing · ${selectedRule.name}` : type}>{selectedRule ? `Testing · ${selectedRule.name}` : type}</span></span></SelectValue>
+      </SelectTrigger>
+      <SelectContent className="w-[320px]">
+        {TYPES.filter(item => item !== 'Testing').map(item => <SelectItem key={item} value={item} textValue={item} className="pr-2 [&>span:first-child]:hidden [&>span:last-child]:min-w-0 [&>span:last-child]:w-full data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground"><span className="flex w-full items-center justify-between gap-3">{item}{statusLabel(rules.filter(rule => rule.type === item))}</span></SelectItem>)}
+        {rules.filter(rule => rule.type === 'Testing').map(rule => <SelectItem key={rule.id} value={`rule:${rule.id}`} textValue={`Testing · ${rule.name}`} className="pr-2 [&>span:first-child]:hidden [&>span:last-child]:min-w-0 [&>span:last-child]:w-full data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground"><span className="flex w-full items-center justify-between gap-3"><span className="max-w-[140px] truncate" title={`Testing · ${rule.name}`}>Testing · {rule.name}</span>{statusLabel([rule])}</span></SelectItem>)}
+      </SelectContent>
+    </Select>
+    <Button variant="outline" className="h-8 rounded-sm px-3 font-normal" onClick={() => useWingzStore.getState().openWingzAndAsk({ kind: 'campaign', campaignId: flagId }, `Summarize the ${type} report for ${flag?.name ?? 'this flag'} in ${environment}.`)}><Sparkles className="size-4" />Summarize</Button>
   </div>;
-  return <ReportsPage featureFlagReport campaignOverride={campaign} leadingControls={controls} resultsTable={type !== 'Testing' ? <FlagGroupedResults rules={selected} type={type} /> : undefined} emptyMessage={(type === 'Testing' ? visitors === 0 : selected.length === 0) ? 'No report data for this selection yet. Reports appear after a rule receives user activity.' : undefined} />;
+  const reportHeader = <Badge tone={status === 'Tracking data' ? 'green' : status === 'Tracking paused' ? 'amber' : 'neutral'} className="shrink-0 gap-1.5"><span className="size-1.5 rounded-full bg-current" aria-hidden="true" />{status}</Badge>;
+  return <ReportsPage featureFlagReport campaignOverride={campaign} leadingControls={controls} reportHeader={reportHeader} resultsTable={type !== 'Testing' ? <FlagGroupedResults rules={selected} type={type} /> : undefined} emptyMessage={(type === 'Testing' ? visitors === 0 : selected.length === 0) ? 'No report data for this selection yet. Reports appear after a rule receives user activity.' : undefined} />;
 }
