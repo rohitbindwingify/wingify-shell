@@ -81,4 +81,4 @@ New routes: add a page under `src/pages/` and register it in `src/routes/index.t
 ## Notes
 
 - All data is local/dummy; refreshes reset anything that isn’t persisted in Zustand.
-- Agent/contributor invariants for this repo also live in `CLAUDE.md`.
+- Agent/contributor invariants for this repo also live in `CLAUDE.md`

@@ -378,7 +378,7 @@ export default function ExpandedNav({
           // Collapsed rows clamp to the icon so the active pill can't bleed past the rail.
           // Expanded: 4px inset inside selection → icon/chevron sit 16px from nav
           // (12px container + 4px).
-          expanded ? "w-full px-1" : "w-9 justify-start",
+          expanded ? "w-full" : "w-9 justify-start",
           isActive && expanded && !hasSections && "bg-accent hover:bg-accent",
           isActive &&
             !expanded &&
@@ -453,17 +453,8 @@ export default function ExpandedNav({
             isActive && expanded && "font-medium"
           )}
         >
-          {/* Open: wrap glyph only so gap-2 is icon→text. Collapsed: 36px hit target. */}
-          <span
-            className={cn(
-              "flex shrink-0 items-center justify-center",
-              expanded
-                ? item.initials
-                  ? "h-7 w-7"
-                  : "h-4 w-4"
-                : "h-9 w-9"
-            )}
-          >
+          {/* Same 36px slot in both states so glyphs don't resize or slide. */}
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center">
             {leadingIcon}
           </span>
           <span className={labelClass} style={{ transition: revealTransition }}>
@@ -807,7 +798,7 @@ export default function ExpandedNav({
 
   const separator = (
     <div
-      className={cn("my-2.5 shrink-0", expanded ? "px-3" : "px-2")}
+      className="my-2.5 shrink-0 px-2"
       aria-hidden="true"
     >
       {/* Collapsed rule spans the icon slot exactly, so it stays inside the rail. */}
@@ -840,30 +831,15 @@ export default function ExpandedNav({
             className="flex h-full flex-col"
             style={{ width: EXPANDED_NAV_WIDTH }}
           >
-            {/* h-[56px] matches the top bar. Open: 12px side inset; collapsed: 8px
-                so the 40px icon slot centers in the 56px rail. */}
-            <div
-              className={cn(
-                "flex h-[56px] shrink-0 items-center",
-                expanded ? "px-3" : "px-2"
-              )}
-            >
-              <span
-                className={cn(
-                  "flex h-10 shrink-0 items-center",
-                  expanded ? "min-w-0" : "w-10 justify-center"
-                )}
-              >
-                <WingifyLogoButton showWordmark={expanded} />
-              </span>
+            {/* h-[56px] matches the top bar. 8px inset keeps the icon slot
+                centered in the 56px rail in both states. */}
+            <div className="flex h-[56px] shrink-0 items-center px-2">
+              <WingifyLogoButton showWordmark={expanded} />
             </div>
 
             {!welcomeChrome && (
               <div
-                className={cn(
-                  "mt-4 flex shrink-0 flex-col gap-0.5",
-                  expanded ? "px-3" : "px-2"
-                )}
+                className="mt-4 flex shrink-0 flex-col gap-0.5 px-2"
               >
                 {group1.map((i) => renderItem(i))}
               </div>
@@ -872,7 +848,7 @@ export default function ExpandedNav({
             <div
               className={cn(
                 "flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-                expanded ? "px-3" : "px-2",
+                "px-2",
                 welcomeChrome && "mt-4"
               )}
             >
@@ -933,17 +909,17 @@ export default function ExpandedNav({
             <div
               className={cn(
                 "flex shrink-0 flex-col gap-0.5",
-                expanded ? "px-3" : "px-2"
+                "px-2"
               )}
             >
               {group3.map((i) => renderItem(i))}
-              {/* Expand/collapse under profile: icon-only, right-aligned with chevrons when open. */}
+              {/* Expand/collapse under profile: icon-only, left-aligned with nav icons when open. */}
               {!forceCollapsed && !welcomeChrome && (
                 <div
                   className={cn(
                     "mt-0.5 flex items-center gap-0.5 rounded-md transition-[background-color,width] duration-200",
-                    // Match nav rows: collapsed clamps to the icon slot.
-                    expanded ? "w-full px-1" : "w-9 justify-start"
+                    // Match nav rows: same icon slot open or collapsed.
+                    expanded ? "w-full" : "w-9 justify-start"
                   )}
                 >
                   <Tooltip.Root>
@@ -957,24 +933,9 @@ export default function ExpandedNav({
                         }
                         aria-pressed={isDocked}
                         onClick={toggleDock}
-                        className={cn(
-                          "flex shrink-0 items-center outline-none transition-colors",
-                          expanded
-                            ? // Align with section chevrons: 16px from nav (12+4).
-                              "ml-auto size-4 text-muted-foreground hover:text-foreground"
-                            : "h-9 w-9 justify-start overflow-hidden text-foreground hover:bg-muted"
-                        )}
+                        className="flex h-9 w-9 shrink-0 items-center justify-center text-foreground outline-none transition-colors hover:bg-muted"
                       >
-                        {expanded ? (
-                          <PanelLeft className="size-4" strokeWidth={1.75} />
-                        ) : (
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center">
-                            <PanelLeft
-                              className="h-4 w-4"
-                              strokeWidth={1.75}
-                            />
-                          </span>
-                        )}
+                        <PanelLeft className="h-4 w-4" strokeWidth={1.75} />
                       </button>
                     </Tooltip.Trigger>
                     <Tooltip.Portal>

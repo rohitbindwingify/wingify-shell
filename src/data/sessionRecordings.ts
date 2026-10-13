@@ -20,19 +20,14 @@ export type SessionRow = {
   timestamp: string;
 };
 
+/** Right-rail “All Data” metrics strip (info soft surface). */
 export const RECORDING_STATS = [
-  { label: "Total Sessions", value: "1.67M" },
-  { label: "Total Pageviews", value: "4.83M" },
-  { label: "Data Retention", value: "2,190 days" },
+  { label: "Data Retention", value: "3710 Days" },
+  { label: "Sessions", value: "1.75M" },
+  { label: "PageViews", value: "4.97M" },
 ] as const;
 
 export const RECORDING_VIEWS: RecordingView[] = [
-  {
-    id: "agency",
-    name: "Agency Partners",
-    url: "https://vwo.com/partners/agencies",
-    status: "Running",
-  },
   {
     id: "signup",
     name: "New sign up-Create Acco...",
@@ -97,13 +92,6 @@ export const SESSION_ROWS: SessionRow[] = CITIES.map((city, i) => ({
   events: 0,
   timestamp: `01 Jul, 2025 ${String(10 + (i % 5)).padStart(2, "0")}:${String(3 + i).padStart(2, "0")} AM`,
 }));
-
-export const ACTIVE_REPORT = {
-  name: "Agency Partners",
-  status: "Running" as const,
-  createdBy: "Randeep",
-  createdAt: "20 Feb, 2026 at 11:43 AM",
-};
 
 export function parseDurationMs(duration: string): number {
   const parts = duration.split(":").map((n) => Number(n) || 0);
