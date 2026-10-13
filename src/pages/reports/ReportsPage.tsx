@@ -735,16 +735,16 @@ function ReportsChrome({
       >
         <div
           ref={tabsBarRef}
-          className={cn("z-40 flex shrink-0 justify-between gap-4 border-b border-border bg-background px-4", featureFlagReport ? "h-14 items-center" : "h-[52px] items-end")}
+          className={cn("z-40 shrink-0 gap-4 border-b border-border bg-background px-4", featureFlagReport ? "grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center" : "flex h-[52px] items-end justify-between")}
         >
-          <div className={cn("flex min-w-0 gap-4 overflow-x-auto", featureFlagReport ? "h-full items-center overflow-y-hidden" : "items-end")}>
-          {leadingControls}
-          <TabsList className={featureFlagReport ? "h-8 shrink-0 gap-1 rounded-sm bg-muted p-1" : "h-auto gap-5 rounded-none bg-transparent p-0"}>
+          <div className={featureFlagReport ? "contents" : "flex min-w-0 items-end gap-4 overflow-x-auto"}>
+          {featureFlagReport ? <div className="flex h-full min-w-0 items-center overflow-x-auto overflow-y-hidden">{leadingControls}</div> : leadingControls}
+          <TabsList variant={featureFlagReport ? "segmented" : "pill"} className={featureFlagReport ? undefined : "h-auto gap-5 rounded-none bg-transparent p-0"}>
             {TABS.filter(tab => !featureFlagReport || tab !== "Overview").map((tab) => (
               <TabsTrigger
                 key={tab}
                 value={tabValue(tab)}
-                className={featureFlagReport ? "h-6 rounded-sm px-2 py-0 text-sm font-normal shadow-none data-[state=active]:bg-background" : cn("relative rounded-none border-0 bg-transparent px-1 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:font-medium data-[state=active]:text-foreground data-[state=active]:shadow-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:bg-foreground after:transition-transform data-[state=active]:after:scale-x-100", featureFlagReport ? "h-full py-0" : "pb-3 pt-2")}
+                className={featureFlagReport ? undefined : cn("relative rounded-none border-0 bg-transparent px-1 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:font-medium data-[state=active]:text-foreground data-[state=active]:shadow-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:bg-foreground after:transition-transform data-[state=active]:after:scale-x-100", featureFlagReport ? "h-full py-0" : "pb-3 pt-2")}
               >
                 {tab}
               </TabsTrigger>
@@ -752,7 +752,7 @@ function ReportsChrome({
           </TabsList>
           </div>
 
-          {featureFlagReport ? reportHeader : <div className={cn("flex shrink-0 items-center gap-2", !featureFlagReport && "pb-2.5")}>
+          {featureFlagReport ? <div className="flex min-w-0 justify-end">{reportHeader}</div> : <div className={cn("flex shrink-0 items-center gap-2", !featureFlagReport && "pb-2.5")}>
             <span className="whitespace-nowrap text-sm text-muted-foreground">
               Last updated {overview.lastUpdated}
             </span>

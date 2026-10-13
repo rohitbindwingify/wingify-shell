@@ -5,6 +5,8 @@ export type FlagRule = {
   flagId: string;
   environment: FlagEnvironment;
   name: string;
+  key?: string;
+  description?: string;
   type: 'Rollout' | 'Testing' | 'Personalization';
   enabled: boolean;
   hasStarted: boolean;

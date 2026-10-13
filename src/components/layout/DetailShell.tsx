@@ -1484,7 +1484,7 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
 
   return (
     <div className="flex h-full flex-col bg-background text-foreground">
-      <header className="flex h-[56px] shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4">
+      <header className={cn("h-[56px] shrink-0 items-center gap-4 border-b border-border bg-background px-4", isFeatureFlags ? "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]" : "flex justify-between")}>
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <WingifyLogoButton />
 
