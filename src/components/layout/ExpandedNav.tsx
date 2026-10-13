@@ -49,7 +49,7 @@ const FLYOUT_VIEWPORT_MARGIN = 8;
 const MORE_FLYOUT_WIDTH = 248;
 /** Rail ↔ expanded morph — keep label/accordion timing in sync. */
 const WIDTH_MS = 280;
-const WIDTH_EASE = "cubic-bezier(0.2, 0.8, 0.2, 1)";
+const WIDTH_EASE = "var(--ease-smooth)";
 const widthTransition = `width ${WIDTH_MS}ms ${WIDTH_EASE}`;
 const revealTransition = `opacity ${WIDTH_MS}ms ${WIDTH_EASE}, transform ${WIDTH_MS}ms ${WIDTH_EASE}`;
 const accordionTransition = `grid-template-rows ${WIDTH_MS}ms ${WIDTH_EASE}, opacity ${WIDTH_MS}ms ${WIDTH_EASE}`;
@@ -374,7 +374,7 @@ export default function ExpandedNav({
       <div
         data-nav-item={item.path}
         className={cn(
-          "group flex items-center gap-0.5 rounded-md transition-[background-color,color,width] duration-200 hover:bg-muted",
+          "group flex items-center gap-0.5 rounded-md transition-[background-color,color,width] duration-[280ms] hover:bg-muted",
           // Collapsed rows clamp to the icon so the active pill can't bleed past the rail.
           // Expanded: 4px inset inside selection → icon/chevron sit 16px from nav
           // (12px container + 4px).
@@ -522,7 +522,7 @@ export default function ExpandedNav({
           >
             <ChevronDown
               className={cn(
-                "size-4 transition-transform duration-200",
+                "size-4 transition-transform duration-[280ms]",
                 open && "rotate-180"
               )}
             />
@@ -678,7 +678,7 @@ export default function ExpandedNav({
                                 >
                                   <ChevronDown
                                     className={cn(
-                                      "h-4 w-4 transition-transform duration-150",
+                                      "h-4 w-4 transition-transform duration-[280ms]",
                                       subOpen && "rotate-180"
                                     )}
                                   />
@@ -917,7 +917,7 @@ export default function ExpandedNav({
               {!forceCollapsed && !welcomeChrome && (
                 <div
                   className={cn(
-                    "mt-0.5 flex items-center gap-0.5 rounded-md transition-[background-color,width] duration-200",
+                    "mt-0.5 flex items-center gap-0.5 rounded-md transition-[background-color,width] duration-[280ms]",
                     // Match nav rows: same icon slot open or collapsed.
                     expanded ? "w-full" : "w-9 justify-start"
                   )}
@@ -959,7 +959,7 @@ export default function ExpandedNav({
         {flyout && flyoutItem?.sections && (
           <div
             ref={flyoutRef}
-            className="fixed z-40 animate-scale-in pl-1.5 duration-150"
+            className="fixed z-40 animate-scale-in pl-1.5 duration-200"
             style={{
               left: expanded ? EXPANDED_NAV_WIDTH : RAIL_WIDTH,
               top: flyout.top,
@@ -990,7 +990,7 @@ export default function ExpandedNav({
         {!expanded && moreFlyout && unpinned.length > 0 && (
           <div
             ref={moreFlyoutRef}
-            className="fixed z-40 animate-scale-in pl-1.5 duration-150"
+            className="fixed z-40 animate-scale-in pl-1.5 duration-200"
             style={{ left: RAIL_WIDTH, top: moreFlyout.top }}
             onMouseEnter={cancelMoreClose}
             onMouseLeave={scheduleMoreClose}
@@ -1062,7 +1062,7 @@ export default function ExpandedNav({
         {!expanded && moreFlyout && moreNested && moreNestedItem?.sections && (
           <div
             ref={moreNestedRef}
-            className="fixed z-40 animate-scale-in pl-1.5 duration-150"
+            className="fixed z-40 animate-scale-in pl-1.5 duration-200"
             style={{
               left: RAIL_WIDTH + 6 + MORE_FLYOUT_WIDTH,
               top: moreNested.top,

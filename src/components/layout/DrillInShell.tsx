@@ -132,7 +132,7 @@ export default function DrillInShell() {
       };
     }
     setNavShown(false);
-    const unmountTimer = window.setTimeout(() => setNavRendered(false), 180);
+    const unmountTimer = window.setTimeout(() => setNavRendered(false), 280);
     return () => window.clearTimeout(unmountTimer);
   }, [navOpen]);
 
@@ -295,14 +295,14 @@ export default function DrillInShell() {
           >
             <div
               className={cn(
-                "absolute inset-0 bg-foreground transition-opacity [transition-duration:180ms] ease-out",
+                "absolute inset-0 bg-foreground transition-opacity [transition-duration:280ms] ease-out",
                 navShown ? "opacity-20" : "opacity-0"
               )}
               onClick={() => setNavOpen(false)}
             />
             <div
               className={cn(
-                "absolute inset-y-0 left-0 flex bg-background shadow-xl transition-transform [transition-duration:180ms] ease-out motion-reduce:transition-none",
+                "absolute inset-y-0 left-0 flex bg-background shadow-xl transition-transform [transition-duration:280ms] ease-out motion-reduce:transition-none",
                 navShown ? "translate-x-0" : "-translate-x-full"
               )}
               onMouseEnter={cancelScheduledClose}

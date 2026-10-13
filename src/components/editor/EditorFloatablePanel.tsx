@@ -625,7 +625,7 @@ export function EditorFloatingPanelGroup({
           : "translateX(0) scale(1)",
         transformOrigin: "right center",
         transition: exiting
-          ? "transform 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease"
+          ? "transform 320ms var(--ease-smooth), opacity 240ms var(--ease-smooth)"
           : undefined,
       }}
     >

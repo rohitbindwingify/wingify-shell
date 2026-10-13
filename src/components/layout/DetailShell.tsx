@@ -923,8 +923,8 @@ function KebabMenu({
 
 const EDGE_OPEN_DELAY_MS = 240;
 const OVERLAY_CLOSE_GRACE_MS = 250;
-/** Must match the [transition-duration:180ms] classes on the overlay scrim and panel. */
-const OVERLAY_ANIM_MS = 180;
+/** Must match the [transition-duration:280ms] classes on the overlay scrim and panel. */
+const OVERLAY_ANIM_MS = 280;
 
 /** Neutral ID badge with copy — copies the number only (no #).
  *  Copy control is a span (not a button) so it can sit inside the switcher trigger. */
@@ -2378,14 +2378,14 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
           >
             <div
               className={cn(
-                "absolute inset-0 bg-foreground transition-opacity [transition-duration:180ms] ease-out",
+                "absolute inset-0 bg-foreground transition-opacity [transition-duration:280ms] ease-out",
                 navShown ? "opacity-20" : "opacity-0"
               )}
               onClick={() => setNavOpen(false)}
             />
             <div
               className={cn(
-                "absolute inset-y-0 left-0 flex bg-background shadow-xl transition-transform [transition-duration:180ms] ease-out motion-reduce:transition-none",
+                "absolute inset-y-0 left-0 flex bg-background shadow-xl transition-transform [transition-duration:280ms] ease-out motion-reduce:transition-none",
                 navShown ? "translate-x-0" : "-translate-x-full"
               )}
               onMouseEnter={cancelScheduledClose}

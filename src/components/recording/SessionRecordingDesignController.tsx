@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { DESIGN_CONTROLLER_ENABLED } from "@/store/designController";
 import { useSessionRecordingDesignStore } from "@/store/sessionRecordingDesign";
 
-const CLOSE_ANIM_MS = 180;
+const CLOSE_ANIM_MS = 280;
 
 /**
  * Page-scoped design controller for the session recording player.

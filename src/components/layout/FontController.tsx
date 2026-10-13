@@ -20,7 +20,7 @@ import HeaderColorPicker from "./HeaderColorPicker";
 import IconLibraryPicker from "./IconLibraryPicker";
 import { WEB_EXPERIMENT_OLD_PATH } from "../../config/navigation";
 
-const CLOSE_ANIM_MS = 180;
+const CLOSE_ANIM_MS = 280;
 
 /**
  * Floating design CTA — compact icon tab on the right; expands label on hover;

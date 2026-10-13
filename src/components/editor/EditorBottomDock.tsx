@@ -1066,7 +1066,7 @@ export function EditorBottomDock({
         className={cn(
           "pointer-events-none absolute z-50 will-change-transform",
           !dragging &&
-            "transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            "transition-transform duration-300 ease-out",
           edgeParkedClass,
           free && !dragging && "left-0 top-0",
           hiddenSlideClass,

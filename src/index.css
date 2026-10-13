@@ -16,6 +16,9 @@
     --font-sub-menu: "DM Sans", ui-sans-serif, system-ui, sans-serif;
     /* Digits-only face (unicode-range) — first in every role stack. */
     --font-number-digits: "Wingify Digits DM Sans";
+    /* Keeps speed through the whole motion, then settles. Steep ease-outs
+       arrive early and look stuck for the rest of the duration. */
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   html {
@@ -688,6 +691,14 @@ body {
     mascot-eye-twinkle 1.15s ease-in-out infinite;
   transform-origin: 55% 60%;
   will-change: transform, filter;
+}
+
+/* Enter/exit animations (menus, dialogs, sheets) share the same curve.
+   Duration utilities still win; this only replaces the default `ease`,
+   which hesitates at both ends. */
+.animate-in,
+.animate-out {
+  animation-timing-function: var(--ease-smooth);
 }
 
 /* Respect the OS "Reduce motion" setting: collapse every transition and

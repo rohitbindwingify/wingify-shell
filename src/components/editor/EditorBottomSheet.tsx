@@ -273,7 +273,7 @@ export function EditorBottomSheet({
         role="dialog"
         aria-modal="true"
         className={cn(
-          "pointer-events-auto relative flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-[0_16px_48px_-16px_rgb(from var(--foreground) r g b / 0.35)] will-change-transform transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "pointer-events-auto relative flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-[0_16px_48px_-16px_rgb(from var(--foreground) r g b / 0.35)] will-change-transform transition-[transform,opacity] duration-300 ease-out",
           side ? "group/sheet my-0" : "group/sheet w-full max-w-[720px]",
           entered ? "translate-x-0 translate-y-0 opacity-100" : exitTransform
         )}

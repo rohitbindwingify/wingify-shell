@@ -102,7 +102,7 @@ export function EditorScenarioFloat({
               className={cn(
                 "group flex items-center overflow-hidden border border-border bg-background text-foreground outline-none",
                 "rounded-t-md border-b-0 shadow-[0_-4px_16px_-8px_rgb(from var(--foreground) r g b / 0.18)]",
-                "transition-[width,height,padding,gap] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                "transition-[width,height,padding,gap] duration-200 ease-out",
                 "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
                 expanded
                   ? "h-8 gap-1.5 px-2.5"
@@ -119,7 +119,7 @@ export function EditorScenarioFloat({
               <span
                 className={cn(
                   "truncate text-xs font-medium leading-none tracking-tight",
-                  "transition-[max-width,opacity,margin] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                  "transition-[max-width,opacity,margin] duration-200 ease-out",
                   expanded
                     ? "ml-0 max-w-[7.5rem] opacity-100"
                     : "ml-0 max-w-0 opacity-0"
