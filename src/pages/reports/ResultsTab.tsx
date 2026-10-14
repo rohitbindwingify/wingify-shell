@@ -1,3 +1,4 @@
+import FlagExperimentResults from '@/pages/feature-management/FlagExperimentResults';
 import {
   Fragment,
   forwardRef,
@@ -539,7 +540,9 @@ function dateRangeToStored(range: DateRange): ReportDateRange {
 function FilterBar({
   campaignId,
   right,
+  campaignOverride,
 }: {
+  campaignOverride?: Campaign;
   campaignId: string;
   right?: ReactNode;
 }) {
@@ -547,7 +550,7 @@ function FilterBar({
     useCampaignSharedFilters(campaignId);
   const updateSharedFilters = useReportViewsStore((s) => s.updateSharedFilters);
   const campaigns = useVisibleCampaigns();
-  const campaign = campaigns.find((c) => c.id === campaignId);
+  const campaign = campaignOverride ?? campaigns.find((c) => c.id === campaignId);
   const datePresets = useMemo(() => {
     if (!campaign) return getDateRangePresets();
     const range = campaignReportDateRange(campaign);
@@ -798,7 +801,11 @@ export function ResultsFilterPanel({
   right,
   appliedTrailing,
   embedded,
+  compact = false,
+  campaignOverride,
 }: {
+  campaignOverride?: Campaign;
+  compact?: boolean;
   campaignId: string;
   right?: ReactNode;
   /** Renders on the applied-segments row (e.g. Group by). */
@@ -811,12 +818,12 @@ export function ResultsFilterPanel({
       className={cn(
         embedded
           ? "border-b border-border bg-background"
-          : "overflow-hidden rounded-lg border border-surface-border bg-surface"
+          : compact ? "overflow-hidden rounded-lg border border-border bg-canvas" : "overflow-hidden rounded-lg border border-surface-border bg-surface"
       )}
     >
-      <SavedFilterBar campaignId={campaignId} embedded />
-      <div className={filterPanelInsetClass}>
-        <FilterBar campaignId={campaignId} right={right} />
+      {!compact && <SavedFilterBar campaignId={campaignId} embedded />}
+      <div className={compact ? "p-4" : filterPanelInsetClass}>
+        <FilterBar campaignId={campaignId} right={right} campaignOverride={campaignOverride} />
       </div>
       <AppliedSegmentsRow
         campaignId={campaignId}
@@ -1640,12 +1647,14 @@ function StatisticalConfigurationTooltip({
 // Metric header
 
 function MetricHeader({
+  compact = false,
   campaign,
   metric,
   isPrimary,
   onOpenLearnings,
   onViewVitalsDetails,
 }: {
+  compact?: boolean;
   campaign: Campaign;
   metric: string;
   isPrimary: boolean;
@@ -1654,7 +1663,7 @@ function MetricHeader({
 }) {
   const openWingzAndAsk = useWingzStore((s) => s.openWingzAndAsk);
   const metricTitleClass =
-    "border-b border-dashed border-muted-foreground text-lg font-semibold leading-tight tracking-tight text-foreground";
+    cn("border-b border-dashed border-muted-foreground font-semibold leading-tight text-foreground", compact ? "text-base" : "text-lg tracking-tight");
 
   return (
     <div className="flex flex-nowrap items-center justify-between gap-4">
@@ -1674,7 +1683,7 @@ function MetricHeader({
             <span className={cn(metricTitleClass, "truncate")}>{metric}</span>
           )}
           {isPrimary && (
-            <span className="inline-flex items-center rounded border border-border bg-background px-2 py-0.5 text-xs font-medium text-foreground/70">
+            <span className={compact ? "inline-flex items-center rounded-full bg-muted px-2 text-xs font-normal" : "inline-flex items-center rounded border border-border bg-background px-2 py-0.5 text-xs font-medium text-foreground/70"}>
               Primary
             </span>
           )}
@@ -1724,7 +1733,7 @@ function MetricHeader({
           type="button"
           variant="outline"
           size="sm"
-          className="h-9 gap-1.5 rounded-md font-medium"
+          className={compact ? "h-8 gap-1 rounded-sm px-3 font-normal" : "h-9 gap-1.5 rounded-md font-medium"}
           aria-label="Campaign summary"
           onClick={() =>
             openWingzAndAsk(
@@ -4914,12 +4923,14 @@ function GraphPanel({
   filters,
   defaultGraph,
   className,
+  compact = false,
 }: {
   campaign: Campaign;
   metricName: string;
   filters: ReportFilterContext;
   defaultGraph: ResultsGraphDefault;
   className?: string;
+  compact?: boolean;
 }) {
   const [graphTab, setGraphTab] = useState(() =>
     graphTabIndexFromDefault(defaultGraph)
@@ -4945,7 +4956,7 @@ function GraphPanel({
   const xLabels = ["Oct 25", "Nov 25", "Dec 25", "Jan 26"];
 
   return (
-    <div className={cn("px-8 pb-8", className)}>
+    <div className={cn(compact ? "px-6 pb-6" : "px-8 pb-8", className)}>
       <div className="flex flex-wrap items-end gap-x-8 gap-y-1 border-b border-border">
         {GRAPH_TABS.map(({ id, label, icon: Icon, helpTitle, helpBody, helpAria }, i) => (
           <div
@@ -4967,15 +4978,15 @@ function GraphPanel({
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <Icon className="h-[18px] w-[18px]" aria-hidden />
+              {!compact && <Icon className="h-[18px] w-[18px]" aria-hidden />}
               {label}
             </button>
-            <TableColumnHelp
+            {!compact && <TableColumnHelp
               title={helpTitle}
               body={helpBody}
               ariaLabel={helpAria}
               variant="compact"
-            />
+            />}
           </div>
         ))}
       </div>
@@ -5933,7 +5944,9 @@ export default function ResultsTab({
   campaign,
   onNavigateToVitals,
   resultsTable,
+  featureFlagReport = false,
 }: {
+  featureFlagReport?: boolean;
   resultsTable?: ReactNode;
   campaign: Campaign;
   onNavigateToVitals: () => void;
@@ -5998,7 +6011,21 @@ export default function ResultsTab({
   return (
     <TooltipProvider delayDuration={200}>
       <div className="flex h-full min-h-0 min-w-0 flex-1 items-stretch overflow-hidden">
-      {compareMode ? (
+      {featureFlagReport ? (
+        <aside aria-label="Report metrics" className="w-[240px] shrink-0 overflow-y-auto border-r border-border bg-canvas max-lg:w-[200px]">
+          {[
+            { title: 'Primary Metric', metrics: [campaign.primaryMetric] },
+            { title: 'Secondary', metrics: others.slice(splitAt).map(metric => metric.name) },
+            { title: 'Guardrails', metrics: others.slice(0, splitAt).map(metric => metric.name) },
+          ].map(group => <section key={group.title} className="space-y-2 border-b border-border p-4">
+            <h2 className="text-sm font-semibold">{group.title}</h2>
+            {group.metrics.map(name => <button key={name} type="button" aria-current={selectedMetric === name ? 'true' : undefined} onClick={() => setSelectedMetric(name)} className={cn('flex min-h-9 w-full items-center gap-2 rounded-sm px-3 py-1 text-left text-sm hover:bg-muted', selectedMetric === name && 'bg-accent font-semibold text-accent-foreground')}>
+              <img className="shrink-0" src={/average order value/i.test(name) ? '/feature-flags/report-layout/revenue.svg' : '/feature-flags/report-layout/metric.svg'} alt="" />
+              <span className="truncate" title={name}>{name}</span>
+            </button>)}
+          </section>)}
+        </aside>
+      ) : compareMode ? (
         <CompareMetricSelector
           campaign={campaign}
           selected={compareSelected}
@@ -6017,8 +6044,8 @@ export default function ResultsTab({
           onToggleCollapsed={() => setMetricsNavCollapsed(!metricsNavCollapsed)}
         />
       )}
-      <div className="min-h-0 min-w-0 flex-1 overflow-auto">
-        <div className="mx-auto w-full min-w-[44rem] max-w-[1120px] space-y-8 px-8 pb-8 pt-12 sm:px-12">
+      <div className={cn("min-h-0 min-w-0 flex-1 overflow-auto", featureFlagReport && "flag-report-scroll bg-canvas [scrollbar-gutter:stable]")}>
+        <div className={featureFlagReport ? "flag-report-body mx-auto w-full max-w-[950px] space-y-6 px-6 pb-8 pt-6" : "mx-auto w-full min-w-[44rem] max-w-[1120px] space-y-8 px-8 pb-8 pt-12 sm:px-12"}>
           <LearningsDialog open={learningsOpen} onOpenChange={setLearningsOpen} />
           {compareMode ? (
             <>
@@ -6050,9 +6077,10 @@ export default function ResultsTab({
             </>
           ) : (
             <>
-              <ResultsFilterPanel campaignId={campaign.id} />
+              <ResultsFilterPanel campaignId={campaign.id} compact={featureFlagReport} campaignOverride={featureFlagReport ? campaign : undefined} />
               <div className="space-y-4">
                 <MetricHeader
+                  compact={featureFlagReport}
                   campaign={campaign}
                   metric={selectedMetric}
                   isPrimary={selectedMetric === campaign.primaryMetric}
@@ -6083,6 +6111,11 @@ export default function ResultsTab({
                 </div>
                 {resultsTable ?? (isStatisticsPreset ? (
                   <StatisticsPresetEmptyState metricName={selectedMetric} />
+                ) : featureFlagReport ? (
+                  <div className="space-y-6">
+                    <FlagExperimentResults metric={selectedMetric} />
+                    <GraphPanel campaign={campaign} metricName={selectedMetric} filters={filters} defaultGraph={viewSettings.defaultGraph} compact />
+                  </div>
                 ) : viewSettings.layout === "graphs-first" ? (
                   <div className="flex flex-col gap-12">
                     <GraphPanel

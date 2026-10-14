@@ -1,7 +1,6 @@
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useWingzStore } from '@/store/wingz';
-import { Sparkles, Layers, ArrowRight, FlaskConical, UserRound } from '@/components/icons/protoLucide';
+import './FeatureFlagReports.css';
+import { ArrowRight, UserRound } from '@/components/icons/protoLucide';
 import FlagGroupedResults from "./FlagGroupedResults";
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -52,18 +51,18 @@ export default function FeatureFlagReports({ flagId }: { flagId: string }) {
     const label = trackingStatus(items);
     return <span className={`shrink-0 whitespace-nowrap text-xs font-medium ${label === 'Collecting data' ? 'text-[var(--success-fg)]' : label === 'Tracking paused' ? 'text-[var(--warning-fg)]' : 'text-muted-foreground'}`}>{label}</span>;
   };
-  const environmentDot = (on: boolean) => <span aria-hidden="true" className={`inline-block size-1.5 shrink-0 rounded-full ${on ? 'bg-[var(--success-fg)]' : 'bg-[var(--warning-fg)]'}`} />;
-  const controls = <div className="flex w-full min-w-0 items-center gap-2.5">
+  const environmentIcon = (on: boolean) => <div aria-hidden="true" className={`flag-report-environment-icon ${on ? 'text-[var(--success-fg)]' : 'text-[var(--warning-fg)]'}`} />;
+  const controls = <div className="flex w-full min-w-0 items-center gap-1">
     <Select value={environment} onValueChange={value => update('environment', value)}>
-      <SelectTrigger aria-label={`Report environment: ${environment}, flag ${environmentEnabled ? 'on' : 'off'}`} className="h-8 min-w-[104px] max-w-[156px] flex-1 gap-1.5 rounded-sm border bg-background text-sm shadow-none [&>span]:min-w-0 [&>span]:flex-1 [&>span]:text-left">
-        <Layers className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-        <SelectValue><span className="flex min-w-0 items-center gap-2"><span className="truncate" title={environment}>{environment}</span>{environmentDot(environmentEnabled)}</span></SelectValue>
+      <SelectTrigger aria-label={`Report environment: ${environment}, flag ${environmentEnabled ? 'on' : 'off'}`} className="flag-report-environment-trigger h-8 w-[156px] min-w-[156px] max-w-[156px] shrink-0 gap-1 rounded-sm border-0 px-3 py-1.5 text-sm shadow-none [&>span]:min-w-0 [&>span]:flex-1 [&>span]:text-left">
+        {environmentIcon(environmentEnabled)}
+        <SelectValue><span className="flex min-w-0 items-center gap-2"><span className="truncate" title={environment}>{environment}</span></span></SelectValue>
       </SelectTrigger>
-      <SelectContent className="w-[180px]">{FLAG_ENVIRONMENTS.map(item => <SelectItem key={item} value={item} textValue={item} aria-label={`${item}, flag ${isEnvironmentEnabled(item) ? 'on' : 'off'}`}><span className="flex items-center gap-2">{item}{environmentDot(isEnvironmentEnabled(item))}</span></SelectItem>)}</SelectContent>
+      <SelectContent className="w-[180px]">{FLAG_ENVIRONMENTS.map(item => <SelectItem key={item} value={item} textValue={item} aria-label={`${item}, flag ${isEnvironmentEnabled(item) ? 'on' : 'off'}`}><span className="flex items-center gap-2">{environmentIcon(isEnvironmentEnabled(item))}{item}</span></SelectItem>)}</SelectContent>
     </Select>
     <Select value={selection} onValueChange={value => update('rule', value)}>
-      <SelectTrigger aria-label={`Report rule: ${selectedRule?.name ?? type}, ${status}`} className="h-8 min-w-[104px] max-w-[156px] flex-1 gap-1 rounded-sm border bg-background text-sm shadow-none [&>span]:min-w-0 [&>span]:flex-1 [&>span]:truncate [&>span]:text-left">
-        <div className="shrink-0 text-muted-foreground" aria-hidden="true">{type === 'Rollout' ? <ArrowRight className="size-4" /> : type === 'Testing' ? <FlaskConical className="size-4" /> : <UserRound className="size-4" />}</div>
+      <SelectTrigger aria-label={`Report rule: ${selectedRule?.name ?? type}, ${status}`} className="h-8 w-[156px] min-w-[156px] max-w-[156px] shrink-0 gap-1 rounded-sm border-0 px-3 py-1.5 bg-transparent text-sm shadow-none [&>span]:min-w-0 [&>span]:flex-1 [&>span]:truncate [&>span]:text-left">
+        <div className="shrink-0 text-muted-foreground" aria-hidden="true">{type === 'Rollout' ? <ArrowRight className="size-4" /> : type === 'Testing' ? <img src="/feature-flags/report-layout/testing.svg" alt="" /> : <UserRound className="size-4" />}</div>
         <SelectValue><span className="flex min-w-0 items-center gap-2"><span className="min-w-0 flex-1 truncate" title={selectedRule ? `Testing · ${selectedRule.name}` : type}>{selectedRule ? `Testing · ${selectedRule.name}` : type}</span></span></SelectValue>
       </SelectTrigger>
       <SelectContent className="w-[320px]">
@@ -71,8 +70,9 @@ export default function FeatureFlagReports({ flagId }: { flagId: string }) {
         {rules.filter(rule => rule.type === 'Testing').map(rule => <SelectItem key={rule.id} value={`rule:${rule.id}`} textValue={`Testing · ${rule.name}`} className="pr-2 [&>span:first-child]:hidden [&>span:last-child]:min-w-0 [&>span:last-child]:w-full data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground"><span className="flex w-full items-center justify-between gap-3"><span className="max-w-[140px] truncate" title={`Testing · ${rule.name}`}>Testing · {rule.name}</span>{statusLabel([rule])}</span></SelectItem>)}
       </SelectContent>
     </Select>
-    <Button variant="outline" className="h-8 shrink-0 rounded-sm px-3 font-normal" onClick={() => useWingzStore.getState().openWingzAndAsk({ kind: 'campaign', campaignId: flagId }, `Summarize the ${type} report for ${flag?.name ?? 'this flag'} in ${environment}.`)}><Sparkles className="size-4" />Summarize</Button>
+
   </div>;
+
   const reportHeader = <Badge tone={status === 'Collecting data' ? 'green' : status === 'Tracking paused' ? 'amber' : 'neutral'} className="shrink-0 gap-1.5"><span className="size-1.5 rounded-full bg-current" aria-hidden="true" />{status}</Badge>;
-  return <ReportsPage featureFlagReport campaignOverride={campaign} leadingControls={controls} reportHeader={reportHeader} resultsTable={type !== 'Testing' ? <FlagGroupedResults rules={selected} type={type} /> : undefined} emptyMessage={(type === 'Testing' ? visitors === 0 : selected.length === 0) ? 'No report data for this selection yet. Reports appear after a rule receives user activity.' : undefined} />;
+  return <ReportsPage reportHeader={reportHeader} featureFlagReport campaignOverride={campaign} leadingControls={controls} resultsTable={type !== 'Testing' ? <FlagGroupedResults rules={selected} type={type} /> : undefined} emptyMessage={(type === 'Testing' ? visitors === 0 : selected.length === 0) ? 'No report data for this selection yet. Reports appear after a rule receives user activity.' : undefined} />;
 }

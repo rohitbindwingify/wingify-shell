@@ -1,0 +1,26 @@
+.flag-report-scroll {
+  scrollbar-color: var(--border-strong) var(--canvas);
+}
+.flag-report-scroll::-webkit-scrollbar { width: 12px; }
+.flag-report-scroll::-webkit-scrollbar-track { background: var(--canvas); }
+.flag-report-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 3px solid var(--canvas);
+  border-radius: 999px;
+}
+
+.flag-report-environment-trigger {
+  --appearance-dropdown-background: var(--cta-tertiary-bg);
+  --appearance-dropdown-hover-background: var(--cta-tertiary-hover);
+  --appearance-dropdown-focus-background: var(--cta-tertiary-bg);
+  --appearance-dropdown-text: var(--cta-tertiary-fg);
+}
+.flag-report-environment-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask: url('/feature-flags/report-layout/environment.svg') center / contain no-repeat;
+  -webkit-mask: url('/feature-flags/report-layout/environment.svg') center / contain no-repeat;
+}

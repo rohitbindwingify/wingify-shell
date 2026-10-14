@@ -1,3 +1,4 @@
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { type CSSProperties, type ReactNode, type RefObject, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import {
@@ -735,16 +736,16 @@ function ReportsChrome({
       >
         <div
           ref={tabsBarRef}
-          className={cn("z-40 shrink-0 gap-4 border-b border-border bg-background px-4", featureFlagReport ? "grid h-14 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center" : "flex h-[52px] items-end justify-between")}
+          className={cn("z-40 shrink-0 gap-4 border-b border-border bg-background px-4", featureFlagReport ? "grid min-h-12 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center bg-canvas" : "flex h-[52px] items-end justify-between")}
         >
           <div className={featureFlagReport ? "contents" : "flex min-w-0 items-end gap-4 overflow-x-auto"}>
           {featureFlagReport ? <div className="flex h-full min-w-0 items-center overflow-x-auto overflow-y-hidden">{leadingControls}</div> : leadingControls}
-          <TabsList variant={featureFlagReport ? "segmented" : "pill"} className={featureFlagReport ? undefined : "h-auto gap-5 rounded-none bg-transparent p-0"}>
-            {TABS.filter(tab => !featureFlagReport || tab !== "Overview").map((tab) => (
+          <TabsList variant={featureFlagReport ? "underline" : "pill"} className={featureFlagReport ? "h-full items-end gap-0 border-0 bg-transparent" : "h-auto gap-5 rounded-none bg-transparent p-0"}>
+            {TABS.filter(tab => !featureFlagReport || (tab !== "Overview" && tab !== "Vitals")).map((tab) => (
               <TabsTrigger
                 key={tab}
                 value={tabValue(tab)}
-                className={featureFlagReport ? undefined : cn("relative rounded-none border-0 bg-transparent px-1 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:font-medium data-[state=active]:text-foreground data-[state=active]:shadow-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:bg-foreground after:transition-transform data-[state=active]:after:scale-x-100", featureFlagReport ? "h-full py-0" : "pb-3 pt-2")}
+                className={featureFlagReport ? "mb-0 px-2 py-1.5 font-normal data-[state=active]:font-medium" : cn("relative rounded-none border-0 bg-transparent px-1 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:bg-transparent data-[state=active]:font-medium data-[state=active]:text-foreground data-[state=active]:shadow-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:scale-x-0 after:bg-foreground after:transition-transform data-[state=active]:after:scale-x-100", featureFlagReport ? "h-full py-0" : "pb-3 pt-2")}
               >
                 {tab}
               </TabsTrigger>
@@ -752,7 +753,7 @@ function ReportsChrome({
           </TabsList>
           </div>
 
-          {featureFlagReport ? <div className="flex min-w-0 justify-end">{reportHeader}</div> : <div className={cn("flex shrink-0 items-center gap-2", !featureFlagReport && "pb-2.5")}>
+          {featureFlagReport ? <div className="flex min-w-0 items-center justify-end gap-4">{reportHeader}<TooltipProvider><Tooltip><TooltipTrigger asChild><Button variant="ghost" size="icon" className="size-8 shrink-0" aria-label="Refresh report" onClick={() => window.location.reload()}><img src="/feature-flags/report-layout/refresh.svg" alt="" /></Button></TooltipTrigger><TooltipContent>Last updated {overview.lastUpdated}</TooltipContent></Tooltip></TooltipProvider></div> : <div className={cn("flex shrink-0 items-center gap-2", !featureFlagReport && "pb-2.5")}>
             <span className="whitespace-nowrap text-sm text-muted-foreground">
               Last updated {overview.lastUpdated}
             </span>
@@ -764,13 +765,14 @@ function ReportsChrome({
 
         <div
           className="flex min-h-0 min-w-0 flex-1 items-stretch overflow-hidden"
-          style={{ paddingRight: UTILITY_RAIL_WIDTH }}
+          style={{ paddingRight: featureFlagReport ? 0 : UTILITY_RAIL_WIDTH }}
         >
           {emptyMessage ? <div className="flex flex-1 items-center justify-center p-12 text-sm text-muted-foreground">{emptyMessage}</div> : activeTab === "results" ? (
             <ResultsTab
               key={campaign.id}
               campaign={campaign}
               resultsTable={resultsTable}
+              featureFlagReport={featureFlagReport}
               onNavigateToVitals={() => setActiveTab("vitals")}
             />
           ) : (

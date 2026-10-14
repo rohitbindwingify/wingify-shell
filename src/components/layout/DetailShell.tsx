@@ -2349,7 +2349,7 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
           >
             {children}
           </div>
-          {onReports ? (
+          {onReports && !isFeatureFlags ? (
             <div
               className={cn("absolute bottom-0 right-0 z-30", "top-14")}
               style={{ width: UTILITY_RAIL_WIDTH }}
