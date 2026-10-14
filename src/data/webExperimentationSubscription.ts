@@ -97,35 +97,35 @@ export const MTU_WORKSPACES: MtuWorkspace[] = [
   {
     id: "master",
     name: "Wingify.com Master",
-    swatch: "var(--chart-div-1)",
+    swatch: "var(--chart-7)",
     total: "17K",
     daily: MASTER,
   },
   {
     id: "app",
     name: "Wingify App",
-    swatch: "var(--chart-div-6)",
+    swatch: "var(--cherry-500)",
     total: "42K",
     daily: APP,
   },
   {
     id: "content",
     name: "Content Feedback",
-    swatch: "var(--chart-div-2)",
+    swatch: "var(--green-300)",
     total: "0",
     daily: CONTENT,
   },
   {
     id: "sample",
     name: "Sample Account",
-    swatch: "var(--chart-div-5)",
+    swatch: "var(--amber-300)",
     total: "109",
     daily: SAMPLE,
   },
   {
     id: "roadmap",
     name: "roadmap-hub",
-    swatch: "var(--chart-div-3)",
+    swatch: "var(--berry-500)",
     total: "74",
     daily: ROADMAP,
   },
@@ -161,16 +161,6 @@ const CYCLE_WORKSPACES = (
     consumption,
     boxed: name === "Wingify.com Master" || name === "Wingify App",
   }));
-
-let historyPageRows: MtuBillingCycle[] = [];
-
-export function setMtuHistoryPageRows(rows: MtuBillingCycle[]) {
-  historyPageRows = rows;
-}
-
-export function mtuHistoryPageRows(): MtuBillingCycle[] {
-  return historyPageRows;
-}
 
 export function downloadMtuCycles(cycles: MtuBillingCycle[]) {
   const lines = [

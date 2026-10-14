@@ -29,7 +29,6 @@ import {
   downloadMtuCycles,
   MTU_BILLING_CYCLES,
   MTU_HISTORY_PATH,
-  mtuHistoryPageRows,
 } from "@/data/webExperimentationSubscription";
 import { findProfileMode } from "../../config/navigation";
 import { cn } from "../../lib/utils";
@@ -211,23 +210,40 @@ export default function DrillInShell() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="h-9 gap-1.5 px-3 shadow-none"
+                    size="sm"
+                    className="gap-1.5 shadow-none"
                   >
                     <Download className="size-4" strokeWidth={1.75} aria-hidden />
                     Export CSV
                     <ChevronDown className="size-3.5" strokeWidth={1.75} aria-hidden />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuContent align="end" className="w-80 p-2">
                   <DropdownMenuItem
-                    onSelect={() => downloadMtuCycles(MTU_BILLING_CYCLES)}
+                    className="flex-col items-start gap-1 whitespace-normal rounded-md px-3 py-3"
+                    onSelect={() =>
+                      downloadMtuCycles(
+                        MTU_BILLING_CYCLES.filter((cycle) => cycle.current)
+                      )
+                    }
                   >
-                    All billing cycles
+                    <span className="font-semibold text-foreground">
+                      Current billing cycle
+                    </span>
+                    <span className="text-sm font-normal leading-snug text-muted-foreground">
+                      Export monthly MTU usage for the current billing cycle
+                    </span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onSelect={() => downloadMtuCycles(mtuHistoryPageRows())}
+                    className="flex-col items-start gap-1 whitespace-normal rounded-md px-3 py-3"
+                    onSelect={() => downloadMtuCycles(MTU_BILLING_CYCLES)}
                   >
-                    This page
+                    <span className="font-semibold text-foreground">
+                      All Billing Cycles
+                    </span>
+                    <span className="text-sm font-normal leading-snug text-muted-foreground">
+                      Export monthly MTU usage for all billing cycles
+                    </span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

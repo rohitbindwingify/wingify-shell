@@ -241,7 +241,7 @@ export default function WebExperimentationSubscriptionPage() {
             {
               id: "total",
               name: "Total",
-              swatch: "var(--chart-div-1)",
+              swatch: "var(--cherry-500)",
               total: "",
               daily: Array.from({ length: MTU_DAY_COUNT }, (_, index) =>
                 MTU_WORKSPACES.reduce(

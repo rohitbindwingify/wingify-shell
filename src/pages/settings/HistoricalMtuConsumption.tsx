@@ -2,7 +2,7 @@
  * Opened from View consumptions on Web Experimentation & Rollout.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/select";
 import {
   MTU_BILLING_CYCLES,
-  setMtuHistoryPageRows,
   type MtuBillingCycle,
 } from "@/data/webExperimentationSubscription";
 import { cn } from "@/lib/utils";
@@ -47,10 +46,6 @@ export default function HistoricalMtuConsumption() {
     );
   };
 
-  useEffect(() => {
-    setMtuHistoryPageRows(pageRows);
-  }, [pageRows]);
-
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-8 py-6">
       <div className="overflow-hidden rounded-xl border border-border bg-background">
@@ -62,19 +57,17 @@ export default function HistoricalMtuConsumption() {
               <th className="px-4 py-3 text-right font-medium">MTU consumptions</th>
             </tr>
           </thead>
-          <tbody>
-            {pageRows.map((cycle) => {
-              const open = openIds.includes(cycle.id);
-              return (
-                <CycleRows
-                  key={cycle.id}
-                  cycle={cycle}
-                  open={open}
-                  onToggle={() => toggle(cycle.id)}
-                />
-              );
-            })}
-          </tbody>
+          {pageRows.map((cycle) => {
+            const open = openIds.includes(cycle.id);
+            return (
+              <CycleRows
+                key={cycle.id}
+                cycle={cycle}
+                open={open}
+                onToggle={() => toggle(cycle.id)}
+              />
+            );
+          })}
         </table>
       </div>
 
@@ -165,7 +158,7 @@ function CycleRows({
   onToggle: () => void;
 }) {
   return (
-    <>
+    <tbody>
       <tr className="border-t border-border">
         <td className="px-4 py-3">
           <button
@@ -195,42 +188,29 @@ function CycleRows({
           {cycle.consumption}
         </td>
       </tr>
-      {open ? (
-        <tr className="border-t border-border">
-          <td colSpan={3} className="bg-muted/20 px-4 py-3">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left text-xs text-muted-foreground">
-                  <th className="px-8 py-2 font-medium">Workspaces</th>
-                  <th className="px-4 py-2 text-right font-medium">
-                    Consumption breakdown
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {cycle.workspaces.map((workspace) => (
-                  <tr key={workspace.name} className="border-t border-border">
-                    <td className="px-8 py-2.5">
-                      <span
-                        className={cn(
-                          "text-sm text-foreground",
-                          workspace.boxed &&
-                            "inline-flex rounded-md border border-border bg-background px-1.5 py-0.5"
-                        )}
-                      >
-                        {workspace.name}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
-                      {workspace.consumption}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </td>
-        </tr>
-      ) : null}
-    </>
+      {open
+        ? cycle.workspaces.map((workspace, index) => (
+            <tr key={workspace.name}>
+              <td
+                className={cn(
+                  "py-1.5 pl-10 pr-4 text-sm text-foreground",
+                  index === cycle.workspaces.length - 1 && "pb-3"
+                )}
+              >
+                {workspace.name}
+              </td>
+              <td />
+              <td
+                className={cn(
+                  "px-4 py-1.5 text-right text-sm tabular-nums text-foreground",
+                  index === cycle.workspaces.length - 1 && "pb-3"
+                )}
+              >
+                {workspace.consumption}
+              </td>
+            </tr>
+          ))
+        : null}
+    </tbody>
   );
 }
