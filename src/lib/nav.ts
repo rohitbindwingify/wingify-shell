@@ -3,6 +3,7 @@ import {
   NAV,
   PROFILE_MODES,
   WEB_EXPERIMENT_OLD_PATH,
+  findDrillInLeaf,
   findProfileMode,
   firstModePath,
   flattenNavLeaves,
@@ -168,9 +169,7 @@ export function pageLabel(pathname: string): string {
   if (mode) {
     for (const section of mode.nav) {
       if (section.items) {
-        const leaf = section.items.find(
-          (l) => pathname === l.path || pathname.startsWith(l.path + "/")
-        );
+        const leaf = findDrillInLeaf(pathname, section);
         if (leaf) return leaf.label;
       }
       if (pathname === section.path || pathname.startsWith(section.path + "/")) {

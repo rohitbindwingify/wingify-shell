@@ -3,6 +3,8 @@
 import { AddressBook } from "@phosphor-icons/react/dist/ssr/AddressBook";
 import { AppWindow } from "@phosphor-icons/react/dist/ssr/AppWindow";
 import { Archive } from "@phosphor-icons/react/dist/ssr/Archive";
+import { ChatText } from "@phosphor-icons/react/dist/ssr/ChatText";
+import { CreditCard } from "@phosphor-icons/react/dist/ssr/CreditCard";
 import { ArrowBendUpLeft } from "@phosphor-icons/react/dist/ssr/ArrowBendUpLeft";
 import { ArrowClockwise } from "@phosphor-icons/react/dist/ssr/ArrowClockwise";
 import { ArrowCounterClockwise } from "@phosphor-icons/react/dist/ssr/ArrowCounterClockwise";
@@ -88,9 +90,11 @@ import { Headphones } from "@phosphor-icons/react/dist/ssr/Headphones";
 import { Heartbeat } from "@phosphor-icons/react/dist/ssr/Heartbeat";
 import { Hourglass } from "@phosphor-icons/react/dist/ssr/Hourglass";
 import { House } from "@phosphor-icons/react/dist/ssr/House";
+import { IdentificationCard } from "@phosphor-icons/react/dist/ssr/IdentificationCard";
 import { Image } from "@phosphor-icons/react/dist/ssr/Image";
 import { Images } from "@phosphor-icons/react/dist/ssr/Images";
 import { Info } from "@phosphor-icons/react/dist/ssr/Info";
+import { Invoice } from "@phosphor-icons/react/dist/ssr/Invoice";
 import { Layout } from "@phosphor-icons/react/dist/ssr/Layout";
 import { Lifebuoy } from "@phosphor-icons/react/dist/ssr/Lifebuoy";
 import { Lightbulb } from "@phosphor-icons/react/dist/ssr/Lightbulb";
@@ -130,6 +134,7 @@ import { PushPin } from "@phosphor-icons/react/dist/ssr/PushPin";
 import { PushPinSlash } from "@phosphor-icons/react/dist/ssr/PushPinSlash";
 import { PuzzlePiece } from "@phosphor-icons/react/dist/ssr/PuzzlePiece";
 import { Question } from "@phosphor-icons/react/dist/ssr/Question";
+import { Receipt } from "@phosphor-icons/react/dist/ssr/Receipt";
 import { Rectangle } from "@phosphor-icons/react/dist/ssr/Rectangle";
 import { Robot } from "@phosphor-icons/react/dist/ssr/Robot";
 import { Rocket } from "@phosphor-icons/react/dist/ssr/Rocket";
@@ -142,6 +147,7 @@ import { Sidebar } from "@phosphor-icons/react/dist/ssr/Sidebar";
 import { SignOut } from "@phosphor-icons/react/dist/ssr/SignOut";
 import { Sparkle } from "@phosphor-icons/react/dist/ssr/Sparkle";
 import { Square } from "@phosphor-icons/react/dist/ssr/Square";
+import { SlidersHorizontal } from "@phosphor-icons/react/dist/ssr/SlidersHorizontal";
 import { SquaresFour } from "@phosphor-icons/react/dist/ssr/SquaresFour";
 import { Stack } from "@phosphor-icons/react/dist/ssr/Stack";
 import { Star } from "@phosphor-icons/react/dist/ssr/Star";
@@ -206,6 +212,7 @@ export const PHOSPHOR_COMPONENTS = {
   "CalendarDays": CalendarDots,
   "CalendarRange": CalendarBlank,
   "CaseSensitive": TextAa,
+  "ChatText": ChatText,
   "Check": Check,
   "CheckCircle2": CheckCircle,
   "ChevronDown": CaretDown,
@@ -233,6 +240,7 @@ export const PHOSPHOR_COMPONENTS = {
   "Component": PuzzlePiece,
   "Construction": HardHat,
   "Contact": AddressBook,
+  "CreditCard": CreditCard,
   "Copy": Copy,
   "CopyPlus": CopySimple,
   "CornerUpRight": ArrowElbowUpRight,
@@ -269,7 +277,9 @@ export const PHOSPHOR_COMPONENTS = {
   "History": ClockCounterClockwise,
   "Home": House,
   "Hourglass": Hourglass,
+  "IdentificationCard": IdentificationCard,
   "Image": Image,
+  "Invoice": Invoice,
   "ImageIcon": Image,
   "Images": Images,
   "Info": Info,
@@ -325,6 +335,7 @@ export const PHOSPHOR_COMPONENTS = {
   "PlusCircle": PlusCircle,
   "Printer": Printer,
   "Puzzle": PuzzlePiece,
+  "Receipt": Receipt,
   "RectangleHorizontal": Rectangle,
   "Redo2": ArrowClockwise,
   "RefreshCw": ArrowsClockwise,
@@ -340,6 +351,7 @@ export const PHOSPHOR_COMPONENTS = {
   "SendHorizontal": PaperPlaneTilt,
   "Settings": Gear,
   "Settings2": GearSix,
+  "SlidersHorizontal": SlidersHorizontal,
   "Share2": ShareNetwork,
   "Shield": Shield,
   "Shirt": TShirt,

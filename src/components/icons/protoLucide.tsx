@@ -34,6 +34,7 @@ export const CalendarClock = (props: any) => <AppIcon name="CalendarClock" {...p
 export const CalendarDays = (props: any) => <AppIcon name="CalendarDays" {...props} />;
 export const CalendarRange = (props: any) => <AppIcon name="CalendarRange" {...props} />;
 export const CaseSensitive = (props: any) => <AppIcon name="CaseSensitive" {...props} />;
+export const ChatText = (props: any) => <AppIcon name="ChatText" {...props} />;
 export const Check = (props: any) => <AppIcon name="Check" {...props} />;
 export const CheckCircle2 = (props: any) => <AppIcon name="CheckCircle2" {...props} />;
 export const ChevronDown = (props: any) => <AppIcon name="ChevronDown" {...props} />;
@@ -90,7 +91,9 @@ export const HelpCircle = (props: any) => <AppIcon name="HelpCircle" {...props} 
 export const Headphones = (props: any) => <AppIcon name="Headphones" {...props} />;
 export const History = (props: any) => <AppIcon name="History" {...props} />;
 export const Hourglass = (props: any) => <AppIcon name="Hourglass" {...props} />;
+export const IdentificationCard = (props: any) => <AppIcon name="IdentificationCard" {...props} />;
 export const Image = (props: any) => <AppIcon name="Image" {...props} />;
+export const Invoice = (props: any) => <AppIcon name="Invoice" {...props} />;
 export const ImageIcon = (props: any) => <AppIcon name="ImageIcon" {...props} />;
 export const Info = (props: any) => <AppIcon name="Info" {...props} />;
 export const Italic = (props: any) => <AppIcon name="Italic" {...props} />;
@@ -141,6 +144,7 @@ export const Plug = (props: any) => <AppIcon name="Plug" {...props} />;
 export const Plus = (props: any) => <AppIcon name="Plus" {...props} />;
 export const PlusCircle = (props: any) => <AppIcon name="PlusCircle" {...props} />;
 export const Printer = (props: any) => <AppIcon name="Printer" {...props} />;
+export const Receipt = (props: any) => <AppIcon name="Receipt" {...props} />;
 export const RectangleHorizontal = (props: any) => <AppIcon name="RectangleHorizontal" {...props} />;
 export const Redo2 = (props: any) => <AppIcon name="Redo2" {...props} />;
 export const RefreshCw = (props: any) => <AppIcon name="RefreshCw" {...props} />;
@@ -155,6 +159,7 @@ export const SearchX = (props: any) => <AppIcon name="SearchX" {...props} />;
 export const SendHorizontal = (props: any) => <AppIcon name="SendHorizontal" {...props} />;
 export const Settings = (props: any) => <AppIcon name="Settings" {...props} />;
 export const Settings2 = (props: any) => <AppIcon name="Settings2" {...props} />;
+export const SlidersHorizontal = (props: any) => <AppIcon name="SlidersHorizontal" {...props} />;
 export const Share2 = (props: any) => <AppIcon name="Share2" {...props} />;
 export const Shield = (props: any) => <AppIcon name="Shield" {...props} />;
 export const Smartphone = (props: any) => <AppIcon name="Smartphone" {...props} />;
@@ -210,6 +215,9 @@ export const UserCircle = (props: any) => (
 );
 export const Contact = (props: any) => (
   <AppIcon name="Contact" {...props} />
+);
+export const CreditCard = (props: any) => (
+  <AppIcon name="CreditCard" {...props} />
 );
 export const AppWindow = (props: any) => (
   <AppIcon name="AppWindow" {...props} />

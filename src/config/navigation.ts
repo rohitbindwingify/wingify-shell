@@ -18,6 +18,11 @@ import {
   Layers,
   FileText,
   Contact,
+  UserRound,
+  Invoice,
+  Receipt,
+  CreditCard,
+  SlidersHorizontal,
   Building2,
   Archive,
   // Circle, // reserved for dummyNav placeholder sidebars
@@ -392,9 +397,9 @@ export const SETTINGS_NAV: DrillInNavItem[] = [
   },
   { label: "Campaigns", path: "/settings/campaigns", icon: Layers, hideCreate: true },
   {
-    label: "Subscription",
+    label: "Subscription & Invoices",
     path: "/settings/subscription",
-    icon: FileText,
+    icon: Invoice,
     items: [
       {
         label: "My Subscription",
@@ -418,18 +423,13 @@ export const SETTINGS_NAV: DrillInNavItem[] = [
         hideCreate: true,
       },
       {
-        label: "Wingify Insights – Mobile App",
-        path: "/settings/subscription/wingify-insights-mobile-app",
-        hideCreate: true,
-      },
-      {
-        label: "Wingify Rollouts – Web",
-        path: "/settings/subscription/wingify-rollouts-web",
-        hideCreate: true,
-      },
-      {
         label: "Web Personalization",
         path: "/settings/subscription/web-personalization",
+        hideCreate: true,
+      },
+      {
+        label: "User Feedback",
+        path: "/settings/subscription/user-feedback",
         hideCreate: true,
       },
       {
@@ -437,44 +437,50 @@ export const SETTINGS_NAV: DrillInNavItem[] = [
         path: "/settings/subscription/wingz",
         hideCreate: true,
       },
-    ],
-  },
-  {
-    label: "Inactive Subscriptions",
-    path: "/settings/inactive",
-    icon: Archive,
-    items: [
       {
-        label: "Wingify Testing – Mobile App",
-        path: "/settings/inactive/wingify-testing-mobile-app",
+        label: "Journey Analytics",
+        path: "/settings/subscription/journey-analytics",
         hideCreate: true,
       },
       {
-        label: "Wingify Testing – Server Side",
-        path: "/settings/inactive/wingify-testing-server-side",
+        label: "Invoice History",
+        path: "/settings/subscription/invoice-history",
         hideCreate: true,
+        icon: Receipt,
+      },
+      {
+        label: "Visitor Allocation",
+        path: "/settings/subscription/visitor-allocation",
+        hideCreate: true,
+        icon: SlidersHorizontal,
+      },
+      {
+        label: "Billing Profile",
+        path: "/settings/subscription/billing-profile",
+        hideCreate: true,
+        icon: CreditCard,
+      },
+      {
+        label: "Inactive Subscriptions",
+        path: "/settings/subscription/inactive",
+        hideCreate: true,
+        icon: Archive,
+        items: [
+          {
+            label: "Wingify Testing – Mobile App",
+            path: "/settings/subscription/inactive/wingify-testing-mobile-app",
+            hideCreate: true,
+          },
+          {
+            label: "Wingify Testing – Server Side",
+            path: "/settings/subscription/inactive/wingify-testing-server-side",
+            hideCreate: true,
+          },
+        ],
       },
     ],
   },
-  {
-    label: "Invoice History",
-    path: "/settings/invoice-history",
-    icon: FileText,
-    hideCreate: true,
-  },
-  {
-    label: "Visitor Allocation",
-    path: "/settings/visitor-allocation",
-    icon: Settings2,
-    hideCreate: true,
-  },
-  {
-    label: "Billing Profile",
-    path: "/settings/billing-profile",
-    icon: Contact,
-    hideCreate: true,
-  },
-  { label: "Profile details", path: "/settings/profile-details", icon: Contact, hideCreate: true },
+  { label: "Profile details", path: "/settings/profile-details", icon: UserRound, hideCreate: true },
   { label: "Workspaces", path: "/settings/workspaces", icon: Building2, hideCreate: true },
 ];
 
@@ -781,6 +787,12 @@ export function firstModePath(mode: ProfileMode): string {
   return first ? sectionLandPath(first) : mode.path;
 }
 
+function terminalLeaves(leaves: NavLeaf[]): NavLeaf[] {
+  return leaves.flatMap((leaf) =>
+    leaf.items?.length ? terminalLeaves(leaf.items) : [leaf]
+  );
+}
+
 export function modeLeaves(mode: ProfileMode): NavLeaf[] {
   return mode.nav.flatMap((item) => {
     if (!item.items?.length) {
@@ -794,7 +806,7 @@ export function modeLeaves(mode: ProfileMode): NavLeaf[] {
         hideCreate: item.hideCreate ?? true,
       });
     }
-    return leaves;
+    return terminalLeaves(leaves);
   });
 }
 
@@ -814,9 +826,20 @@ export function findDrillInLeaf(
   section: DrillInNavItem
 ): NavLeaf | undefined {
   if (!section.items?.length) return undefined;
-  return section.items.find(
-    (l) => pathname === l.path || pathname.startsWith(l.path + "/")
-  );
+  const match = (leaves: NavLeaf[]): NavLeaf | undefined => {
+    for (const leaf of leaves) {
+      const nested = leaf.items?.length ? match(leaf.items) : undefined;
+      if (nested) return nested;
+      if (
+        !leaf.items?.length &&
+        (pathname === leaf.path || pathname.startsWith(leaf.path + "/"))
+      ) {
+        return leaf;
+      }
+    }
+    return undefined;
+  };
+  return match(section.items);
 }
 
 /** @deprecated use firstModePath(findProfileMode(...)) — kept for Settings gear. */

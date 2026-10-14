@@ -86,6 +86,9 @@ export default function DrillInShell() {
   const isMtuHistory = pathname === MTU_HISTORY_PATH;
   const showSubscriptionCtas =
     !isMtuHistory &&
+    pathname !== "/settings/subscription/invoice-history" &&
+    pathname !== "/settings/subscription/billing-profile" &&
+    pathname !== "/settings/subscription/visitor-allocation" &&
     SUBSCRIPTION_CTA_PREFIXES.some((prefix) => pathname.startsWith(prefix));
   const assetsHubCtaLabel = ASSETS_HUB_HEADER_CTAS[pathname];
   const [navOpen, setNavOpen] = useState(false);

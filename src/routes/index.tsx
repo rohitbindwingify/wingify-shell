@@ -28,6 +28,9 @@ import IntegrationDetailPage from "../pages/integrations/IntegrationDetailPage";
 import AccountGeneralPage from "../pages/settings/AccountGeneralPage";
 import AccountUsersPage from "../pages/settings/AccountUsersPage";
 import MySubscriptionPage from "../pages/settings/MySubscriptionPage";
+import InvoiceHistoryPage from "../pages/settings/InvoiceHistoryPage";
+import BillingProfilePage from "../pages/settings/BillingProfilePage";
+import VisitorAllocationPage from "../pages/settings/VisitorAllocationPage";
 import WebExperimentationSubscriptionPage from "../pages/settings/WebExperimentationSubscriptionPage";
 import HistoricalMtuConsumption from "../pages/settings/HistoricalMtuConsumption";
 import { WEB_EXP_SUBSCRIPTION_PATH } from "../data/webExperimentationSubscription";
@@ -368,6 +371,51 @@ const profileModeRoutes: RouteObject[] = PROFILE_MODES.map((mode) => {
       ...(mode.id === "settings"
         ? [
             {
+              path: "invoice-history",
+              element: (
+                <Navigate to="/settings/subscription/invoice-history" replace />
+              ),
+            },
+            {
+              path: "billing-profile",
+              element: (
+                <Navigate to="/settings/subscription/billing-profile" replace />
+              ),
+            },
+            {
+              path: "visitor-allocation",
+              element: (
+                <Navigate to="/settings/subscription/visitor-allocation" replace />
+              ),
+            },
+            {
+              path: "inactive",
+              element: (
+                <Navigate
+                  to="/settings/subscription/inactive/wingify-testing-mobile-app"
+                  replace
+                />
+              ),
+            },
+            {
+              path: "inactive/wingify-testing-mobile-app",
+              element: (
+                <Navigate
+                  to="/settings/subscription/inactive/wingify-testing-mobile-app"
+                  replace
+                />
+              ),
+            },
+            {
+              path: "inactive/wingify-testing-server-side",
+              element: (
+                <Navigate
+                  to="/settings/subscription/inactive/wingify-testing-server-side"
+                  replace
+                />
+              ),
+            },
+            {
               path: "subscription/web-experimentation-rollout",
               children: [
                 { index: true, element: <WebExperimentationSubscriptionPage /> },
@@ -403,6 +451,12 @@ const profileModeRoutes: RouteObject[] = PROFILE_MODES.map((mode) => {
             <AccountUsersPage />
           ) : leaf.path === "/settings/subscription/my-subscription" ? (
             <MySubscriptionPage />
+          ) : leaf.path === "/settings/subscription/invoice-history" ? (
+            <InvoiceHistoryPage />
+          ) : leaf.path === "/settings/subscription/billing-profile" ? (
+            <BillingProfilePage />
+          ) : leaf.path === "/settings/subscription/visitor-allocation" ? (
+            <VisitorAllocationPage />
           ) : leaf.path === "/configuration/assets-hub/images" ? (
             <AssetImagesPage />
           ) : leaf.path === "/configuration/assets-hub/widgets" ? (

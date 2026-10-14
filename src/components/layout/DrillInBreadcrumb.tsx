@@ -430,14 +430,21 @@ export default function DrillInBreadcrumb({
         icon: section.icon,
       });
     }
-    for (const item of section.items) {
-      leafItems.push({
-        id: item.path,
-        label: item.label,
-        path: item.path,
-        icon: item.icon,
-      });
-    }
+    const pushLeaves = (items: typeof section.items) => {
+      for (const item of items ?? []) {
+        if (item.items?.length) {
+          pushLeaves(item.items);
+          continue;
+        }
+        leafItems.push({
+          id: item.path,
+          label: item.label,
+          path: item.path,
+          icon: item.icon,
+        });
+      }
+    };
+    pushLeaves(section.items);
   }
 
   const leafLabel =
