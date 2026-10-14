@@ -28,6 +28,9 @@ import IntegrationDetailPage from "../pages/integrations/IntegrationDetailPage";
 import AccountGeneralPage from "../pages/settings/AccountGeneralPage";
 import AccountUsersPage from "../pages/settings/AccountUsersPage";
 import MySubscriptionPage from "../pages/settings/MySubscriptionPage";
+import WebExperimentationSubscriptionPage from "../pages/settings/WebExperimentationSubscriptionPage";
+import HistoricalMtuConsumption from "../pages/settings/HistoricalMtuConsumption";
+import { WEB_EXP_SUBSCRIPTION_PATH } from "../data/webExperimentationSubscription";
 import WebsitesAndAppsPage from "../pages/websites-and-apps/WebsitesAndAppsPage";
 import WebsiteDetailPage from "../pages/websites-and-apps/WebsiteDetailPage";
 import AssetImagesPage from "../pages/configuration/AssetImagesPage";
@@ -351,6 +354,7 @@ const INTEGRATIONS_LEAF = "/configuration/integrations";
 const profileModeRoutes: RouteObject[] = PROFILE_MODES.map((mode) => {
   const leaves = modeLeaves(mode).filter(
     (leaf) =>
+      leaf.path !== WEB_EXP_SUBSCRIPTION_PATH &&
       !(
         mode.id === "configuration" &&
         (leaf.path === WNA_SITES_LEAF || leaf.path === INTEGRATIONS_LEAF)
@@ -361,6 +365,17 @@ const profileModeRoutes: RouteObject[] = PROFILE_MODES.map((mode) => {
     element: <DrillInShell />,
     children: [
       { index: true, element: <Navigate to={firstModePath(mode)} replace /> },
+      ...(mode.id === "settings"
+        ? [
+            {
+              path: "subscription/web-experimentation-rollout",
+              children: [
+                { index: true, element: <WebExperimentationSubscriptionPage /> },
+                { path: "history", element: <HistoricalMtuConsumption /> },
+              ],
+            },
+          ]
+        : []),
       ...(mode.id === "configuration"
         ? [
             {

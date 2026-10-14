@@ -18,6 +18,7 @@ export type SubscriptionProduct = {
   metricDetail: string;
   renewalDate: string;
   billingFrequency: string;
+  path: string;
 };
 
 export const ACTIVE_SUBSCRIPTION_PRODUCTS: SubscriptionProduct[] = [
@@ -34,6 +35,7 @@ export const ACTIVE_SUBSCRIPTION_PRODUCTS: SubscriptionProduct[] = [
     metricDetail: "of 1.20M, expires on Jul 27, 2029",
     renewalDate: "Jul 27, 2029",
     billingFrequency: "Annually",
+    path: "/settings/subscription/web-experimentation-rollout",
   },
   {
     id: "feature-mgmt",
@@ -48,6 +50,7 @@ export const ACTIVE_SUBSCRIPTION_PRODUCTS: SubscriptionProduct[] = [
     metricDetail: "of 1.20M, expires on Jul 27, 2029",
     renewalDate: "Jul 27, 2029",
     billingFrequency: "Annually",
+    path: "/settings/subscription/feature-management",
   },
   {
     id: "behavior-analytics",
@@ -62,6 +65,7 @@ export const ACTIVE_SUBSCRIPTION_PRODUCTS: SubscriptionProduct[] = [
     metricDetail: "of 100K, resets on Sep 24, 2026",
     renewalDate: "Jul 27, 2029",
     billingFrequency: "Annually",
+    path: "/settings/subscription/behavior-analytics",
   },
   {
     id: "mobile-insights",
@@ -76,5 +80,6 @@ export const ACTIVE_SUBSCRIPTION_PRODUCTS: SubscriptionProduct[] = [
     metricDetail: "of 100K, resets on Sep 24, 2026",
     renewalDate: "Jul 27, 2029",
     billingFrequency: "Annually",
+    path: "/settings/subscription/wingify-insights-mobile-app",
   },
 ];

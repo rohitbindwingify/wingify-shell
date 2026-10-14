@@ -4,8 +4,10 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import {
   ArrowUpRight,
   Calendar,
+  ChevronDown,
   CircleMinus,
   CirclePlus,
+  Download,
   FileText,
   History,
   MoreVertical,
@@ -23,6 +25,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  downloadMtuCycles,
+  MTU_BILLING_CYCLES,
+  MTU_HISTORY_PATH,
+  mtuHistoryPageRows,
+} from "@/data/webExperimentationSubscription";
 import { findProfileMode } from "../../config/navigation";
 import { cn } from "../../lib/utils";
 import { useIntegrationRequestStore } from "@/store/integrationRequest";
@@ -76,9 +84,10 @@ export default function DrillInShell() {
   // Campaign detail hides workspace + mode crumbs; same on these entity pages.
   const hideParentCrumbs = showCreateConnection || isWebsiteDetail;
   const showAddUser = pathname === ACCOUNT_USERS_PATH;
-  const showSubscriptionCtas = SUBSCRIPTION_CTA_PREFIXES.some((prefix) =>
-    pathname.startsWith(prefix)
-  );
+  const isMtuHistory = pathname === MTU_HISTORY_PATH;
+  const showSubscriptionCtas =
+    !isMtuHistory &&
+    SUBSCRIPTION_CTA_PREFIXES.some((prefix) => pathname.startsWith(prefix));
   const assetsHubCtaLabel = ASSETS_HUB_HEADER_CTAS[pathname];
   const [navOpen, setNavOpen] = useState(false);
   const [navRendered, setNavRendered] = useState(false);
@@ -195,6 +204,33 @@ export default function DrillInShell() {
                 <CirclePlus className="size-4" strokeWidth={1.75} aria-hidden />
                 {assetsHubCtaLabel}
               </Button>
+            ) : null}
+            {isMtuHistory ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-9 gap-1.5 px-3 shadow-none"
+                  >
+                    <Download className="size-4" strokeWidth={1.75} aria-hidden />
+                    Export CSV
+                    <ChevronDown className="size-3.5" strokeWidth={1.75} aria-hidden />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-44">
+                  <DropdownMenuItem
+                    onSelect={() => downloadMtuCycles(MTU_BILLING_CYCLES)}
+                  >
+                    All billing cycles
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => downloadMtuCycles(mtuHistoryPageRows())}
+                  >
+                    This page
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : null}
             {showSubscriptionCtas ? (
               <>

@@ -2,6 +2,7 @@
  * Header CTAs live in DrillInShell. Reuses shadcn Button + Tooltip.
  */
 
+import { useNavigate } from "react-router-dom";
 import { ChevronRight, CircleHelp, Info } from "@/components/icons/protoLucide";
 import {
   Tooltip,
@@ -34,11 +35,13 @@ function InfoTip({ label }: { label: string }) {
 }
 
 function ProductCard({ product }: { product: SubscriptionProduct }) {
+  const navigate = useNavigate();
   const Icon = product.icon;
 
   return (
     <button
       type="button"
+      onClick={() => navigate(product.path)}
       className="flex w-full items-center gap-6 rounded-xl border border-border bg-background px-5 py-4 text-left transition-colors hover:bg-muted/30"
     >
       <div className="flex min-w-0 flex-1 items-start gap-3">

@@ -4,12 +4,18 @@
 // Integration detail crumb mirrors DetailShell (search + ListFilter + max-h list).
 // Landing uses sectionLandPath (root page when landable, else first child).
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Popover from "@radix-ui/react-popover";
 import { ChevronDown, ListFilter, Search } from "@/components/icons/protoLucide";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  MTU_HISTORY_PATH,
+  WEB_EXP_PLAN,
+  WEB_EXP_SUBSCRIPTION_PATH,
+} from "@/data/webExperimentationSubscription";
 import {
   findDrillInLeaf,
   findDrillInSection,
@@ -66,6 +72,7 @@ function CrumbDropdown({
   items,
   groups,
   strong = false,
+  trailing,
 }: {
   label: string;
   ariaLabel: string;
@@ -75,6 +82,8 @@ function CrumbDropdown({
   groups?: CrumbItem[][];
   /** Current page crumb — heavier weight. */
   strong?: boolean;
+  /** Sits inside the trigger, between the label and the chevron. */
+  trailing?: ReactNode;
 }) {
   const sections = groups ?? (items ? [items] : []);
 
@@ -85,13 +94,15 @@ function CrumbDropdown({
           type="button"
           aria-label={ariaLabel}
           className={cn(
-            "flex items-center gap-0.5 truncate rounded-md px-1 py-0.5 outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+            "flex min-w-0 items-center rounded-md px-1 py-0.5 outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none",
+            trailing ? "gap-1.5" : "gap-0.5",
             strong
               ? "font-semibold text-foreground"
               : "font-normal text-foreground"
           )}
         >
           <span className="truncate">{label}</span>
+          {trailing}
           <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         </button>
       </DropdownMenu.Trigger>
@@ -442,6 +453,7 @@ export default function DrillInBreadcrumb({
     path: websiteDetailPath(row.id),
   }));
 
+  const isMtuHistory = pathname === MTU_HISTORY_PATH;
   const hasLeafCrumb =
     !!section && leafItems.length > 0 && !!leafLabel && !!leafActiveId;
   const hasWebsiteCrumb = !!website && !!websiteId;
@@ -480,8 +492,31 @@ export default function DrillInBreadcrumb({
             ariaLabel={`Switch ${section!.label} page`}
             activeId={leafActiveId!}
             items={leafItems}
-            strong={!hasWebsiteCrumb && !hasIntegrationCrumb}
+            strong={!hasWebsiteCrumb && !hasIntegrationCrumb && !isMtuHistory}
+            trailing={
+              leafActiveId === WEB_EXP_SUBSCRIPTION_PATH ? (
+                <Badge
+                  tone="neutral"
+                  fill="light"
+                  size="sm"
+                  className="shrink-0 font-normal"
+                >
+                  {WEB_EXP_PLAN.name}
+                </Badge>
+              ) : null
+            }
           />
+        </>
+      )}
+
+      {isMtuHistory && (
+        <>
+          <span className="text-muted-foreground" aria-hidden>
+            /
+          </span>
+          <span className="truncate px-1 font-semibold text-foreground">
+            Historical MTU Consumption
+          </span>
         </>
       )}
 
