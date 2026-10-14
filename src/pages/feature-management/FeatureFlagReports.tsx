@@ -46,11 +46,11 @@ export default function FeatureFlagReports({ flagId }: { flagId: string }) {
     });
   }
   const isLive = (items: FlagRule[]) => items.some(rule => ruleStatus(rule, environmentEnabled) === 'Active');
-  const trackingStatus = (items: FlagRule[]) => isLive(items) ? 'Tracking data' : items.some(rule => rule.visitors > 0) ? 'Tracking paused' : 'No data';
+  const trackingStatus = (items: FlagRule[]) => isLive(items) ? 'Collecting data' : items.some(rule => rule.visitors > 0) ? 'Tracking paused' : 'No data';
   const status = trackingStatus(selected);
   const statusLabel = (items: FlagRule[]) => {
     const label = trackingStatus(items);
-    return <span className={`shrink-0 whitespace-nowrap text-xs font-medium ${label === 'Tracking data' ? 'text-[var(--success-fg)]' : label === 'Tracking paused' ? 'text-[var(--warning-fg)]' : 'text-muted-foreground'}`}>{label}</span>;
+    return <span className={`shrink-0 whitespace-nowrap text-xs font-medium ${label === 'Collecting data' ? 'text-[var(--success-fg)]' : label === 'Tracking paused' ? 'text-[var(--warning-fg)]' : 'text-muted-foreground'}`}>{label}</span>;
   };
   const environmentDot = (on: boolean) => <span aria-hidden="true" className={`inline-block size-1.5 shrink-0 rounded-full ${on ? 'bg-[var(--success-fg)]' : 'bg-[var(--warning-fg)]'}`} />;
   const controls = <div className="flex w-full min-w-0 items-center gap-2.5">
@@ -73,6 +73,6 @@ export default function FeatureFlagReports({ flagId }: { flagId: string }) {
     </Select>
     <Button variant="outline" className="h-8 shrink-0 rounded-sm px-3 font-normal" onClick={() => useWingzStore.getState().openWingzAndAsk({ kind: 'campaign', campaignId: flagId }, `Summarize the ${type} report for ${flag?.name ?? 'this flag'} in ${environment}.`)}><Sparkles className="size-4" />Summarize</Button>
   </div>;
-  const reportHeader = <Badge tone={status === 'Tracking data' ? 'green' : status === 'Tracking paused' ? 'amber' : 'neutral'} className="shrink-0 gap-1.5"><span className="size-1.5 rounded-full bg-current" aria-hidden="true" />{status}</Badge>;
+  const reportHeader = <Badge tone={status === 'Collecting data' ? 'green' : status === 'Tracking paused' ? 'amber' : 'neutral'} className="shrink-0 gap-1.5"><span className="size-1.5 rounded-full bg-current" aria-hidden="true" />{status}</Badge>;
   return <ReportsPage featureFlagReport campaignOverride={campaign} leadingControls={controls} reportHeader={reportHeader} resultsTable={type !== 'Testing' ? <FlagGroupedResults rules={selected} type={type} /> : undefined} emptyMessage={(type === 'Testing' ? visitors === 0 : selected.length === 0) ? 'No report data for this selection yet. Reports appear after a rule receives user activity.' : undefined} />;
 }

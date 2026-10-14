@@ -54,3 +54,15 @@
 @media (prefers-reduced-motion: reduce) {
   .flag-rule-tab-transition { animation: none; }
 }
+
+.flag-rule-scroll {
+  scrollbar-color: var(--border-strong) var(--canvas);
+}
+.flag-rule-scroll::-webkit-scrollbar { width: 12px; }
+.flag-rule-scroll::-webkit-scrollbar-track,
+.flag-rule-scroll::-webkit-scrollbar-corner { background: var(--canvas); }
+.flag-rule-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 3px solid var(--canvas);
+  border-radius: 999px;
+}

@@ -2336,7 +2336,7 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
             // children like Workflow Mode with no room to render.
             // Reports: relative so the utility rail can sit below the full-bleed
             // sticky tabs without shrinking the tab bar.
-            onReports ? "relative flex flex-col overflow-hidden" : "flex flex-col overflow-y-auto"
+            onReports ? "relative flex flex-col overflow-hidden" : isFeatureFlags && pathname.endsWith("/rules") ? "flex flex-col overflow-hidden bg-canvas" : "flex flex-col overflow-y-auto"
           )}
         >
           <div
@@ -2344,7 +2344,7 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
               "min-h-0",
               // Reports owns scroll below its tab bar so the metrics rail can
               // sit flush under the tabs with no canvas gap.
-              onReports ? "min-h-0 flex-1 overflow-hidden" : "flex-1"
+              onReports ? "min-h-0 flex-1 overflow-hidden" : isFeatureFlags && pathname.endsWith("/rules") ? "flex min-h-0 flex-1 flex-col overflow-hidden" : "flex-1"
             )}
           >
             {children}
@@ -2358,7 +2358,7 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
             </div>
           ) : null}
         </main>
-        {!onReports ? <UtilityRail entityId={entityId} /> : null}
+        {!onReports && !(isFeatureFlags && pathname.endsWith("/rules")) ? <UtilityRail entityId={entityId} /> : null}
       </div>
 
       {/* Edge-reveal hotzone: dwell on the left viewport edge to open the nav overlay. */}
