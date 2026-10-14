@@ -1,3 +1,4 @@
+import FlagEnvironmentSelect from '@/components/feature-flags/FlagEnvironmentSelect';
 import CreateRolloutRuleSheet from './CreateRolloutRuleSheet';
 import AnimatedRuleContent from './AnimatedRuleContent';
 import './FeatureFlagRules.css';
@@ -37,7 +38,10 @@ export default function FeatureFlagDetail() {
 
 function FlagDetailContent({ flagId }: { flagId: string }) {
   const { pathname } = useLocation();
-  return pathname.endsWith('/reports') ? <FeatureFlagReports flagId={flagId} /> : <FlagWorkspace key={flagId} flagId={flagId} />;
+  const section = pathname.endsWith('/reports') ? 'reports' : pathname.endsWith('/rules') ? 'rules' : 'configuration';
+  return <div key={`${flagId}:${section}`} className={`flex h-full min-h-0 flex-1 flex-col ${section !== 'configuration' ? 'flag-page-transition' : ''}`}>
+    {section === 'reports' ? <FeatureFlagReports flagId={flagId} /> : <FlagWorkspace key={flagId} flagId={flagId} />}
+  </div>;
 }
 
 function FlagWorkspace({ flagId }: { flagId: string }) {
@@ -50,7 +54,8 @@ function FlagWorkspace({ flagId }: { flagId: string }) {
   const envParam = query.get('environment');
   const environment: FlagEnvironment = FLAG_ENVIRONMENTS.find(env => env === envParam) ?? 'Production';
   const key = `${flagId}:${environment}`;
-  const isOn = enabled[key] ?? key !== '30:LocalTest';
+  const isEnvironmentEnabled = (name: string) => enabled[`${flagId}:${name}`] ?? false;
+  const isOn = isEnvironmentEnabled(environment);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const setCategory = (group: string) => setCollapsedGroups(previous => ({ ...previous, [group]: false }));
   const [debuggerOpen, setDebuggerOpen] = useState(false);
@@ -105,10 +110,10 @@ function FlagWorkspace({ flagId }: { flagId: string }) {
 
   return <TooltipProvider><div className="flag-rule-workspace flex min-h-0 flex-1 overflow-hidden">
     <div className="flag-rule-main flex min-h-0 min-w-0 flex-1 flex-col bg-canvas">
-      <div className="z-10 flex min-h-12 shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-2"><div><div className="flex items-center gap-3"><Switch checked={isOn} aria-label={`${environment} flag enabled`} onCheckedChange={next => {
+      <div className="z-10 flex min-h-12 shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-2"><div><div className="flex items-center gap-3"><FlagEnvironmentSelect value={environment} onValueChange={env => setQuery({ environment: env })} isEnabled={isEnvironmentEnabled} /><Switch checked={isOn} aria-label={`${environment} flag enabled`} onCheckedChange={next => {
         setEnabled(key, next);
         if (next) environmentRules.filter(rule => rule.enabled && !rule.completed && (!rule.scheduledFor || Date.parse(rule.scheduledFor) <= Date.now())).forEach(rule => save({ ...rule, hasStarted: true }));
-      }} /><Select value={environment} onValueChange={env => setQuery({ environment: env })}><SelectTrigger aria-label="Flag environment" className="h-8 w-40 border-0 bg-transparent font-semibold shadow-none"><SelectValue /></SelectTrigger><SelectContent>{FLAG_ENVIRONMENTS.map(env => <SelectItem key={env} value={env}>{env}</SelectItem>)}</SelectContent></Select></div></div>{!debuggerOpen && <div className="flex items-center gap-3"><DropdownMenu><DropdownMenuTrigger asChild><Button className="h-8 gap-1 rounded-sm px-3 font-normal"><img src="/feature-flags/layout/create.svg" alt="" />Create rule</Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={createRule}>Rollout rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('AB test rule')}>AB test rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('Personalize rule')}>Personalize rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('Multivariate rule')}>Multivariate rule</DropdownMenuItem></DropdownMenuContent></DropdownMenu><Button variant="outline" size="icon" className="size-8 rounded-sm" title="Manage holdout" aria-label="Manage holdout" onClick={() => openFlow(holdout[key] ? 'Remove from holdout' : 'Add to holdout')}><img src="/feature-flags/layout/holdout.svg" alt="" /></Button><Button variant="outline" size="icon" className="size-8 rounded-sm" title="Copy rule" aria-label="Copy rule" disabled={!rules.length} onClick={() => { setSourceId(''); setCopying(true); }}><img src="/feature-flags/layout/copy.svg" alt="" /></Button><Button variant="outline" size="icon" className="size-8 rounded-sm" title="Debugger" aria-label="Debugger" onClick={() => setDebuggerOpen(true)}><img src="/feature-flags/layout/debugger.svg" alt="" /></Button></div>}</div>
+      }} /></div></div>{!debuggerOpen && <div className="flex items-center gap-3"><DropdownMenu><DropdownMenuTrigger asChild><Button className="h-8 gap-1 rounded-sm px-3 font-normal"><img src="/feature-flags/layout/create.svg" alt="" />Create rule</Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={createRule}>Rollout rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('AB test rule')}>AB test rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('Personalize rule')}>Personalize rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('Multivariate rule')}>Multivariate rule</DropdownMenuItem></DropdownMenuContent></DropdownMenu><Tooltip delayDuration={250} disableHoverableContent><TooltipTrigger asChild><Button variant="outline" size="icon" className="size-8 rounded-sm" aria-label="Manage holdout" onClick={() => openFlow(holdout[key] ? 'Remove from holdout' : 'Add to holdout')}><img src="/feature-flags/layout/holdout.svg" alt="" /></Button></TooltipTrigger><TooltipContent side="bottom" sideOffset={8} className="pointer-events-none max-w-64 text-center leading-5">Add flag to holdout group to measure its true impact</TooltipContent></Tooltip><Tooltip delayDuration={250} disableHoverableContent><TooltipTrigger asChild><span className="inline-flex" tabIndex={!rules.length ? 0 : undefined} aria-label={!rules.length ? "Copy rules" : undefined}><Button variant="outline" size="icon" className="size-8 rounded-sm" aria-label="Copy rule" disabled={!rules.length} onClick={() => { setSourceId(''); setCopying(true); }}><img src="/feature-flags/layout/copy.svg" alt="" /></Button></span></TooltipTrigger><TooltipContent side="bottom" sideOffset={8} className="pointer-events-none max-w-64 text-center leading-5">Copy rules from other environments</TooltipContent></Tooltip><Tooltip delayDuration={250} disableHoverableContent><TooltipTrigger asChild><Button variant="outline" size="icon" className="size-8 rounded-sm" aria-label="Debugger" onClick={() => setDebuggerOpen(true)}><img src="/feature-flags/layout/debugger.svg" alt="" /></Button></TooltipTrigger><TooltipContent side="bottom" sideOffset={8} className="pointer-events-none max-w-64 text-center leading-5">Test your rule evaluation before going live</TooltipContent></Tooltip></div>}</div>
       <div className="flag-rule-scroll min-h-0 flex-1 overflow-y-auto bg-canvas py-4 [scrollbar-gutter:stable_both-edges]">
       <div className="mx-auto w-[80%] min-w-0 max-w-[1000px]">
       {notice && <Card role="status" aria-live="polite" aria-atomic="true" className="fixed bottom-6 right-6 z-50 max-w-sm shadow-lg"><CardContent className="px-4 py-3 text-sm">{notice.message}</CardContent></Card>}
@@ -127,9 +132,10 @@ function FlagWorkspace({ flagId }: { flagId: string }) {
         const visible = category === 'rollout' ? rollout : experiments;
         const expanded = !collapsedGroups[category];
         return <Fragment key={category}>
-          {category === 'experiments' && <div className="flex flex-col items-center gap-1 text-center text-sm text-muted-foreground">
+          {category === 'experiments' && <div className="!mt-3 [&+section]:!mt-3 flex w-full items-center justify-center gap-2 rounded bg-info-bg/40 px-4 py-3 text-center text-sm text-muted-foreground">
+            <ArrowRight className="size-4 shrink-0 rotate-90" aria-hidden="true" />
             <p>Users qualifying for rollout rules are evaluated for the following rules.</p>
-            <ArrowRight className="size-4 rotate-90" aria-hidden="true" />
+            <ArrowRight className="size-4 shrink-0 rotate-90" aria-hidden="true" />
           </div>}
           <section className="rounded border border-[var(--border-strong)] bg-canvas p-4">
           <h2><Button variant="ghost" className="h-auto gap-2 p-0 text-base font-semibold text-muted-foreground hover:bg-transparent" aria-expanded={expanded} aria-controls={'group-' + category} onClick={() => setCollapsedGroups(previous => ({ ...previous, [category]: expanded }))}><img src="/feature-flags/layout/section.svg" alt="" className={'shrink-0 transition-transform duration-200 motion-reduce:transition-none ' + (expanded ? 'rotate-90' : '')} />{category === 'rollout' ? 'Rollout Rules' : 'Experimentation & Personalisation'} ({visible.length})</Button></h2>

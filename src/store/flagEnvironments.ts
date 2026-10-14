@@ -6,7 +6,7 @@ type FlagEnvironmentState = {
   setEnabled: (key: string, enabled: boolean) => void;
 };
 
-// Each flag has independent environment switches. Unset environments default to On.
+// Each flag has independent environment switches. Unset environments default to Off; saved choices persist across switches and reloads.
 export const useFlagEnvironmentsStore = create<FlagEnvironmentState>()(
   persist(
     (set) => ({

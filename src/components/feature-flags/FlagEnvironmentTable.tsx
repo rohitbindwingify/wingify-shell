@@ -28,7 +28,7 @@ export default function FlagEnvironmentTable({ rows }: { rows: FeatureFlag[] }) 
   function toggle(id: string) {
     setExpanded(previous => { const next = new Set(previous); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   }
-  const environmentOn = (key: string) => enabled[key] ?? key !== '30:LocalTest';
+  const environmentOn = (key: string) => enabled[key] ?? false;
   return <TooltipProvider delayDuration={150}>
     <div className="overflow-hidden rounded-lg border border-border bg-background">
       <div className="overflow-x-auto">

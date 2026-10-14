@@ -1,3 +1,4 @@
+import FlagEnvironmentSelect from '@/components/feature-flags/FlagEnvironmentSelect';
 import { Badge } from '@/components/ui/badge';
 import './FeatureFlagReports.css';
 import { ArrowRight, UserRound } from '@/components/icons/protoLucide';
@@ -19,7 +20,7 @@ export default function FeatureFlagReports({ flagId }: { flagId: string }) {
   const flag = useVisibleFeatureFlags().find(item => item.id === flagId);
   const environment = FLAG_ENVIRONMENTS.find(item => item === params.get('environment')) ?? 'Production';
   const enabledEnvironments = useFlagEnvironmentsStore(state => state.enabled);
-  const isEnvironmentEnabled = (name: string) => enabledEnvironments[`${flagId}:${name}`] ?? `${flagId}:${name}` !== '30:LocalTest';
+  const isEnvironmentEnabled = (name: string) => enabledEnvironments[`${flagId}:${name}`] ?? false;
   const environmentEnabled = isEnvironmentEnabled(environment);
   const rules = allRules.filter(rule => rule.flagId === flagId && rule.environment === environment);
   const linkedRule = rules.find(rule => rule.id === params.get('rule'));
@@ -51,15 +52,8 @@ export default function FeatureFlagReports({ flagId }: { flagId: string }) {
     const label = trackingStatus(items);
     return <span className={`shrink-0 whitespace-nowrap text-xs font-medium ${label === 'Collecting data' ? 'text-[var(--success-fg)]' : label === 'Tracking paused' ? 'text-[var(--warning-fg)]' : 'text-muted-foreground'}`}>{label}</span>;
   };
-  const environmentIcon = (on: boolean) => <div aria-hidden="true" className={`flag-report-environment-icon ${on ? 'text-[var(--success-fg)]' : 'text-[var(--warning-fg)]'}`} />;
   const controls = <div className="flex w-full min-w-0 items-center gap-1">
-    <Select value={environment} onValueChange={value => update('environment', value)}>
-      <SelectTrigger aria-label={`Report environment: ${environment}, flag ${environmentEnabled ? 'on' : 'off'}`} className="flag-report-environment-trigger h-8 w-[156px] min-w-[156px] max-w-[156px] shrink-0 gap-1 rounded-sm border-0 px-3 py-1.5 text-sm shadow-none [&>span]:min-w-0 [&>span]:flex-1 [&>span]:text-left">
-        {environmentIcon(environmentEnabled)}
-        <SelectValue><span className="flex min-w-0 items-center gap-2"><span className="truncate" title={environment}>{environment}</span></span></SelectValue>
-      </SelectTrigger>
-      <SelectContent className="w-[180px]">{FLAG_ENVIRONMENTS.map(item => <SelectItem key={item} value={item} textValue={item} aria-label={`${item}, flag ${isEnvironmentEnabled(item) ? 'on' : 'off'}`}><span className="flex items-center gap-2">{environmentIcon(isEnvironmentEnabled(item))}{item}</span></SelectItem>)}</SelectContent>
-    </Select>
+    <FlagEnvironmentSelect value={environment} onValueChange={value => update('environment', value)} isEnabled={isEnvironmentEnabled} label="Report environment" />
     <Select value={selection} onValueChange={value => update('rule', value)}>
       <SelectTrigger aria-label={`Report rule: ${selectedRule?.name ?? type}, ${status}`} className="h-8 w-[156px] min-w-[156px] max-w-[156px] shrink-0 gap-1 rounded-sm border-0 px-3 py-1.5 bg-transparent text-sm shadow-none [&>span]:min-w-0 [&>span]:flex-1 [&>span]:truncate [&>span]:text-left">
         <div className="shrink-0 text-muted-foreground" aria-hidden="true">{type === 'Rollout' ? <ArrowRight className="size-4" /> : type === 'Testing' ? <img src="/feature-flags/report-layout/testing.svg" alt="" /> : <UserRound className="size-4" />}</div>
