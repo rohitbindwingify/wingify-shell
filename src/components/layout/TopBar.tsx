@@ -101,6 +101,10 @@ export default function TopBar({ showLogo = false }: { showLogo?: boolean }) {
   const openWingzAndAsk = useWingzStore((s) => s.openWingzAndAsk);
 
   const handleSelect = (option: CreateOption) => {
+    if (pathname === "/feature-management/environments" || pathname === "/feature-management/mutually-exclusive-groups") {
+      navigate(`${pathname}?create=1`);
+      return;
+    }
     // Route-backed options (e.g. Create with Copilot) navigate to their screen.
     if (option.route) {
       navigate(option.route);

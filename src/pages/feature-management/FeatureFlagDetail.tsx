@@ -1,3 +1,5 @@
+import FlagHoldoutSheet from './FlagHoldoutSheet';
+import { FLAG_HOLDOUTS, initialFlagHoldouts } from '@/data/flagHoldouts';
 import FlagEnvironmentSelect from '@/components/feature-flags/FlagEnvironmentSelect';
 import CreateRolloutRuleSheet from './CreateRolloutRuleSheet';
 import AnimatedRuleContent from './AnimatedRuleContent';
@@ -72,7 +74,12 @@ function FlagWorkspace({ flagId }: { flagId: string }) {
     const timeout = window.setTimeout(() => setNotice(null), 3000);
     return () => window.clearTimeout(timeout);
   }, [notice]);
-  const { holdout } = useFlagDetailPreferences();
+  const { linkedHoldouts, saveHoldouts } = useFlagDetailPreferences();
+  const selectedHoldoutIds = linkedHoldouts[key] ?? initialFlagHoldouts(key);
+  const selectedHoldouts = FLAG_HOLDOUTS.filter(item => selectedHoldoutIds.includes(item.id));
+  const showHoldoutSummary = selectedHoldouts.length > 0;
+  const [holdoutOpen, setHoldoutOpen] = useState(false);
+  const [holdoutsExpanded, setHoldoutsExpanded] = useState(false);
   const environmentRules = rules.filter(rule => rule.environment === environment);
   const rollout = environmentRules.filter(rule => rule.type === 'Rollout');
   const experiments = environmentRules.filter(rule => rule.type !== 'Rollout');
@@ -113,26 +120,52 @@ function FlagWorkspace({ flagId }: { flagId: string }) {
       <div className="z-10 flex min-h-12 shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-2"><div><div className="flex items-center gap-3"><FlagEnvironmentSelect value={environment} onValueChange={env => setQuery({ environment: env })} isEnabled={isEnvironmentEnabled} /><Switch checked={isOn} aria-label={`${environment} flag enabled`} onCheckedChange={next => {
         setEnabled(key, next);
         if (next) environmentRules.filter(rule => rule.enabled && !rule.completed && (!rule.scheduledFor || Date.parse(rule.scheduledFor) <= Date.now())).forEach(rule => save({ ...rule, hasStarted: true }));
-      }} /></div></div>{!debuggerOpen && <div className="flex items-center gap-3"><DropdownMenu><DropdownMenuTrigger asChild><Button className="h-8 gap-1 rounded-sm px-3 font-normal"><img src="/feature-flags/layout/create.svg" alt="" />Create rule</Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={createRule}>Rollout rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('AB test rule')}>AB test rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('Personalize rule')}>Personalize rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('Multivariate rule')}>Multivariate rule</DropdownMenuItem></DropdownMenuContent></DropdownMenu><Tooltip delayDuration={250} disableHoverableContent><TooltipTrigger asChild><Button variant="outline" size="icon" className="size-8 rounded-sm" aria-label="Manage holdout" onClick={() => openFlow(holdout[key] ? 'Remove from holdout' : 'Add to holdout')}><img src="/feature-flags/layout/holdout.svg" alt="" /></Button></TooltipTrigger><TooltipContent side="bottom" sideOffset={8} className="pointer-events-none max-w-64 text-center leading-5">Add flag to holdout group to measure its true impact</TooltipContent></Tooltip><Tooltip delayDuration={250} disableHoverableContent><TooltipTrigger asChild><span className="inline-flex" tabIndex={!rules.length ? 0 : undefined} aria-label={!rules.length ? "Copy rules" : undefined}><Button variant="outline" size="icon" className="size-8 rounded-sm" aria-label="Copy rule" disabled={!rules.length} onClick={() => { setSourceId(''); setCopying(true); }}><img src="/feature-flags/layout/copy.svg" alt="" /></Button></span></TooltipTrigger><TooltipContent side="bottom" sideOffset={8} className="pointer-events-none max-w-64 text-center leading-5">Copy rules from other environments</TooltipContent></Tooltip><Tooltip delayDuration={250} disableHoverableContent><TooltipTrigger asChild><Button variant="outline" size="icon" className="size-8 rounded-sm" aria-label="Debugger" onClick={() => setDebuggerOpen(true)}><img src="/feature-flags/layout/debugger.svg" alt="" /></Button></TooltipTrigger><TooltipContent side="bottom" sideOffset={8} className="pointer-events-none max-w-64 text-center leading-5">Test your rule evaluation before going live</TooltipContent></Tooltip></div>}</div>
+      }} /></div></div>{!debuggerOpen && <div className="flex items-center gap-3"><DropdownMenu><DropdownMenuTrigger asChild><Button className="h-8 gap-1 rounded-sm px-3 font-normal"><img src="/feature-flags/layout/create.svg" alt="" />Create rule</Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem onSelect={createRule}>Rollout rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('AB test rule')}>AB test rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('Personalize rule')}>Personalize rule</DropdownMenuItem><DropdownMenuItem onSelect={() => openFlow('Multivariate rule')}>Multivariate rule</DropdownMenuItem></DropdownMenuContent></DropdownMenu>{!showHoldoutSummary && <Tooltip delayDuration={250} disableHoverableContent><TooltipTrigger asChild><Button variant="outline" size="icon" className="size-8 rounded-sm" aria-label="Add to Holdout" onClick={() => setHoldoutOpen(true)}><img src="/feature-flags/layout/holdout.svg" alt="" /></Button></TooltipTrigger><TooltipContent side="bottom" sideOffset={8} className="pointer-events-none max-w-64 text-center leading-5">Add flag to holdout group to measure its true impact</TooltipContent></Tooltip>}<Tooltip delayDuration={250} disableHoverableContent><TooltipTrigger asChild><span className="inline-flex" tabIndex={!rules.length ? 0 : undefined} aria-label={!rules.length ? "Copy rules" : undefined}><Button variant="outline" size="icon" className="size-8 rounded-sm" aria-label="Copy rule" disabled={!rules.length} onClick={() => { setSourceId(''); setCopying(true); }}><img src="/feature-flags/layout/copy.svg" alt="" /></Button></span></TooltipTrigger><TooltipContent side="bottom" sideOffset={8} className="pointer-events-none max-w-64 text-center leading-5">Copy rules from other environments</TooltipContent></Tooltip><Tooltip delayDuration={250} disableHoverableContent><TooltipTrigger asChild><Button variant="outline" size="icon" className="size-8 rounded-sm" aria-label="Debugger" onClick={() => setDebuggerOpen(true)}><img src="/feature-flags/layout/debugger.svg" alt="" /></Button></TooltipTrigger><TooltipContent side="bottom" sideOffset={8} className="pointer-events-none max-w-64 text-center leading-5">Test your rule evaluation before going live</TooltipContent></Tooltip></div>}</div>
       <div className="flag-rule-scroll min-h-0 flex-1 overflow-y-auto bg-canvas py-4 [scrollbar-gutter:stable_both-edges]">
       <div className="mx-auto w-[80%] min-w-0 max-w-[1000px]">
       {notice && <Card role="status" aria-live="polite" aria-atomic="true" className="fixed bottom-6 right-6 z-50 max-w-sm shadow-lg"><CardContent className="px-4 py-3 text-sm">{notice.message}</CardContent></Card>}
-      {holdout[key] && <p className="mb-4 text-sm text-muted-foreground">This environment is included in the flag holdout in this prototype.</p>}
       {section === 'reports' ? <><h2 className="mb-2 text-lg font-semibold">Rule reports</h2><p className="mb-6 text-sm text-muted-foreground">Results for rules with user activity in {environment}. Sample data.</p>{environmentRules.filter(rule => hasRuleReport(rule,isOn)).length ? environmentRules.filter(rule => hasRuleReport(rule,isOn)).map(rule => <Card key={rule.id} className={`mb-4 ${query.get('rule') === rule.id ? 'ring-1 ring-border' : ''}`}><CardContent className="flex items-center justify-between gap-4 p-6"><div><Tooltip><TooltipTrigger asChild><span tabIndex={0} aria-label={rule.type === 'Rollout' ? 'Rollout' : rule.type === 'Testing' ? 'AB test' : 'Personalise'}>{rule.type === 'Rollout' ? <ArrowRight className="size-4" /> : rule.type === 'Testing' ? <FlaskConical className="size-4" /> : <UserRound className="size-4" />}</span></TooltipTrigger><TooltipContent>{rule.type === 'Rollout' ? 'Rollout' : rule.type === 'Testing' ? 'AB test' : 'Personalise'}</TooltipContent></Tooltip><h3 className="font-medium">{rule.name}</h3><p className="mt-1 text-sm text-muted-foreground">{rule.type} · {ruleStatus(rule,isOn)}</p></div><div><p className="text-xs text-muted-foreground">Visitors</p><p className="mt-1 font-semibold">{rule.visitors.toLocaleString('en-US')}</p></div><div><p className="text-xs text-muted-foreground">Primary metric</p><p className={`mt-1 font-semibold ${accent}`}>{rule.metric ?? 'No results yet'}</p></div></CardContent></Card>) : <Card><CardContent className="p-10 text-center text-muted-foreground">No reports yet. Reports appear after a rule receives user activity.</CardContent></Card>}</> : <>
       <div key={debuggerOpen ? 'debugger' : 'rules'} className="flag-section-transition">
-      {debuggerOpen && <div className="mb-4 flex items-center justify-between"><h2 className="text-sm font-medium">Debugger</h2><Button variant="ghost" size="icon" aria-label="Close debugger" onClick={() => setDebuggerOpen(false)}><X className="size-4" /></Button></div>}
+      {debuggerOpen && <div className="mb-4 flex items-center justify-between"><h2 className="text-[18px] font-normal">Debugger</h2><Button variant="ghost" size="icon" aria-label="Close debugger" onClick={() => setDebuggerOpen(false)}><X className="size-4" /></Button></div>}
       {debuggerOpen ? <section aria-labelledby="debugger-coming-soon" className="flex min-h-[420px] flex-col items-center justify-center px-6 py-12 text-center">
         <ComingSoonIllustration className="mb-6 h-auto w-full max-w-[280px]" />
         <h2 id="debugger-coming-soon" className="text-xl font-semibold">Debugger is being built</h2>
         <p className="mt-3 max-w-sm text-sm leading-6 text-muted-foreground">Soon, you’ll be able to check how your rules evaluate visitors and understand which experience they receive.</p>
       </section> : <div className="space-y-4">
 
-      <p className="mb-4 text-sm text-muted-foreground">All visitors will be evaluated for the rules in the following order.</p>
+      {showHoldoutSummary && <section className="rounded-sm border border-border bg-card p-4" aria-label="Flag holdouts">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2><Button variant="ghost" className="h-auto gap-2 p-0 text-base font-normal hover:bg-transparent" aria-expanded={holdoutsExpanded} aria-controls="flag-holdouts" onClick={() => setHoldoutsExpanded(value => !value)}>
+            <ChevronDown className={`size-4 transition-transform motion-reduce:transition-none ${holdoutsExpanded ? '' : '-rotate-90'}`} />
+            Holdout ({selectedHoldouts.length})
+          </Button></h2>
+          <Button variant="link" className="h-auto gap-1 p-0 font-normal" onClick={() => setHoldoutOpen(true)}>Manage Holdouts<ArrowRight className="size-4" /></Button>
+        </div>
+        <AnimatedRuleContent open={holdoutsExpanded} id="flag-holdouts">
+          <div className="mt-4 overflow-x-auto rounded-sm border border-border">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-canvas text-muted-foreground"><tr>
+                <th scope="col" className="px-3 py-2 font-medium">Name</th>
+                <th scope="col" className="w-36 whitespace-nowrap px-3 py-2 font-medium">Traffic allocation</th>
+                <th scope="col" className="w-48 whitespace-nowrap px-3 py-2 font-medium">Associated feature flags</th>
+              </tr></thead>
+              <tbody>{selectedHoldouts.map(item => <tr key={item.id}>
+                <td className="px-3 py-2">{item.name}</td><td className="px-3 py-2">{item.traffic}%</td><td className="px-3 py-2">{new Set([...item.linkedFlagIds, flagId]).size}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+        </AnimatedRuleContent>
+      </section>}
+      {showHoldoutSummary ? <div className="!mt-3 [&+section]:!mt-3 flex w-full items-center justify-center gap-2 rounded bg-[color-mix(in_srgb,var(--semantic-bg-canvas),var(--semantic-bg-selected-hover)_50%)] px-4 py-3 text-center text-[14px] font-normal text-muted-foreground">
+        <ArrowRight className="size-4 shrink-0 rotate-90" aria-hidden="true" />
+        <p>Rest of the visitors will be evaluated for the following rules</p>
+        <ArrowRight className="size-4 shrink-0 rotate-90" aria-hidden="true" />
+      </div> : <p className="mb-4 text-sm text-muted-foreground">All visitors will be evaluated for the rules in the following order.</p>}
       {(['rollout', 'experiments'] as const).map(category => {
         const visible = category === 'rollout' ? rollout : experiments;
         const expanded = !collapsedGroups[category];
         return <Fragment key={category}>
-          {category === 'experiments' && <div className="!mt-3 [&+section]:!mt-3 flex w-full items-center justify-center gap-2 rounded bg-info-bg/40 px-4 py-3 text-center text-sm text-muted-foreground">
+          {category === 'experiments' && <div className="!mt-3 [&+section]:!mt-3 flex w-full items-center justify-center gap-2 rounded bg-info-bg/40 px-4 py-3 text-center text-[14px] font-normal text-muted-foreground">
             <ArrowRight className="size-4 shrink-0 rotate-90" aria-hidden="true" />
             <p>Users qualifying for rollout rules are evaluated for the following rules.</p>
             <ArrowRight className="size-4 shrink-0 rotate-90" aria-hidden="true" />
@@ -165,6 +198,7 @@ function FlagWorkspace({ flagId }: { flagId: string }) {
       </div>
       </div>
     </div>
+    {holdoutOpen && <FlagHoldoutSheet key={key} flagId={flagId} environment={environment} selectedIds={selectedHoldoutIds} onClose={() => setHoldoutOpen(false)} onSave={ids => { saveHoldouts(key, ids); setHoldoutOpen(false); setNotice({ message: 'Holdouts saved' }); }} />}
     <Sheet open={!!pendingFlow} onOpenChange={open => { if (!open) setPendingFlow(null); }}>
       <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-lg">
         <SheetHeader className="border-b border-border px-6 py-5 pr-12 text-left"><SheetTitle>{pendingFlow?.title}</SheetTitle></SheetHeader>

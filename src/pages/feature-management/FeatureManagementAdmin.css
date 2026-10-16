@@ -1,0 +1,12 @@
+.fm-admin { padding: 32px; }
+.fm-admin-icon { display: block; flex: none; max-width: none; }
+.fm-admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; line-height: 20px; }
+.fm-admin-table th { height: 42px; background: var(--semantic-bg-disabled, var(--muted)); color: var(--muted-foreground); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.fm-admin-table th, .fm-admin-table td { padding: 0 24px; border-bottom: 1px solid var(--border); }
+.fm-admin-table td { height: 72px; background: var(--background); }
+.fm-admin-table tbody:last-child tr:last-child td { border-bottom: 0; }
+.fm-admin-table .fm-sdk-cell { padding: 16px 24px; background: var(--semantic-bg-canvas, var(--background)); }
+.fm-admin .fm-toggle { width: 28px; height: 16px; border-width: 1px; }
+.fm-admin .fm-toggle > span { width: 12px; height: 12px; }
+.fm-admin .fm-toggle > span[data-state=checked] { transform: translateX(12px); }
+@media (max-width: 767px) { .fm-admin { padding: 20px 16px; } }

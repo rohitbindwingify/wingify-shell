@@ -196,9 +196,11 @@ export const NAV: NavItem[] = [
     { items: [
       { label: "Feature Flags", path: "/feature-management/feature-flags" },
       { label: "Holdout", path: "/feature-management/holdout", hideCreate: true },
+      { label: "Mutually Exclusive Groups", path: "/feature-management/mutually-exclusive-groups" },
+      { label: "Environments", path: "/feature-management/environments" },
     ]},
     { items: [
-      { label: "Tech Debt", path: "/feature-management/tech-debt", hideCreate: true },
+      { label: "Monitoring & Settings", path: "/feature-management/settings", hideCreate: true },
     ]},
   ]},
   { label: "Commerce", path: "/commerce", icon: ShoppingCart, group: 2, pinnable: true, sections: [

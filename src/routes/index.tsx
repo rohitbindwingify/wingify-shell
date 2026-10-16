@@ -55,6 +55,8 @@ import SurveysPage from "../pages/pulse/SurveysPage";
 import SurveyDetailPage from "../pages/pulse/SurveyDetailPage";
 import ConceptTestPage from "../pages/pulse/ConceptTestPage";
 import ConceptTestDetailPage from "../pages/pulse/ConceptTestDetailPage";
+import EnvironmentsPage from "../pages/feature-management/EnvironmentsPage";
+import ExclusiveGroupsPage from "../pages/feature-management/ExclusiveGroupsPage";
 import FeatureFlagsPage from "../pages/feature-management/FeatureFlagsPage";
 import FlagDetailPage from "../pages/feature-management/FlagDetailPage";
 import FlagRolloutPage from "../pages/feature-management/FlagRolloutPage";
@@ -115,6 +117,8 @@ const PAGES: Partial<Record<string, ComponentType>> = {
   "/pulse/surveys": SurveysPage,
   "/pulse/concept-test": ConceptTestPage,
   "/feature-management/feature-flags": FeatureFlagsPage,
+  "/feature-management/environments": EnvironmentsPage,
+  "/feature-management/mutually-exclusive-groups": ExclusiveGroupsPage,
   "/feature-management/flag-rollout": FlagRolloutPage,
   "/feature-management/flag-testing": FlagTestingPage,
   "/feature-management/flag-multivariate": FlagMultivariatePage,
@@ -152,6 +156,7 @@ const pageRoutes: RouteObject[] = [];
 const detailRoutes: RouteObject[] = [];
 
 const addDetailRoute = (leafPath: string) => {
+  if (["/feature-management/environments", "/feature-management/mutually-exclusive-groups", "/feature-management/settings"].includes(leafPath)) return;
   // Recommendation editor has its own chrome (screenshot layout) — not DetailShell.
   if (leafPath === "/commerce/recommendation") {
     detailRoutes.push({
@@ -539,6 +544,8 @@ export const router = createBrowserRouter([
             path: "/design-system/:section",
             element: <DesignSystemPage />,
           },
+          // Keep Tech Debt directly accessible while its navigation placement is deferred.
+          { path: "/feature-management/tech-debt", element: <TechDebtPage /> },
           ...pageRoutes,
           { path: "*", element: <PlaceholderPage /> },
         ],
