@@ -53,8 +53,8 @@ export default function FlagEnvironmentTable({ rows }: { rows: FeatureFlag[] }) 
               {FLAG_ENVIRONMENTS.map(environment => {
                 const rules = rulesForFlag(flag.id, environment);
                 const key = `${flag.id}:${environment}`;
-                const isOpen = environmentExpanded[key] ?? rules.length > 0;
                 const isOn = environmentOn(key);
+                const isOpen = environmentExpanded[key] ?? isOn;
                 const contentId = `environment-rules-${flag.id}-${environment}`;
                 const summary = (['Active', 'Inactive', 'Paused', 'Draft', 'Scheduled', 'Completed'] as const)
                   .map(status => ({ status, count: rules.filter(rule => ruleStatus(rule, isOn) === status).length }))
