@@ -502,14 +502,19 @@ export default function DrillInBreadcrumb({
             strong={!hasWebsiteCrumb && !hasIntegrationCrumb && !isMtuHistory}
             trailing={
               leafActiveId === WEB_EXP_SUBSCRIPTION_PATH ? (
-                <Badge
-                  tone="neutral"
-                  fill="light"
-                  size="sm"
-                  className="shrink-0 font-normal"
-                >
-                  {WEB_EXP_PLAN.name}
-                </Badge>
+                <span className="flex shrink-0 items-center gap-1">
+                  {WEB_EXP_PLAN.badges.map((badge) => (
+                    <Badge
+                      key={badge.label}
+                      tone={badge.tone}
+                      fill="light"
+                      size="sm"
+                      className="shrink-0 font-normal"
+                    >
+                      {badge.label}
+                    </Badge>
+                  ))}
+                </span>
               ) : null
             }
           />

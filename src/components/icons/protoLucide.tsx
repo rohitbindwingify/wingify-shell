@@ -133,6 +133,7 @@ export const PanelRight = (props: any) => <AppIcon name="PanelRight" {...props} 
 export const Paperclip = (props: any) => <AppIcon name="Paperclip" {...props} />;
 export const PenLine = (props: any) => <AppIcon name="PenLine" {...props} />;
 export const Pencil = (props: any) => <AppIcon name="Pencil" {...props} />;
+export const Phone = (props: any) => <AppIcon name="Phone" {...props} />;
 export const Percent = (props: any) => <AppIcon name="Percent" {...props} />;
 export const PictureInPicture2 = (props: any) => <AppIcon name="PictureInPicture2" {...props} />;
 export const PieChart = (props: any) => <AppIcon name="PieChart" {...props} />;

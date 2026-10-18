@@ -120,6 +120,7 @@ import { PaperPlaneTilt } from "@phosphor-icons/react/dist/ssr/PaperPlaneTilt";
 import { Paperclip } from "@phosphor-icons/react/dist/ssr/Paperclip";
 import { Pause } from "@phosphor-icons/react/dist/ssr/Pause";
 import { Pencil } from "@phosphor-icons/react/dist/ssr/Pencil";
+import { Phone } from "@phosphor-icons/react/dist/ssr/Phone";
 import { PencilSimple } from "@phosphor-icons/react/dist/ssr/PencilSimple";
 import { PencilSimpleLine } from "@phosphor-icons/react/dist/ssr/PencilSimpleLine";
 import { Percent } from "@phosphor-icons/react/dist/ssr/Percent";
@@ -323,6 +324,7 @@ export const PHOSPHOR_COMPONENTS = {
   "Paperclip": Paperclip,
   "Pause": Pause,
   "Pencil": Pencil,
+  "Phone": Phone,
   "PenLine": PencilSimpleLine,
   "Percent": Percent,
   "PictureInPicture2": PictureInPicture,

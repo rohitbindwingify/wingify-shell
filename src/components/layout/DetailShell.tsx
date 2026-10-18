@@ -2087,17 +2087,36 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
                       <div className="relative shrink-0">
                         <button
                           type="button"
-                          title={isAnalytics ? "Filter by type" : "Filter by status"}
-                          aria-label={isAnalytics ? "Filter by type" : "Filter by status"}
+                          title={
+                            activeFilter === "All"
+                              ? isAnalytics
+                                ? "Filter by type"
+                                : "Filter by status"
+                              : `Filtered by ${activeFilter}`
+                          }
+                          aria-label={
+                            activeFilter === "All"
+                              ? isAnalytics
+                                ? "Filter by type"
+                                : "Filter by status"
+                              : `Filtered by ${activeFilter}`
+                          }
                           aria-expanded={filterMenuOpen}
+                          aria-pressed={activeFilter !== "All"}
                           onClick={() => setFilterMenuOpen((o) => !o)}
                           className={cn(
-                            "flex items-center justify-center rounded-md border border-input p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-                            activeFilter !== "All" &&
-                              "border-transparent bg-secondary text-secondary-foreground"
+                            "relative flex items-center justify-center rounded-md border border-input p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                            filterMenuOpen && "bg-muted text-foreground",
+                            activeFilter !== "All" && "text-foreground"
                           )}
                         >
                           <ListFilter className="h-4 w-4" />
+                          {activeFilter !== "All" ? (
+                            <span
+                              aria-hidden
+                              className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-foreground ring-2 ring-popover"
+                            />
+                          ) : null}
                         </button>
                         {filterMenuOpen && (
                           <div className="absolute right-0 top-full z-10 mt-1 max-h-64 w-44 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-lg">
@@ -2111,7 +2130,8 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
                                 }}
                                 className={cn(
                                   "flex w-full items-center justify-between gap-2 rounded-sm px-2.5 py-1.5 text-left text-sm text-foreground transition-colors hover:bg-muted",
-                                  activeFilter === filter && "font-medium"
+                                  activeFilter === filter &&
+                                    "bg-accent font-medium text-accent-foreground hover:bg-accent"
                                 )}
                               >
                                 {filter}

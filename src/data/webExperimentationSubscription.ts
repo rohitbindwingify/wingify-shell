@@ -7,9 +7,14 @@ export const MTU_HISTORY_PATH = `${WEB_EXP_SUBSCRIPTION_PATH}/history`;
 
 export const WEB_EXP_PLAN = {
   name: "Enterprise plan",
-  status: "Active",
+  badges: [
+    { label: "Enterprise plan", tone: "neutral" },
+    { label: "Expired", tone: "cherry" },
+    { label: "Has extension", tone: "neutral" },
+  ],
+  status: "Expired",
   consumed: "137K",
-  consumedDetail: "of 1.20M, expires on Jun 15, 2028",
+  consumedDetail: "of 1.20M, expired on Sep 24, 2026",
   renewal: "Aug 24, 2027",
   billing: "Annually",
   retention: "13 Months",

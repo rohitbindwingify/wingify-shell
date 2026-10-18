@@ -28,11 +28,12 @@ export const ACTIVE_SUBSCRIPTION_PRODUCTS: SubscriptionProduct[] = [
     icon: FlaskConical,
     badges: [
       { label: "Enterprise plan" },
+      { label: "Expired" },
       { label: "Has extension", hasInfo: true },
     ],
     metricLabel: "MTU consumed",
     metricValue: "1K",
-    metricDetail: "of 1.20M, expires on Jul 27, 2029",
+    metricDetail: "of 1.20M, expired on Sep 24, 2026",
     renewalDate: "Jul 27, 2029",
     billingFrequency: "Annually",
     path: "/settings/subscription/web-experimentation-rollout",

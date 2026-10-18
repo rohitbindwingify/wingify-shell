@@ -143,6 +143,7 @@ export const LUCIDE_ICON_MAP = {
   "Paperclip": "paperclip",
   "Pause": "pause",
   "Pencil": "pencil",
+  "Phone": "phone",
   "PenLine": "pen-line",
   "Percent": "percent",
   "PictureInPicture2": "picture-in-picture-2",

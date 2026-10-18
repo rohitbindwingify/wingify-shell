@@ -143,6 +143,7 @@ export const PHOSPHOR_ICON_MAP = {
   "Paperclip": "Paperclip",
   "Pause": "Pause",
   "Pencil": "Pencil",
+  "Phone": "Phone",
   "PenLine": "PencilSimpleLine",
   "Percent": "Percent",
   "PictureInPicture2": "PictureInPicture",
