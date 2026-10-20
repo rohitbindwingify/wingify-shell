@@ -15,11 +15,19 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import type { PageGuide } from "@/config/navigation";
 
 function hasGuide(guide?: PageGuide): guide is PageGuide {
   return Boolean(guide && (guide.tutorial || guide.help || guide.info));
 }
+
+const iconBtnClass =
+  "size-7 shrink-0 text-muted-foreground hover:text-foreground";
 
 function HelpVideoCard({
   video,
@@ -51,11 +59,122 @@ function HelpVideoCard({
   );
 }
 
-/** Page guide next to the breadcrumb: one help icon opens tutorial, help, and about. */
+function HelpBody({ help }: { help: NonNullable<PageGuide["help"]> }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-semibold text-foreground">{help.title}</p>
+      {help.video ? <HelpVideoCard video={help.video} /> : null}
+      <p className="text-xs leading-relaxed text-muted-foreground">{help.body}</p>
+      {help.href ? (
+        <a
+          href={help.href}
+          className="inline-flex items-center gap-1 text-xs font-medium text-link hover:text-link-hover"
+        >
+          Learn more
+          <ExternalLink className="size-3" aria-hidden />
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
+function AboutBody({ info }: { info: NonNullable<PageGuide["info"]> }) {
+  return (
+    <div>
+      <p className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+        <Info className="size-3.5 text-muted-foreground" aria-hidden />
+        About this page
+      </p>
+      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+        {info.body}
+        {info.href ? (
+          <>
+            {" "}
+            <a
+              href={info.href}
+              className="font-medium text-link hover:text-link-hover"
+            >
+              Learn more
+            </a>
+          </>
+        ) : null}
+      </p>
+    </div>
+  );
+}
+
+/** Page guide next to the breadcrumb: multi-option menu, or the single action’s icon. */
 export default function PageGuideCluster({ guide }: { guide?: PageGuide }) {
   if (!hasGuide(guide)) return null;
 
   const tutorialLabel = guide.tutorial?.label ?? "Play tutorial";
+  const slots = [
+    guide.tutorial ? "tutorial" : null,
+    guide.help ? "help" : null,
+    guide.info ? "info" : null,
+  ].filter(Boolean) as Array<"tutorial" | "help" | "info">;
+
+  // Single option → that icon upfront (one click / one open).
+  if (slots.length === 1 && slots[0] === "tutorial") {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className={iconBtnClass}
+        aria-label={tutorialLabel}
+        title={tutorialLabel}
+      >
+        <Play className="size-4" aria-hidden />
+      </Button>
+    );
+  }
+
+  if (slots.length === 1 && slots[0] === "help" && guide.help) {
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={iconBtnClass}
+            aria-label="Help"
+            title="Help"
+          >
+            <CircleHelp className="size-4" aria-hidden />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-80 space-y-3 p-3">
+          <HelpBody help={guide.help} />
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
+  if (slots.length === 1 && slots[0] === "info" && guide.info) {
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className={iconBtnClass}
+            aria-label="About this page"
+            title="About this page"
+          >
+            <Info className="size-4" aria-hidden />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-64 p-3">
+          <AboutBody info={guide.info} />
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
+  const showActions = Boolean(guide.tutorial || guide.help);
 
   return (
     <DropdownMenu modal={false}>
@@ -64,13 +183,13 @@ export default function PageGuideCluster({ guide }: { guide?: PageGuide }) {
           type="button"
           variant="ghost"
           size="icon"
-          className="size-7 shrink-0 text-muted-foreground hover:text-foreground"
+          className={iconBtnClass}
           aria-label="Page help"
         >
           <CircleHelp className="size-4" aria-hidden />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
+      <DropdownMenuContent align="start" className="w-64">
         {guide.tutorial ? (
           <DropdownMenuItem className="gap-2">
             <Play className="size-3.5 text-muted-foreground" aria-hidden />
@@ -84,38 +203,15 @@ export default function PageGuideCluster({ guide }: { guide?: PageGuide }) {
               Help
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="w-80 space-y-3 p-3">
-              <p className="text-sm font-semibold text-foreground">
-                {guide.help.title}
-              </p>
-              {guide.help.video ? (
-                <HelpVideoCard video={guide.help.video} />
-              ) : null}
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                {guide.help.body}
-              </p>
-              {guide.help.href ? (
-                <a
-                  href={guide.help.href}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-link hover:text-link-hover"
-                >
-                  Learn more
-                  <ExternalLink className="size-3" aria-hidden />
-                </a>
-              ) : null}
+              <HelpBody help={guide.help} />
             </DropdownMenuSubContent>
           </DropdownMenuSub>
         ) : null}
         {guide.info ? (
           <>
-            {(guide.tutorial || guide.help) && <DropdownMenuSeparator />}
+            {showActions ? <DropdownMenuSeparator /> : null}
             <div className="px-2 py-1.5">
-              <p className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-                <Info className="size-3.5 text-muted-foreground" aria-hidden />
-                About this page
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                {guide.info}
-              </p>
+              <AboutBody info={guide.info} />
             </div>
           </>
         ) : null}

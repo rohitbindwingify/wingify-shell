@@ -54,7 +54,7 @@ import { UPGRADE_ADDONS_PATH, UPGRADE_SECTIONS } from "./upgradeNav";
 export type PageGuide = {
   /** Play-tutorial control. */
   tutorial?: { label?: string };
-  /** Click-open help popover. */
+  /** Help submenu (docs / optional video). */
   help?: {
     title: string;
     body: string;
@@ -62,8 +62,8 @@ export type PageGuide = {
     /** Optional tutorial video card inside the popover. */
     video?: { title: string; duration: string; poster: string };
   };
-  /** Hover tooltip copy. */
-  info?: string;
+  /** About-this-page blurb under the menu divider. */
+  info?: { body: string; href?: string };
 };
 
 export type NavLeaf = {
@@ -314,7 +314,10 @@ export const NAV: NavItem[] = [
               poster: "/editor-preview/images/hero.jpg",
             },
           },
-          info: "Record and playback visitor sessions on your website. Learn more",
+          info: {
+            body: "Record and playback visitor sessions on your website.",
+            href: "#",
+          },
         },
       },
       { label: "Mobile Recordings", path: "/insights/mobile-recordings", hideCreate: true },
@@ -759,6 +762,65 @@ export function flattenNavLeaves(sections: NavSection[]): NavLeaf[] {
   for (const section of sections) walk(section.items);
   return out;
 }
+
+/** Stable hash so each path keeps the same tutorial/help/about mix. */
+function pageGuideVariant(path: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < path.length; i++) {
+    h ^= path.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0) % 7;
+}
+
+/** Dummy page-guide copy; which slots appear varies by path (0–6). */
+function pageGuideFor(label: string, path: string): PageGuide {
+  const v = pageGuideVariant(path);
+  const guide: PageGuide = {};
+  // 0 all · 1 tutorial+help · 2 tutorial+about · 3 help+about · 4 tutorial · 5 help · 6 about
+  if (v === 0 || v === 1 || v === 2 || v === 4) {
+    guide.tutorial = { label: "Play tutorial" };
+  }
+  if (v === 0 || v === 1 || v === 3 || v === 5) {
+    guide.help = {
+      title: label,
+      body: `Get help with ${label}: setup tips, common workflows, and troubleshooting.`,
+      href: "#",
+      ...(v === 0 || v === 3
+        ? {
+            video: {
+              title: `${label} overview`,
+              duration: "3 mins",
+              poster: "/editor-preview/images/hero.jpg",
+            },
+          }
+        : {}),
+    };
+  }
+  if (v === 0 || v === 2 || v === 3 || v === 6) {
+    guide.info = {
+      body: `${label} helps you run and measure experiences for your visitors.`,
+      href: "#",
+    };
+  }
+  return guide;
+}
+
+/** Attach randomized page guides to every product switcher end page (skip hand-authored). */
+function attachMainFeaturePageGuides() {
+  const productPaths = new Set<string>(PRODUCT_SWITCHER_PATHS);
+  for (const item of NAV) {
+    if (!productPaths.has(item.path)) continue;
+    if (!item.sections?.length) {
+      if (!item.pageGuide) item.pageGuide = pageGuideFor(item.label, item.path);
+      continue;
+    }
+    for (const leaf of flattenNavLeaves(item.sections)) {
+      if (!leaf.pageGuide) leaf.pageGuide = pageGuideFor(leaf.label, leaf.path);
+    }
+  }
+}
+attachMainFeaturePageGuides();
 
 /** Land path for a leaf: first nested child when present, else own path. */
 export function leafLandPath(leaf: NavLeaf): string {

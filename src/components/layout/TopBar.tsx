@@ -1,12 +1,11 @@
-import { ChevronDown, Plus, Sparkles } from "@/components/icons/protoLucide";
+import { ChevronDown, Plus } from "@/components/icons/protoLucide";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Badge, BadgeDot } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useRowsStore } from "../../store/rows";
 import { useRecommendationRowsStore } from "../../store/recommendationRows";
-import { showsCreate, showsSummarise, pageLabel } from "../../lib/nav";
-import { useWingzStore } from "@/store/wingz";
+import { showsCreate, pageLabel } from "../../lib/nav";
 import { usePlanModalsStore } from "@/store/planModals";
 import {
   CREATE_GROUP_LABELS,
@@ -98,8 +97,6 @@ export default function TopBar({ showLogo = false }: { showLogo?: boolean }) {
   const getStartedEmailVerified = useWorkspaceStore(
     (s) => s.getStartedProgress.emailVerified
   );
-  const openWingzAndAsk = useWingzStore((s) => s.openWingzAndAsk);
-
   const handleSelect = (option: CreateOption) => {
     // Route-backed options (e.g. Create with Copilot) navigate to their screen.
     if (option.route) {
@@ -125,14 +122,6 @@ export default function TopBar({ showLogo = false }: { showLogo?: boolean }) {
       ? "/web-experiment-old"
       : "/web-experiment";
     navigate(`${base}/c/${id}`);
-  };
-
-  const handleSummarise = () => {
-    const label = pageLabel(pathname);
-    openWingzAndAsk(
-      { kind: "general" },
-      `Summarise this ${label} listing — highlight what's active, trends, and anything that needs attention.`
-    );
   };
 
   const welcomeChrome = pathname === "/design/welcome-start";
@@ -186,20 +175,6 @@ export default function TopBar({ showLogo = false }: { showLogo?: boolean }) {
             <BadgeDot className="bg-[var(--status-running-fg)]" />
             Collecting Data
           </Badge>
-        )}
-        {!welcomeChrome && showsSummarise(pathname) && (
-          <Button
-            type="button"
-            variant="outline"
-            className="h-auto gap-1.5 px-3 py-1.5 shadow-none"
-            onClick={handleSummarise}
-          >
-            <Sparkles
-              className="h-4 w-4 text-[var(--badge-berry-light-fg)]"
-              aria-hidden
-            />
-            Summarise
-          </Button>
         )}
         {!welcomeChrome &&
           showsCreate(pathname) &&
