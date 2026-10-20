@@ -1,91 +1,10 @@
-import { NavLink, useLocation } from "react-router-dom";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { ChevronDown } from "@/components/icons/protoLucide";
+import { useLocation } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { GET_STARTED_PROGRESS } from "@/data/getStarted";
-import {
-  productSwitcherItems,
-  type NavItem,
-} from "../../config/navigation";
-import { firstChildPath, resolveBreadcrumb } from "../../lib/nav";
+import { resolveBreadcrumb } from "../../lib/nav";
 import { useIsGetStartedLocked } from "@/store/getStartedOnboarding";
-import { cn } from "../../lib/utils";
+import { LeafCrumb, ProductCrumb } from "./CrumbSwitchers";
 import PageGuideCluster from "./PageGuideCluster";
-
-const PRODUCTS = productSwitcherItems();
-
-function isSwitcherProduct(item: NavItem): boolean {
-  return PRODUCTS.some((p) => p.path === item.path);
-}
-
-const crumbTriggerClass =
-  "flex items-center gap-0.5 truncate rounded-md px-1 py-0.5 outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none";
-
-/** Product crumb — dropdown to jump between Wingz and the other products. */
-function ProductSwitcher({
-  item,
-  locked = false,
-  strong = false,
-}: {
-  item: NavItem;
-  locked?: boolean;
-  /** Current page crumb — heavier weight. */
-  strong?: boolean;
-}) {
-  const showSwitcher = isSwitcherProduct(item) && !locked;
-  const weight = strong ? "font-semibold text-foreground" : "font-normal text-foreground";
-
-  if (!showSwitcher) {
-    return (
-      <span className={cn("truncate px-1 py-0.5", weight)}>{item.label}</span>
-    );
-  }
-
-  return (
-    <DropdownMenu.Root modal={false}>
-      <DropdownMenu.Trigger asChild>
-        <button
-          type="button"
-          aria-label="Switch product"
-          className={cn(crumbTriggerClass, weight)}
-        >
-          <span className="truncate">{item.label}</span>
-          <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-        </button>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Portal>
-        <DropdownMenu.Content
-          align="start"
-          sideOffset={4}
-          className="z-50 min-w-[240px] rounded-md border border-border bg-popover p-1.5 text-sm text-popover-foreground shadow-lg"
-        >
-          {PRODUCTS.map((product) => {
-            const ProductIcon = product.icon;
-            const to = firstChildPath(product);
-            const active = product.path === item.path;
-            return (
-              <DropdownMenu.Item key={product.path} asChild>
-                <NavLink
-                  to={to}
-                  className={cn(
-                    "flex cursor-pointer items-center gap-2.5 rounded-sm px-3 py-2 outline-none data-[highlighted]:bg-accent",
-                    active && "bg-accent font-medium"
-                  )}
-                >
-                  <ProductIcon
-                    className="h-4 w-4 shrink-0 text-muted-foreground"
-                    aria-hidden
-                  />
-                  <span className="truncate">{product.label}</span>
-                </NavLink>
-              </DropdownMenu.Item>
-            );
-          })}
-        </DropdownMenu.Content>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
-  );
-}
 
 export default function BreadcrumbNav() {
   const { pathname } = useLocation();
@@ -98,7 +17,7 @@ export default function BreadcrumbNav() {
   if (!item.sections || !leaf) {
     return (
       <div className="flex min-w-0 items-center gap-1 text-sm">
-        <ProductSwitcher item={item} locked={navLocked} strong />
+        <ProductCrumb item={item} locked={navLocked} tone="strong" />
         <PageGuideCluster guide={item.pageGuide} />
       </div>
     );
@@ -106,49 +25,16 @@ export default function BreadcrumbNav() {
 
   return (
     <div className="flex min-w-0 items-center gap-1 text-sm">
-      <ProductSwitcher item={item} locked={navLocked} />
+      <ProductCrumb item={item} locked={navLocked} tone="normal" />
       <span className="text-muted-foreground" aria-hidden>
         /
       </span>
-      {navLocked ? (
-        <span className="truncate px-1 py-0.5 font-semibold text-foreground">
-          {leaf.label}
-        </span>
-      ) : (
-        <DropdownMenu.Root modal={false}>
-          <DropdownMenu.Trigger asChild>
-            <button
-              type="button"
-              className={cn(crumbTriggerClass, "font-semibold text-foreground")}
-            >
-              <span className="truncate">{leaf.label}</span>
-              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-            </button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              align="start"
-              sideOffset={4}
-              className="z-50 min-w-[220px] rounded-md border border-border bg-popover p-1.5 text-sm text-popover-foreground shadow-lg"
-            >
-              {siblings.map((sibling) => (
-                <DropdownMenu.Item key={sibling.path} asChild>
-                  {/* Plain-string className: Radix Slot can't merge NavLink's function form */}
-                  <NavLink
-                    to={sibling.path}
-                    className={cn(
-                      "block cursor-pointer rounded-sm px-3 py-2 outline-none data-[highlighted]:bg-accent",
-                      sibling.path === leaf.path && "bg-accent font-medium"
-                    )}
-                  >
-                    {sibling.label}
-                  </NavLink>
-                </DropdownMenu.Item>
-              ))}
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
-      )}
+      <LeafCrumb
+        leaf={leaf}
+        siblings={siblings}
+        locked={navLocked}
+        tone="strong"
+      />
       <PageGuideCluster guide={leaf.pageGuide} />
       {leaf.path === "/home/get-started" && (
         <Badge tone="ocean" fill="light" size="sm">

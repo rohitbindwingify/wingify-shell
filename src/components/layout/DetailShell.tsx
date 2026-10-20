@@ -59,7 +59,14 @@ import {
   withAnalyticsNameOverride,
 } from "@/data/analyticsOverview";
 import { useAnalyticsRowsStore } from "@/store/analyticsRows";
-import { mainNavCrumbPath, UTILITY_RAIL_WIDTH, resolveBreadcrumb } from "../../lib/nav";
+import {
+  mainNavCrumbPath,
+  RAIL_WIDTH,
+  UTILITY_RAIL_WIDTH,
+  resolveBreadcrumb,
+} from "../../lib/nav";
+import { useIsGetStartedLocked } from "@/store/getStartedOnboarding";
+import { LeafCrumb, ProductCrumb } from "./CrumbSwitchers";
 import { cn } from "../../lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -138,6 +145,7 @@ import {
 } from "../../data/personalizations";
 import { recommendationLandingPath } from "../../data/recommendations";
 import ExpandedNav from "./ExpandedNav";
+import DetailCrumbOverflow from "./DetailCrumbOverflow";
 import WingifyLogoButton from "./WingifyLogoButton";
 import UtilityRail from "./UtilityRail";
 
@@ -1028,7 +1036,8 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
   const onReports = pathname.endsWith("/reports");
 
   // Breadcrumb trail: main-nav label, plus the sub-nav label when basePath is a leaf.
-  const { item, leaf } = resolveBreadcrumb(basePath);
+  const { item, leaf, siblings } = resolveBreadcrumb(basePath);
+  const navLocked = useIsGetStartedLocked();
 
   // Real-data paths: Web Exp, Personalize, or Commerce Recommendation.
   const realData = isRealDataPath(basePath);
@@ -1483,11 +1492,21 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
   }, [navOpen]);
 
   return (
-    <div className="flex h-full flex-col bg-background text-foreground">
-      <header className="flex h-[56px] shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <WingifyLogoButton />
+    <div className="relative flex h-full bg-background text-foreground">
+      {/* Pin bird at the same (8,8) slot as the list-page rail — no empty column. */}
+      <div
+        className="absolute left-0 top-0 z-20 flex h-[56px] items-center px-2"
+        style={{ width: RAIL_WIDTH }}
+      >
+        <WingifyLogoButton />
+      </div>
 
+      <div className="flex min-w-0 flex-1 flex-col">
+      <header
+        className="flex h-[56px] shrink-0 items-center justify-between gap-4 border-b border-border bg-background pr-4"
+        style={{ paddingLeft: RAIL_WIDTH }}
+      >
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           {isAnalytics ? (
             /* Analytics: Overview › [Board] › item ▾ — report switcher is board-scoped. */
             <div className="flex min-w-0 items-center gap-0.5">
@@ -1520,20 +1539,27 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
               </TooltipProvider>
 
               <div className="flex min-w-0 items-center gap-1.5 text-sm">
-                {/* Same destination as the back arrow (list, or board when in board context). */}
-                <Link
-                  to={
-                    isAnalyticsBoardContext && contextBoard
-                      ? analyticsItemPath(contextBoard.id, { basePath })
-                      : basePath
+                <DetailCrumbOverflow
+                  earlier={
+                    isAnalyticsBoardContext
+                      ? [{ label: analyticsListCrumb, to: basePath }]
+                      : undefined
                   }
-                  className="shrink-0 rounded-md px-1.5 py-1 font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:bg-muted"
-                >
-                  {analyticsListCrumb}
-                </Link>
+                />
+                <span className="shrink-0 text-muted-foreground" aria-hidden>
+                  /
+                </span>
+                {/* Last two: list (or board when in board context) + entity. */}
+                {!(isAnalyticsBoardContext && contextBoard) && (
+                  <Link
+                    to={basePath}
+                    className="shrink-0 rounded-md px-1.5 py-1 font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:bg-muted"
+                  >
+                    {analyticsListCrumb}
+                  </Link>
+                )}
                 {isAnalyticsBoardContext && contextBoard ? (
                   <>
-                    <span className="shrink-0 text-muted-foreground">/</span>
                     <Popover.Root
                       open={boardMenuOpen}
                       onOpenChange={(o) => {
@@ -1936,22 +1962,27 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
             </TooltipProvider>
 
             <div className="flex min-w-0 items-center gap-1 text-sm">
-              {/* Section crumb → same list URL as Back (no sibling switcher). */}
+              <DetailCrumbOverflow product={leaf && item ? item : undefined} />
+              <span className="shrink-0 text-muted-foreground" aria-hidden>
+                /
+              </span>
+              {/* Last two: section/list crumb + entity. Each node opens its level switcher. */}
               {leaf ? (
-                <Link
-                  to={mainNavCrumbPath(basePath)}
-                  title={leaf.label}
-                  className="max-w-[10rem] shrink-0 truncate rounded-md px-1 py-0.5 font-normal text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted"
-                >
-                  {leaf.label}
-                </Link>
+                <LeafCrumb
+                  leaf={leaf}
+                  siblings={siblings}
+                  locked={navLocked}
+                  tone="muted"
+                />
+              ) : item ? (
+                <ProductCrumb item={item} locked={navLocked} tone="muted" />
               ) : (
                 <Link
                   to={mainNavCrumbPath(basePath)}
-                  title={item?.label ?? basePath}
-                  className="hidden max-w-[10rem] shrink-0 truncate rounded-md px-1 py-0.5 font-normal text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted lg:inline"
+                  title={basePath}
+                  className="max-w-[10rem] shrink-0 truncate rounded-md px-1 py-0.5 font-normal text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted"
                 >
-                  {item?.label ?? basePath}
+                  {basePath}
                 </Link>
               )}
               <span className="shrink-0 text-muted-foreground" aria-hidden>
@@ -2379,6 +2410,7 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
           ) : null}
         </main>
         {!onReports ? <UtilityRail entityId={entityId} /> : null}
+      </div>
       </div>
 
       {/* Edge-reveal hotzone: dwell on the left viewport edge to open the nav overlay. */}
