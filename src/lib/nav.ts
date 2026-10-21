@@ -103,6 +103,8 @@ export function mainNavCrumbPath(pathname: string): string {
 /** Whether the top bar's Create button shows on this path, per nav config. */
 export function showsCreate(pathname: string): boolean {
   if (findProfileMode(pathname)) return false;
+  // Workflow editor — CTAs live in WorkflowEditorTopBar, not Create.
+  if (/^\/wingz\/workflows\/[^/]+/.test(pathname)) return false;
   const { item, leaf } = resolveBreadcrumb(pathname);
   if (leaf) return !leaf.hideCreate;
   return !item?.hideCreate;

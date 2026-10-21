@@ -82,6 +82,7 @@ import { Funnel } from "@phosphor-icons/react/dist/ssr/Funnel";
 import { FunnelSimple } from "@phosphor-icons/react/dist/ssr/FunnelSimple";
 import { Gear } from "@phosphor-icons/react/dist/ssr/Gear";
 import { GearSix } from "@phosphor-icons/react/dist/ssr/GearSix";
+import { GitBranch } from "@phosphor-icons/react/dist/ssr/GitBranch";
 import { GitFork } from "@phosphor-icons/react/dist/ssr/GitFork";
 import { Globe } from "@phosphor-icons/react/dist/ssr/Globe";
 import { HardHat } from "@phosphor-icons/react/dist/ssr/HardHat";
@@ -269,6 +270,7 @@ export const PHOSPHOR_COMPONENTS = {
   "Focus": Crosshair,
   "Funnel": Funnel,
   "GalleryVerticalEnd": Stack,
+  "GitBranch": GitBranch,
   "GitFork": GitFork,
   "Globe": Globe,
   "GripVertical": DotsSixVertical,

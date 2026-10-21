@@ -87,6 +87,7 @@ export const LUCIDE_ICON_MAP = {
   "Focus": "focus",
   "Funnel": "funnel",
   "GalleryVerticalEnd": "gallery-vertical-end",
+  "GitBranch": "git-branch",
   "GitFork": "git-fork",
   "Globe": "globe",
   "GripVertical": "grip-vertical",

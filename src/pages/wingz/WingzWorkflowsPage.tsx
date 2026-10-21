@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Calendar,
   ChevronDown,
@@ -16,6 +17,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { WORKFLOW_EDITOR_ID } from "@/data/wingzWorkflowEditor";
 
 const TEMPLATES = [
   {
@@ -44,22 +46,35 @@ const TEMPLATES = [
 
 const WORKFLOWS = [
   {
+    id: WORKFLOW_EDITOR_ID,
+    name: "Weekly AB Campaign Visitor Report — Draft with AI",
+    description:
+      "Fetches visitor info for running A/B campaigns weekly and emails a report.",
+    status: "Draft" as const,
+    trigger: "Time Based" as const,
+    lastRun: "Never",
+    createdAt: "21 Oct, 2026 15:19",
+    href: `/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=draft`,
+  },
+  {
     id: "1",
-    name: "Weekly campaign health check",
+    name: "Weekly AB Campaign Visitor Report — Previous version",
     description: "Pulls live campaign metrics and flags at-risk tests.",
     status: "Paused" as const,
     trigger: "Event Based" as const,
     lastRun: "Never",
     createdAt: "01 Oct, 2026 16:24",
+    href: `/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=previous`,
   },
   {
     id: "2",
-    name: "Losing variation digests",
+    name: "Weekly AB Campaign Visitor Report — Run history",
     description: "Emails a digest when a variation underperforms control.",
     status: "Paused" as const,
     trigger: "Time Based" as const,
     lastRun: "Never",
     createdAt: "01 Oct, 2026 14:02",
+    href: `/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=history`,
   },
   {
     id: "3",
@@ -147,31 +162,44 @@ export default function WingzWorkflowsPage() {
 
           {!templatesHidden && (
             <div className="flex gap-3 overflow-x-auto pb-1">
-              {TEMPLATES.map((template) => (
-                <button
-                  key={template.id}
-                  type="button"
-                  className="flex w-56 shrink-0 flex-col gap-3 rounded-xl border border-border bg-background p-4 text-left transition-colors hover:bg-muted"
-                >
-                  {template.id === "scratch" ? (
-                    <span className="flex size-10 items-center justify-center rounded-full border border-dashed border-border text-muted-foreground">
-                      <CirclePlus className="size-5" aria-hidden />
-                    </span>
-                  ) : (
-                    <span className="flex size-8 items-center justify-center rounded-md text-foreground">
-                      <Sparkles className="size-4" aria-hidden />
-                    </span>
-                  )}
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold text-foreground">
-                      {template.title}
-                    </p>
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      {template.description}
-                    </p>
-                  </div>
-                </button>
-              ))}
+              {TEMPLATES.map((template) => {
+                const cardClass =
+                  "flex w-56 shrink-0 flex-col gap-3 rounded-xl border border-border bg-background p-4 text-left transition-colors hover:bg-muted";
+                const body = (
+                  <>
+                    {template.id === "scratch" ? (
+                      <span className="flex size-10 items-center justify-center rounded-full border border-dashed border-border text-muted-foreground">
+                        <CirclePlus className="size-5" aria-hidden />
+                      </span>
+                    ) : (
+                      <span className="flex size-8 items-center justify-center rounded-md text-foreground">
+                        <Sparkles className="size-4" aria-hidden />
+                      </span>
+                    )}
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold text-foreground">
+                        {template.title}
+                      </p>
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        {template.description}
+                      </p>
+                    </div>
+                  </>
+                );
+                return template.id === "scratch" ? (
+                  <Link
+                    key={template.id}
+                    to={`/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=draft`}
+                    className={cardClass}
+                  >
+                    {body}
+                  </Link>
+                ) : (
+                  <button key={template.id} type="button" className={cardClass}>
+                    {body}
+                  </button>
+                );
+              })}
             </div>
           )}
         </section>
@@ -209,7 +237,16 @@ export default function WingzWorkflowsPage() {
                 {filtered.map((row) => (
                   <tr key={row.id} className="hover:bg-muted/30">
                     <td className="px-4 py-3.5">
-                      <p className="font-medium text-foreground">{row.name}</p>
+                      {"href" in row && row.href ? (
+                        <Link
+                          to={row.href}
+                          className="font-medium text-foreground hover:underline"
+                        >
+                          {row.name}
+                        </Link>
+                      ) : (
+                        <p className="font-medium text-foreground">{row.name}</p>
+                      )}
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         {row.description}
                       </p>

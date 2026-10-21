@@ -83,6 +83,7 @@ export const FlaskConical = (props: any) => <AppIcon name="FlaskConical" {...pro
 export const Focus = (props: any) => <AppIcon name="Focus" {...props} />;
 export const Funnel = (props: any) => <AppIcon name="Funnel" {...props} />;
 export const GalleryVerticalEnd = (props: any) => <AppIcon name="GalleryVerticalEnd" {...props} />;
+export const GitBranch = (props: any) => <AppIcon name="GitBranch" {...props} />;
 export const GitFork = (props: any) => <AppIcon name="GitFork" {...props} />;
 export const Globe = (props: any) => <AppIcon name="Globe" {...props} />;
 export const GripVertical = (props: any) => <AppIcon name="GripVertical" {...props} />;

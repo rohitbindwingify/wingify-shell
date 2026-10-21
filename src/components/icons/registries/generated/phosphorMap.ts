@@ -87,6 +87,7 @@ export const PHOSPHOR_ICON_MAP = {
   "Focus": "Crosshair",
   "Funnel": "Funnel",
   "GalleryVerticalEnd": "Stack",
+  "GitBranch": "GitBranch",
   "GitFork": "GitFork",
   "Globe": "Globe",
   "GripVertical": "DotsSixVertical",

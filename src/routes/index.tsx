@@ -83,6 +83,7 @@ import RecommendationReportPage from "../pages/commerce/RecommendationReportPage
 import WingzChatShell from "../components/wingz/WingzChatShell";
 import WingzChatPage from "../pages/wingz/WingzChatPage";
 import WingzAgentsPage from "../pages/wingz/WingzAgentsPage";
+import WingzWorkflowEditorPage from "../pages/wingz/WingzWorkflowEditorPage";
 import WingzWorkflowsPage from "../pages/wingz/WingzWorkflowsPage";
 import WingzSyntheticAbPage from "../pages/wingz/WingzSyntheticAbPage";
 import AnalyticsOverviewPage from "../pages/analytics/AnalyticsOverviewPage";
@@ -564,6 +565,7 @@ export const router = createBrowserRouter([
           { path: "chat", element: <WingzChatPage /> },
           { path: "agents", element: <WingzAgentsPage /> },
           { path: "workflows", element: <WingzWorkflowsPage /> },
+          { path: "workflows/:id", element: <WingzWorkflowEditorPage /> },
           { path: "synthetic-ab", element: <WingzSyntheticAbPage /> },
           // @undo — What's New leaf removed from Wingz
           // { path: "whats-new", element: <PlaceholderPage /> },
