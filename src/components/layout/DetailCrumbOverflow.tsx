@@ -3,12 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import * as Popover from "@radix-ui/react-popover";
-import { Home, MoreHorizontal } from "@/components/icons/protoLucide";
+import { MoreHorizontal } from "@/components/icons/protoLucide";
 import type { NavItem } from "@/config/navigation";
-import { GET_STARTED_PATH } from "@/lib/getStartedGate";
 import { cn } from "@/lib/utils";
 import { useIsGetStartedLocked } from "@/store/getStartedOnboarding";
-import { useIsGetStartedWorkspace } from "@/store/workspace";
 import { ProductCrumb } from "./CrumbSwitchers";
 import WorkspaceSwitcher from "./WorkspaceSwitcher";
 
@@ -20,17 +18,17 @@ export type OverflowCrumb = { label: string; to: string };
 type Props = {
   /** Collapsed product node (opens product switcher). */
   product?: NavItem;
-  /** Extra plain links after workspace / product (e.g. analytics list). */
+  /** Extra plain links after workspace / product (e.g. analytics list crumb). */
   earlier?: OverflowCrumb[];
 };
 
 export default function DetailCrumbOverflow({ product, earlier = [] }: Props) {
-  const getStarted = useIsGetStartedWorkspace();
   const navLocked = useIsGetStartedLocked();
-  const homePath = getStarted ? GET_STARTED_PATH : "/home/dashboard";
   const [open, setOpen] = useState(false);
   const openTimer = useRef<number>();
   const closeTimer = useRef<number>();
+  /** Nested menus portal outside this popover — keep overflow open while any are open. */
+  const nestedCountRef = useRef(0);
 
   useEffect(() => {
     return () => {
@@ -38,6 +36,8 @@ export default function DetailCrumbOverflow({ product, earlier = [] }: Props) {
       window.clearTimeout(closeTimer.current);
     };
   }, []);
+
+  const nestedOpen = () => nestedCountRef.current > 0;
 
   const scheduleOpen = () => {
     window.clearTimeout(closeTimer.current);
@@ -48,11 +48,34 @@ export default function DetailCrumbOverflow({ product, earlier = [] }: Props) {
   const scheduleClose = () => {
     window.clearTimeout(openTimer.current);
     window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setOpen(false), CLOSE_MS);
+    closeTimer.current = window.setTimeout(() => {
+      if (nestedOpen()) return;
+      setOpen(false);
+    }, CLOSE_MS);
+  };
+
+  const handleNestedOpenChange = (next: boolean) => {
+    nestedCountRef.current = Math.max(
+      0,
+      nestedCountRef.current + (next ? 1 : -1)
+    );
+    if (nestedOpen()) {
+      window.clearTimeout(closeTimer.current);
+      setOpen(true);
+      return;
+    }
+    // Last nested menu closed — dismiss overflow unless pointer is still over it.
+    scheduleClose();
   };
 
   return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
+    <Popover.Root
+      open={open}
+      onOpenChange={(next) => {
+        if (!next && nestedOpen()) return;
+        setOpen(next);
+      }}
+    >
       <Popover.Trigger asChild>
         <button
           type="button"
@@ -78,38 +101,39 @@ export default function DetailCrumbOverflow({ product, earlier = [] }: Props) {
           onMouseEnter={scheduleOpen}
           onMouseLeave={scheduleClose}
           onOpenAutoFocus={(e) => e.preventDefault()}
+          onInteractOutside={(e) => {
+            if (nestedOpen()) e.preventDefault();
+          }}
           className="z-50 rounded-md border border-border bg-popover p-1.5 text-sm text-popover-foreground shadow-lg outline-none"
         >
-          <div className="flex flex-wrap items-center gap-1">
-            <Link
-              to={homePath}
-              aria-label="Home"
-              title="Home"
-              className="inline-flex items-center justify-center rounded-md px-1.5 py-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <Home className="size-3.5" strokeWidth={1.75} aria-hidden />
-            </Link>
-            <span className="px-0.5 text-muted-foreground" aria-hidden>
-              /
-            </span>
-            <WorkspaceSwitcher />
+          <div className="flex flex-wrap items-center gap-1 text-sm">
+            <WorkspaceSwitcher
+              compact
+              tone="muted"
+              onOpenChange={handleNestedOpenChange}
+            />
             {product ? (
               <>
-                <span className="px-0.5 text-muted-foreground" aria-hidden>
+                <span className="shrink-0 text-muted-foreground" aria-hidden>
                   /
                 </span>
-                <ProductCrumb item={product} locked={navLocked} tone="muted" />
+                <ProductCrumb
+                  item={product}
+                  locked={navLocked}
+                  tone="muted"
+                  onOpenChange={handleNestedOpenChange}
+                />
               </>
             ) : null}
             {earlier.map((crumb) => (
               <span key={crumb.to} className="contents">
-                <span className="px-0.5 text-muted-foreground" aria-hidden>
+                <span className="shrink-0 text-muted-foreground" aria-hidden>
                   /
                 </span>
                 <Link
                   to={crumb.to}
                   title={crumb.label}
-                  className="max-w-[12rem] truncate rounded-md px-1.5 py-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="max-w-[10rem] truncate rounded-md px-1 py-0.5 font-normal text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted"
                 >
                   {crumb.label}
                 </Link>

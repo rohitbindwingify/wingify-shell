@@ -26,6 +26,11 @@ import {
   type WorkspaceId,
 } from "@/store/workspace";
 import { cn } from "@/lib/utils";
+import {
+  crumbToneClass,
+  crumbTriggerClass,
+  type CrumbTone,
+} from "./CrumbSwitchers";
 
 /** Neutral #id badge with copy — copies the number only (no #). */
 function WorkspaceIdBadge({
@@ -119,20 +124,41 @@ function WorkspaceKindIcon({
   );
 }
 
-export default function WorkspaceSwitcher() {
+export default function WorkspaceSwitcher({
+  onOpenChange,
+  /** Match product/leaf crumb chrome (detail overflow trail). */
+  compact = false,
+  tone = "normal",
+}: {
+  /** Notify parents (e.g. overflow popover) when the menu opens/closes. */
+  onOpenChange?: (open: boolean) => void;
+  compact?: boolean;
+  tone?: CrumbTone;
+} = {}) {
   const navigate = useNavigate();
   const active = useActiveWorkspace();
   const setWorkspaceId = useWorkspaceStore((s) => s.setWorkspaceId);
 
   return (
-    <DropdownMenu.Root modal={false}>
+    <DropdownMenu.Root modal={false} onOpenChange={onOpenChange}>
       <DropdownMenu.Trigger asChild>
         <button
           type="button"
-          className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-foreground outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
+          title={active.triggerLabel}
+          className={cn(
+            compact
+              ? cn(
+                  crumbTriggerClass,
+                  "max-w-[16rem] gap-1.5",
+                  crumbToneClass(tone)
+                )
+              : "flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-foreground outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
+          )}
         >
           <WorkspaceKindIcon workspace={active} />
-          <span className="max-w-[12rem] truncate">{active.triggerLabel}</span>
+          <span className={cn("truncate", compact ? "max-w-[8rem]" : "max-w-[12rem]")}>
+            {active.triggerLabel}
+          </span>
           <WorkspaceIdBadge accountId={active.accountId} />
           <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         </button>

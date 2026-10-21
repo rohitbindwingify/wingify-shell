@@ -719,10 +719,11 @@ export function resolveJdSwitcherItem(pathname: string): JdSwitcherItem | undefi
 export const PINNABLE_PATHS = NAV.filter((i) => i.pinnable).map((i) => i.path);
 
 /**
- * Products shown in the TopBar breadcrumb switcher (Wingz + group-2 products).
+ * Destinations in the TopBar product crumb switcher (Home + Wingz + group-2 products).
  * Order is intentional — matches the product switcher list, not rail grouping.
  */
 export const PRODUCT_SWITCHER_PATHS = [
+  "/home",
   "/wingz",
   "/experimentation",
   "/personalize",

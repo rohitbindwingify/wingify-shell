@@ -17,12 +17,13 @@ function isSwitcherProduct(item: NavItem): boolean {
   return PRODUCTS.some((p) => p.path === item.path);
 }
 
-const crumbTriggerClass =
+/** Shared trigger chrome for every breadcrumb node (list, detail, overflow). */
+export const crumbTriggerClass =
   "flex max-w-[10rem] items-center gap-0.5 truncate rounded-md px-1 py-0.5 outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none";
 
-type Tone = "strong" | "normal" | "muted";
+export type CrumbTone = "strong" | "normal" | "muted";
 
-function toneClass(tone: Tone): string {
+export function crumbToneClass(tone: CrumbTone): string {
   if (tone === "strong") return "font-semibold text-foreground";
   if (tone === "muted") return "font-normal text-muted-foreground";
   return "font-normal text-foreground";
@@ -33,13 +34,16 @@ export function ProductCrumb({
   item,
   locked = false,
   tone = "normal",
+  onOpenChange,
 }: {
   item: NavItem;
   locked?: boolean;
-  tone?: Tone;
+  tone?: CrumbTone;
+  /** Notify parents (e.g. overflow popover) when the menu opens/closes. */
+  onOpenChange?: (open: boolean) => void;
 }) {
   const showSwitcher = isSwitcherProduct(item) && !locked;
-  const weight = toneClass(tone);
+  const weight = crumbToneClass(tone);
 
   if (!showSwitcher) {
     return (
@@ -50,7 +54,7 @@ export function ProductCrumb({
   }
 
   return (
-    <DropdownMenu.Root modal={false}>
+    <DropdownMenu.Root modal={false} onOpenChange={onOpenChange}>
       <DropdownMenu.Trigger asChild>
         <button
           type="button"
@@ -102,13 +106,15 @@ export function LeafCrumb({
   siblings,
   locked = false,
   tone = "strong",
+  onOpenChange,
 }: {
   leaf: NavLeaf;
   siblings: NavLeaf[];
   locked?: boolean;
-  tone?: Tone;
+  tone?: CrumbTone;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const weight = toneClass(tone);
+  const weight = crumbToneClass(tone);
 
   if (locked || siblings.length <= 1) {
     return (
@@ -119,7 +125,7 @@ export function LeafCrumb({
   }
 
   return (
-    <DropdownMenu.Root modal={false}>
+    <DropdownMenu.Root modal={false} onOpenChange={onOpenChange}>
       <DropdownMenu.Trigger asChild>
         <button
           type="button"
