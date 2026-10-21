@@ -131,6 +131,7 @@ export const PanelLeftClose = (props: any) => <AppIcon name="PanelLeftClose" {..
 export const PanelLeftOpen = (props: any) => <AppIcon name="PanelLeftOpen" {...props} />;
 export const PanelRight = (props: any) => <AppIcon name="PanelRight" {...props} />;
 export const Paperclip = (props: any) => <AppIcon name="Paperclip" {...props} />;
+export const Package = (props: any) => <AppIcon name="Package" {...props} />;
 export const PenLine = (props: any) => <AppIcon name="PenLine" {...props} />;
 export const Pencil = (props: any) => <AppIcon name="Pencil" {...props} />;
 export const Phone = (props: any) => <AppIcon name="Phone" {...props} />;

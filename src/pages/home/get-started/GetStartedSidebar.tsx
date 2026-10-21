@@ -3,12 +3,12 @@
 import {
   CheckCircle2,
   ChevronDown,
+  ExternalLink,
   LayoutGrid,
   Layers,
+  Package,
   Plug,
   Shield,
-  Sparkles,
-  WandSparkles,
   Zap,
 } from "@/components/icons/protoLucide";
 import { Button } from "@/components/ui/button";
@@ -160,29 +160,29 @@ export default function GetStartedSidebar({
         )}
       </nav>
 
-      <div className="mt-auto rounded-lg border border-border bg-background p-4">
-        <div className="flex items-start gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-muted">
-            <Sparkles className="size-4 text-foreground" aria-hidden />
-          </span>
-          <div className="min-w-0 space-y-1">
-            <p className="text-sm font-semibold text-foreground">
-              See Wingify in Action
-            </p>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              Browse prebuilt experiments and sample data to see Wingify in
-              action, no setup required.
-            </p>
-          </div>
-        </div>
+      <div className="mt-auto rounded-xl border border-border bg-background p-4">
+        <span className="flex size-9 items-center justify-center rounded-lg border border-border bg-muted/70">
+          <Package
+            className="size-4 text-foreground/80"
+            strokeWidth={1.75}
+            aria-hidden
+          />
+        </span>
+        <p className="mt-3 text-sm font-semibold tracking-tight text-foreground">
+          See Wingify in Action
+        </p>
+        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+          Browse prebuilt experiments and sample data to see Wingify in action,
+          no setup required.
+        </p>
         <Button
           type="button"
           variant="outline"
           size="sm"
-          className="mt-4 w-full"
+          className="mt-4 h-9 w-full gap-2 font-medium shadow-none"
           onClick={() => setWorkspaceId("demo")}
         >
-          <WandSparkles aria-hidden />
+          <ExternalLink className="size-3.5" strokeWidth={1.75} aria-hidden />
           Explore Demo Workspace
         </Button>
       </div>

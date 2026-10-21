@@ -24,6 +24,7 @@ import CollectionsTwoTone from "@mui/icons-material/CollectionsTwoTone";
 import ConstructionTwoTone from "@mui/icons-material/ConstructionTwoTone";
 import ContactsTwoTone from "@mui/icons-material/ContactsTwoTone";
 import ContentCopyTwoTone from "@mui/icons-material/ContentCopyTwoTone";
+import CreditCardTwoTone from "@mui/icons-material/CreditCardTwoTone";
 import CropSquareTwoTone from "@mui/icons-material/CropSquareTwoTone";
 import DarkModeTwoTone from "@mui/icons-material/DarkModeTwoTone";
 import DataObjectTwoTone from "@mui/icons-material/DataObjectTwoTone";
@@ -89,10 +90,12 @@ import PauseTwoTone from "@mui/icons-material/PauseTwoTone";
 import PeopleTwoTone from "@mui/icons-material/PeopleTwoTone";
 import PercentTwoTone from "@mui/icons-material/PercentTwoTone";
 import PersonTwoTone from "@mui/icons-material/PersonTwoTone";
+import PhoneTwoTone from "@mui/icons-material/PhoneTwoTone";
 import PieChartTwoTone from "@mui/icons-material/PieChartTwoTone";
 import PinTwoTone from "@mui/icons-material/PinTwoTone";
 import PlayArrowTwoTone from "@mui/icons-material/PlayArrowTwoTone";
 import RadioButtonUncheckedTwoTone from "@mui/icons-material/RadioButtonUncheckedTwoTone";
+import ReceiptTwoTone from "@mui/icons-material/ReceiptTwoTone";
 import RedoTwoTone from "@mui/icons-material/RedoTwoTone";
 import RefreshTwoTone from "@mui/icons-material/RefreshTwoTone";
 import RemoveTwoTone from "@mui/icons-material/RemoveTwoTone";
@@ -119,6 +122,7 @@ import TextFieldsTwoTone from "@mui/icons-material/TextFieldsTwoTone";
 import ThumbUpTwoTone from "@mui/icons-material/ThumbUpTwoTone";
 import TrackChangesTwoTone from "@mui/icons-material/TrackChangesTwoTone";
 import TrendingUpTwoTone from "@mui/icons-material/TrendingUpTwoTone";
+import TuneTwoTone from "@mui/icons-material/TuneTwoTone";
 import UndoTwoTone from "@mui/icons-material/UndoTwoTone";
 import UnfoldMoreTwoTone from "@mui/icons-material/UnfoldMoreTwoTone";
 import VideocamTwoTone from "@mui/icons-material/VideocamTwoTone";
@@ -164,6 +168,7 @@ export const MATERIAL_TWOTONE_COMPONENTS = {
   "CalendarDays": CalendarMonthTwoTone,
   "CalendarRange": DateRangeTwoTone,
   "CaseSensitive": TextFieldsTwoTone,
+  "ChatText": HelpOutlined,
   "Check": CheckTwoTone,
   "CheckCircle2": CheckCircleTwoTone,
   "ChevronDown": KeyboardArrowDownTwoTone,
@@ -194,6 +199,7 @@ export const MATERIAL_TWOTONE_COMPONENTS = {
   "Copy": ContentCopyTwoTone,
   "CopyPlus": HelpOutlined,
   "CornerUpRight": HelpOutlined,
+  "CreditCard": CreditCardTwoTone,
   "Crosshair": HelpOutlined,
   "Crown": HelpOutlined,
   "Database": StorageTwoTone,
@@ -227,10 +233,12 @@ export const MATERIAL_TWOTONE_COMPONENTS = {
   "History": HistoryTwoTone,
   "Home": HomeTwoTone,
   "Hourglass": HelpOutlined,
+  "IdentificationCard": HelpOutlined,
   "Image": ImageTwoTone,
   "ImageIcon": ImageTwoTone,
   "Images": CollectionsTwoTone,
   "Info": InfoOutlineTwoTone,
+  "Invoice": HelpOutlined,
   "Italic": FormatItalicTwoTone,
   "Languages": HelpOutlined,
   "Layers": LayersTwoTone,
@@ -263,6 +271,7 @@ export const MATERIAL_TWOTONE_COMPONENTS = {
   "MoreVertical": MoreVertTwoTone,
   "MousePointerClick": HelpOutlined,
   "Move": OpenWithTwoTone,
+  "Package": HelpOutlined,
   "Palette": PaletteTwoTone,
   "PanelLeft": ViewSidebarTwoTone,
   "PanelLeftClose": HelpOutlined,
@@ -273,6 +282,7 @@ export const MATERIAL_TWOTONE_COMPONENTS = {
   "Pencil": EditTwoTone,
   "PenLine": HelpOutlined,
   "Percent": PercentTwoTone,
+  "Phone": PhoneTwoTone,
   "PictureInPicture2": HelpOutlined,
   "PieChart": PieChartTwoTone,
   "Pin": PinTwoTone,
@@ -283,6 +293,7 @@ export const MATERIAL_TWOTONE_COMPONENTS = {
   "PlusCircle": HelpOutlined,
   "Printer": HelpOutlined,
   "Puzzle": HelpOutlined,
+  "Receipt": ReceiptTwoTone,
   "RectangleHorizontal": HelpOutlined,
   "Redo2": RedoTwoTone,
   "RefreshCw": RefreshTwoTone,
@@ -302,6 +313,7 @@ export const MATERIAL_TWOTONE_COMPONENTS = {
   "Shield": ShieldTwoTone,
   "Shirt": HelpOutlined,
   "ShoppingCart": ShoppingCartTwoTone,
+  "SlidersHorizontal": TuneTwoTone,
   "Smartphone": SmartphoneTwoTone,
   "Sparkles": AutoAwesomeTwoTone,
   "Square": CropSquareTwoTone,

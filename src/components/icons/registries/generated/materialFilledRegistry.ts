@@ -24,6 +24,7 @@ import Collections from "@mui/icons-material/Collections";
 import Construction from "@mui/icons-material/Construction";
 import Contacts from "@mui/icons-material/Contacts";
 import ContentCopy from "@mui/icons-material/ContentCopy";
+import CreditCard from "@mui/icons-material/CreditCard";
 import CropSquare from "@mui/icons-material/CropSquare";
 import DarkMode from "@mui/icons-material/DarkMode";
 import DataObject from "@mui/icons-material/DataObject";
@@ -88,10 +89,12 @@ import Pause from "@mui/icons-material/Pause";
 import People from "@mui/icons-material/People";
 import Percent from "@mui/icons-material/Percent";
 import Person from "@mui/icons-material/Person";
+import Phone from "@mui/icons-material/Phone";
 import PieChart from "@mui/icons-material/PieChart";
 import Pin from "@mui/icons-material/Pin";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import RadioButtonUnchecked from "@mui/icons-material/RadioButtonUnchecked";
+import Receipt from "@mui/icons-material/Receipt";
 import Redo from "@mui/icons-material/Redo";
 import Refresh from "@mui/icons-material/Refresh";
 import Remove from "@mui/icons-material/Remove";
@@ -118,6 +121,7 @@ import TextFields from "@mui/icons-material/TextFields";
 import ThumbUp from "@mui/icons-material/ThumbUp";
 import TrackChanges from "@mui/icons-material/TrackChanges";
 import TrendingUp from "@mui/icons-material/TrendingUp";
+import Tune from "@mui/icons-material/Tune";
 import Undo from "@mui/icons-material/Undo";
 import UnfoldMore from "@mui/icons-material/UnfoldMore";
 import Videocam from "@mui/icons-material/Videocam";
@@ -163,6 +167,7 @@ export const MATERIAL_FILLED_COMPONENTS = {
   "CalendarDays": CalendarMonth,
   "CalendarRange": DateRange,
   "CaseSensitive": TextFields,
+  "ChatText": HelpOutlined,
   "Check": Check,
   "CheckCircle2": CheckCircle,
   "ChevronDown": KeyboardArrowDown,
@@ -193,6 +198,7 @@ export const MATERIAL_FILLED_COMPONENTS = {
   "Copy": ContentCopy,
   "CopyPlus": HelpOutlined,
   "CornerUpRight": HelpOutlined,
+  "CreditCard": CreditCard,
   "Crosshair": HelpOutlined,
   "Crown": HelpOutlined,
   "Database": Storage,
@@ -226,10 +232,12 @@ export const MATERIAL_FILLED_COMPONENTS = {
   "History": History,
   "Home": Home,
   "Hourglass": HelpOutlined,
+  "IdentificationCard": HelpOutlined,
   "Image": Image,
   "ImageIcon": Image,
   "Images": Collections,
   "Info": HelpOutlined,
+  "Invoice": HelpOutlined,
   "Italic": FormatItalic,
   "Languages": HelpOutlined,
   "Layers": Layers,
@@ -262,6 +270,7 @@ export const MATERIAL_FILLED_COMPONENTS = {
   "MoreVertical": MoreVert,
   "MousePointerClick": HelpOutlined,
   "Move": OpenWith,
+  "Package": HelpOutlined,
   "Palette": Palette,
   "PanelLeft": ViewSidebar,
   "PanelLeftClose": HelpOutlined,
@@ -272,6 +281,7 @@ export const MATERIAL_FILLED_COMPONENTS = {
   "Pencil": Edit,
   "PenLine": HelpOutlined,
   "Percent": Percent,
+  "Phone": Phone,
   "PictureInPicture2": HelpOutlined,
   "PieChart": PieChart,
   "Pin": Pin,
@@ -282,6 +292,7 @@ export const MATERIAL_FILLED_COMPONENTS = {
   "PlusCircle": HelpOutlined,
   "Printer": HelpOutlined,
   "Puzzle": HelpOutlined,
+  "Receipt": Receipt,
   "RectangleHorizontal": HelpOutlined,
   "Redo2": Redo,
   "RefreshCw": Refresh,
@@ -301,6 +312,7 @@ export const MATERIAL_FILLED_COMPONENTS = {
   "Shield": Shield,
   "Shirt": HelpOutlined,
   "ShoppingCart": ShoppingCart,
+  "SlidersHorizontal": Tune,
   "Smartphone": Smartphone,
   "Sparkles": AutoAwesome,
   "Square": CropSquare,

@@ -3,8 +3,6 @@
 import { AddressBook } from "@phosphor-icons/react/dist/ssr/AddressBook";
 import { AppWindow } from "@phosphor-icons/react/dist/ssr/AppWindow";
 import { Archive } from "@phosphor-icons/react/dist/ssr/Archive";
-import { ChatText } from "@phosphor-icons/react/dist/ssr/ChatText";
-import { CreditCard } from "@phosphor-icons/react/dist/ssr/CreditCard";
 import { ArrowBendUpLeft } from "@phosphor-icons/react/dist/ssr/ArrowBendUpLeft";
 import { ArrowClockwise } from "@phosphor-icons/react/dist/ssr/ArrowClockwise";
 import { ArrowCounterClockwise } from "@phosphor-icons/react/dist/ssr/ArrowCounterClockwise";
@@ -43,6 +41,7 @@ import { ChartBar } from "@phosphor-icons/react/dist/ssr/ChartBar";
 import { ChartLine } from "@phosphor-icons/react/dist/ssr/ChartLine";
 import { ChartPie } from "@phosphor-icons/react/dist/ssr/ChartPie";
 import { Chat } from "@phosphor-icons/react/dist/ssr/Chat";
+import { ChatText } from "@phosphor-icons/react/dist/ssr/ChatText";
 import { Check } from "@phosphor-icons/react/dist/ssr/Check";
 import { CheckCircle } from "@phosphor-icons/react/dist/ssr/CheckCircle";
 import { Circle } from "@phosphor-icons/react/dist/ssr/Circle";
@@ -55,6 +54,7 @@ import { Columns } from "@phosphor-icons/react/dist/ssr/Columns";
 import { Compass } from "@phosphor-icons/react/dist/ssr/Compass";
 import { Copy } from "@phosphor-icons/react/dist/ssr/Copy";
 import { CopySimple } from "@phosphor-icons/react/dist/ssr/CopySimple";
+import { CreditCard } from "@phosphor-icons/react/dist/ssr/CreditCard";
 import { Crosshair } from "@phosphor-icons/react/dist/ssr/Crosshair";
 import { Crown } from "@phosphor-icons/react/dist/ssr/Crown";
 import { CursorClick } from "@phosphor-icons/react/dist/ssr/CursorClick";
@@ -115,15 +115,16 @@ import { Minus } from "@phosphor-icons/react/dist/ssr/Minus";
 import { MinusCircle } from "@phosphor-icons/react/dist/ssr/MinusCircle";
 import { Monitor } from "@phosphor-icons/react/dist/ssr/Monitor";
 import { Moon } from "@phosphor-icons/react/dist/ssr/Moon";
+import { Package } from "@phosphor-icons/react/dist/ssr/Package";
 import { Palette } from "@phosphor-icons/react/dist/ssr/Palette";
 import { PaperPlaneTilt } from "@phosphor-icons/react/dist/ssr/PaperPlaneTilt";
 import { Paperclip } from "@phosphor-icons/react/dist/ssr/Paperclip";
 import { Pause } from "@phosphor-icons/react/dist/ssr/Pause";
 import { Pencil } from "@phosphor-icons/react/dist/ssr/Pencil";
-import { Phone } from "@phosphor-icons/react/dist/ssr/Phone";
 import { PencilSimple } from "@phosphor-icons/react/dist/ssr/PencilSimple";
 import { PencilSimpleLine } from "@phosphor-icons/react/dist/ssr/PencilSimpleLine";
 import { Percent } from "@phosphor-icons/react/dist/ssr/Percent";
+import { Phone } from "@phosphor-icons/react/dist/ssr/Phone";
 import { PictureInPicture } from "@phosphor-icons/react/dist/ssr/PictureInPicture";
 import { Play } from "@phosphor-icons/react/dist/ssr/Play";
 import { Plug } from "@phosphor-icons/react/dist/ssr/Plug";
@@ -146,9 +147,9 @@ import { Shield } from "@phosphor-icons/react/dist/ssr/Shield";
 import { ShoppingCartSimple } from "@phosphor-icons/react/dist/ssr/ShoppingCartSimple";
 import { Sidebar } from "@phosphor-icons/react/dist/ssr/Sidebar";
 import { SignOut } from "@phosphor-icons/react/dist/ssr/SignOut";
+import { SlidersHorizontal } from "@phosphor-icons/react/dist/ssr/SlidersHorizontal";
 import { Sparkle } from "@phosphor-icons/react/dist/ssr/Sparkle";
 import { Square } from "@phosphor-icons/react/dist/ssr/Square";
-import { SlidersHorizontal } from "@phosphor-icons/react/dist/ssr/SlidersHorizontal";
 import { SquaresFour } from "@phosphor-icons/react/dist/ssr/SquaresFour";
 import { Stack } from "@phosphor-icons/react/dist/ssr/Stack";
 import { Star } from "@phosphor-icons/react/dist/ssr/Star";
@@ -241,10 +242,10 @@ export const PHOSPHOR_COMPONENTS = {
   "Component": PuzzlePiece,
   "Construction": HardHat,
   "Contact": AddressBook,
-  "CreditCard": CreditCard,
   "Copy": Copy,
   "CopyPlus": CopySimple,
   "CornerUpRight": ArrowElbowUpRight,
+  "CreditCard": CreditCard,
   "Crosshair": Crosshair,
   "Crown": Crown,
   "Database": Database,
@@ -280,10 +281,10 @@ export const PHOSPHOR_COMPONENTS = {
   "Hourglass": Hourglass,
   "IdentificationCard": IdentificationCard,
   "Image": Image,
-  "Invoice": Invoice,
   "ImageIcon": Image,
   "Images": Images,
   "Info": Info,
+  "Invoice": Invoice,
   "Italic": TextItalic,
   "Languages": Translate,
   "Layers": Stack,
@@ -316,6 +317,7 @@ export const PHOSPHOR_COMPONENTS = {
   "MoreVertical": DotsThreeVertical,
   "MousePointerClick": CursorClick,
   "Move": ArrowsOutCardinal,
+  "Package": Package,
   "Palette": Palette,
   "PanelLeft": Sidebar,
   "PanelLeftClose": Sidebar,
@@ -324,9 +326,9 @@ export const PHOSPHOR_COMPONENTS = {
   "Paperclip": Paperclip,
   "Pause": Pause,
   "Pencil": Pencil,
-  "Phone": Phone,
   "PenLine": PencilSimpleLine,
   "Percent": Percent,
+  "Phone": Phone,
   "PictureInPicture2": PictureInPicture,
   "PieChart": ChartPie,
   "Pin": PushPin,
@@ -353,11 +355,11 @@ export const PHOSPHOR_COMPONENTS = {
   "SendHorizontal": PaperPlaneTilt,
   "Settings": Gear,
   "Settings2": GearSix,
-  "SlidersHorizontal": SlidersHorizontal,
   "Share2": ShareNetwork,
   "Shield": Shield,
   "Shirt": TShirt,
   "ShoppingCart": ShoppingCartSimple,
+  "SlidersHorizontal": SlidersHorizontal,
   "Smartphone": DeviceMobile,
   "Sparkles": Sparkle,
   "Square": Square,

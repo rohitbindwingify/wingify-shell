@@ -296,6 +296,10 @@ export default function ExpandedNav({
   const unpinned = welcomeChrome
     ? []
     : nav.filter((i) => i.pinnable && !pinnedPaths.includes(i.path));
+  /** Current route lives under an unpinned product — select it in More / … */
+  const unpinnedActivePath = unpinned.find(
+    (i) => activeItem?.path === i.path
+  )?.path;
   const flyoutItem = flyout
     ? nav.find((i) => i.path === flyout.path)
     : undefined;
@@ -892,7 +896,9 @@ export default function ExpandedNav({
                         onBlur={scheduleMoreClose}
                         className={cn(
                           "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted",
-                          !!moreFlyout && "bg-muted"
+                          unpinnedActivePath &&
+                            "bg-rail-active text-rail-active-foreground hover:bg-rail-active",
+                          !unpinnedActivePath && !!moreFlyout && "bg-muted"
                         )}
                       >
                         <MoreHorizontal
@@ -1001,6 +1007,8 @@ export default function ExpandedNav({
             >
               {unpinned.map((item) => {
                 const Icon = item.icon;
+                const isActive = unpinnedActivePath === item.path;
+                const isNestedOpen = moreNestedItem?.path === item.path;
                 return (
                   <div
                     key={item.path}
@@ -1014,7 +1022,9 @@ export default function ExpandedNav({
                     }}
                     className={cn(
                       "flex items-center gap-1 rounded-sm pr-1.5 transition-colors hover:bg-muted",
-                      moreNestedItem?.path === item.path && "bg-muted"
+                      isActive &&
+                        "bg-accent font-medium text-accent-foreground hover:bg-accent",
+                      !isActive && isNestedOpen && "bg-muted"
                     )}
                   >
                     <button

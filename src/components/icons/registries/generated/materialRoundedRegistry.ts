@@ -24,6 +24,7 @@ import CollectionsRounded from "@mui/icons-material/CollectionsRounded";
 import ConstructionRounded from "@mui/icons-material/ConstructionRounded";
 import ContactsRounded from "@mui/icons-material/ContactsRounded";
 import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
+import CreditCardRounded from "@mui/icons-material/CreditCardRounded";
 import CropSquareRounded from "@mui/icons-material/CropSquareRounded";
 import DarkModeRounded from "@mui/icons-material/DarkModeRounded";
 import DataObjectRounded from "@mui/icons-material/DataObjectRounded";
@@ -89,10 +90,12 @@ import PauseRounded from "@mui/icons-material/PauseRounded";
 import PeopleRounded from "@mui/icons-material/PeopleRounded";
 import PercentRounded from "@mui/icons-material/PercentRounded";
 import PersonRounded from "@mui/icons-material/PersonRounded";
+import PhoneRounded from "@mui/icons-material/PhoneRounded";
 import PieChartRounded from "@mui/icons-material/PieChartRounded";
 import PinRounded from "@mui/icons-material/PinRounded";
 import PlayArrowRounded from "@mui/icons-material/PlayArrowRounded";
 import RadioButtonUncheckedRounded from "@mui/icons-material/RadioButtonUncheckedRounded";
+import ReceiptRounded from "@mui/icons-material/ReceiptRounded";
 import RedoRounded from "@mui/icons-material/RedoRounded";
 import RefreshRounded from "@mui/icons-material/RefreshRounded";
 import RemoveRounded from "@mui/icons-material/RemoveRounded";
@@ -119,6 +122,7 @@ import TextFieldsRounded from "@mui/icons-material/TextFieldsRounded";
 import ThumbUpRounded from "@mui/icons-material/ThumbUpRounded";
 import TrackChangesRounded from "@mui/icons-material/TrackChangesRounded";
 import TrendingUpRounded from "@mui/icons-material/TrendingUpRounded";
+import TuneRounded from "@mui/icons-material/TuneRounded";
 import UndoRounded from "@mui/icons-material/UndoRounded";
 import UnfoldMoreRounded from "@mui/icons-material/UnfoldMoreRounded";
 import VideocamRounded from "@mui/icons-material/VideocamRounded";
@@ -164,6 +168,7 @@ export const MATERIAL_ROUNDED_COMPONENTS = {
   "CalendarDays": CalendarMonthRounded,
   "CalendarRange": DateRangeRounded,
   "CaseSensitive": TextFieldsRounded,
+  "ChatText": HelpOutlined,
   "Check": CheckRounded,
   "CheckCircle2": CheckCircleRounded,
   "ChevronDown": KeyboardArrowDownRounded,
@@ -194,6 +199,7 @@ export const MATERIAL_ROUNDED_COMPONENTS = {
   "Copy": ContentCopyRounded,
   "CopyPlus": HelpOutlined,
   "CornerUpRight": HelpOutlined,
+  "CreditCard": CreditCardRounded,
   "Crosshair": HelpOutlined,
   "Crown": HelpOutlined,
   "Database": StorageRounded,
@@ -227,10 +233,12 @@ export const MATERIAL_ROUNDED_COMPONENTS = {
   "History": HistoryRounded,
   "Home": HomeRounded,
   "Hourglass": HelpOutlined,
+  "IdentificationCard": HelpOutlined,
   "Image": ImageRounded,
   "ImageIcon": ImageRounded,
   "Images": CollectionsRounded,
   "Info": InfoOutlineRounded,
+  "Invoice": HelpOutlined,
   "Italic": FormatItalicRounded,
   "Languages": HelpOutlined,
   "Layers": LayersRounded,
@@ -263,6 +271,7 @@ export const MATERIAL_ROUNDED_COMPONENTS = {
   "MoreVertical": MoreVertRounded,
   "MousePointerClick": HelpOutlined,
   "Move": OpenWithRounded,
+  "Package": HelpOutlined,
   "Palette": PaletteRounded,
   "PanelLeft": ViewSidebarRounded,
   "PanelLeftClose": HelpOutlined,
@@ -273,6 +282,7 @@ export const MATERIAL_ROUNDED_COMPONENTS = {
   "Pencil": EditRounded,
   "PenLine": HelpOutlined,
   "Percent": PercentRounded,
+  "Phone": PhoneRounded,
   "PictureInPicture2": HelpOutlined,
   "PieChart": PieChartRounded,
   "Pin": PinRounded,
@@ -283,6 +293,7 @@ export const MATERIAL_ROUNDED_COMPONENTS = {
   "PlusCircle": HelpOutlined,
   "Printer": HelpOutlined,
   "Puzzle": HelpOutlined,
+  "Receipt": ReceiptRounded,
   "RectangleHorizontal": HelpOutlined,
   "Redo2": RedoRounded,
   "RefreshCw": RefreshRounded,
@@ -302,6 +313,7 @@ export const MATERIAL_ROUNDED_COMPONENTS = {
   "Shield": ShieldRounded,
   "Shirt": HelpOutlined,
   "ShoppingCart": ShoppingCartRounded,
+  "SlidersHorizontal": TuneRounded,
   "Smartphone": SmartphoneRounded,
   "Sparkles": AutoAwesomeRounded,
   "Square": CropSquareRounded,

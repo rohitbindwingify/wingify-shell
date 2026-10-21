@@ -24,6 +24,7 @@ import CollectionsSharp from "@mui/icons-material/CollectionsSharp";
 import ConstructionSharp from "@mui/icons-material/ConstructionSharp";
 import ContactsSharp from "@mui/icons-material/ContactsSharp";
 import ContentCopySharp from "@mui/icons-material/ContentCopySharp";
+import CreditCardSharp from "@mui/icons-material/CreditCardSharp";
 import CropSquareSharp from "@mui/icons-material/CropSquareSharp";
 import DarkModeSharp from "@mui/icons-material/DarkModeSharp";
 import DataObjectSharp from "@mui/icons-material/DataObjectSharp";
@@ -89,10 +90,12 @@ import PauseSharp from "@mui/icons-material/PauseSharp";
 import PeopleSharp from "@mui/icons-material/PeopleSharp";
 import PercentSharp from "@mui/icons-material/PercentSharp";
 import PersonSharp from "@mui/icons-material/PersonSharp";
+import PhoneSharp from "@mui/icons-material/PhoneSharp";
 import PieChartSharp from "@mui/icons-material/PieChartSharp";
 import PinSharp from "@mui/icons-material/PinSharp";
 import PlayArrowSharp from "@mui/icons-material/PlayArrowSharp";
 import RadioButtonUncheckedSharp from "@mui/icons-material/RadioButtonUncheckedSharp";
+import ReceiptSharp from "@mui/icons-material/ReceiptSharp";
 import RedoSharp from "@mui/icons-material/RedoSharp";
 import RefreshSharp from "@mui/icons-material/RefreshSharp";
 import RemoveSharp from "@mui/icons-material/RemoveSharp";
@@ -119,6 +122,7 @@ import TextFieldsSharp from "@mui/icons-material/TextFieldsSharp";
 import ThumbUpSharp from "@mui/icons-material/ThumbUpSharp";
 import TrackChangesSharp from "@mui/icons-material/TrackChangesSharp";
 import TrendingUpSharp from "@mui/icons-material/TrendingUpSharp";
+import TuneSharp from "@mui/icons-material/TuneSharp";
 import UndoSharp from "@mui/icons-material/UndoSharp";
 import UnfoldMoreSharp from "@mui/icons-material/UnfoldMoreSharp";
 import VideocamSharp from "@mui/icons-material/VideocamSharp";
@@ -164,6 +168,7 @@ export const MATERIAL_SHARP_COMPONENTS = {
   "CalendarDays": CalendarMonthSharp,
   "CalendarRange": DateRangeSharp,
   "CaseSensitive": TextFieldsSharp,
+  "ChatText": HelpOutlined,
   "Check": CheckSharp,
   "CheckCircle2": CheckCircleSharp,
   "ChevronDown": KeyboardArrowDownSharp,
@@ -194,6 +199,7 @@ export const MATERIAL_SHARP_COMPONENTS = {
   "Copy": ContentCopySharp,
   "CopyPlus": HelpOutlined,
   "CornerUpRight": HelpOutlined,
+  "CreditCard": CreditCardSharp,
   "Crosshair": HelpOutlined,
   "Crown": HelpOutlined,
   "Database": StorageSharp,
@@ -227,10 +233,12 @@ export const MATERIAL_SHARP_COMPONENTS = {
   "History": HistorySharp,
   "Home": HomeSharp,
   "Hourglass": HelpOutlined,
+  "IdentificationCard": HelpOutlined,
   "Image": ImageSharp,
   "ImageIcon": ImageSharp,
   "Images": CollectionsSharp,
   "Info": InfoOutlineSharp,
+  "Invoice": HelpOutlined,
   "Italic": FormatItalicSharp,
   "Languages": HelpOutlined,
   "Layers": LayersSharp,
@@ -263,6 +271,7 @@ export const MATERIAL_SHARP_COMPONENTS = {
   "MoreVertical": MoreVertSharp,
   "MousePointerClick": HelpOutlined,
   "Move": OpenWithSharp,
+  "Package": HelpOutlined,
   "Palette": PaletteSharp,
   "PanelLeft": ViewSidebarSharp,
   "PanelLeftClose": HelpOutlined,
@@ -273,6 +282,7 @@ export const MATERIAL_SHARP_COMPONENTS = {
   "Pencil": EditSharp,
   "PenLine": HelpOutlined,
   "Percent": PercentSharp,
+  "Phone": PhoneSharp,
   "PictureInPicture2": HelpOutlined,
   "PieChart": PieChartSharp,
   "Pin": PinSharp,
@@ -283,6 +293,7 @@ export const MATERIAL_SHARP_COMPONENTS = {
   "PlusCircle": HelpOutlined,
   "Printer": HelpOutlined,
   "Puzzle": HelpOutlined,
+  "Receipt": ReceiptSharp,
   "RectangleHorizontal": HelpOutlined,
   "Redo2": RedoSharp,
   "RefreshCw": RefreshSharp,
@@ -302,6 +313,7 @@ export const MATERIAL_SHARP_COMPONENTS = {
   "Shield": ShieldSharp,
   "Shirt": HelpOutlined,
   "ShoppingCart": ShoppingCartSharp,
+  "SlidersHorizontal": TuneSharp,
   "Smartphone": SmartphoneSharp,
   "Sparkles": AutoAwesomeSharp,
   "Square": CropSquareSharp,

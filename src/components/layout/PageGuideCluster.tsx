@@ -21,6 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import type { PageGuide } from "@/config/navigation";
+import { cn } from "@/lib/utils";
 
 function hasGuide(guide?: PageGuide): guide is PageGuide {
   return Boolean(guide && (guide.tutorial || guide.help || guide.info));
@@ -115,17 +116,22 @@ export default function PageGuideCluster({ guide }: { guide?: PageGuide }) {
   ].filter(Boolean) as Array<"tutorial" | "help" | "info">;
 
   // Single option → that icon upfront (one click / one open).
+  // Play expands to “Play tutorial” on hover (same motion as the old header control).
   if (slots.length === 1 && slots[0] === "tutorial") {
     return (
       <Button
         type="button"
         variant="ghost"
-        size="icon"
-        className={iconBtnClass}
+        size="sm"
+        className={cn(
+          "group h-7 shrink-0 gap-0 overflow-hidden px-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+        )}
         aria-label={tutorialLabel}
-        title={tutorialLabel}
       >
-        <Play className="size-4" aria-hidden />
+        <Play className="size-3.5 shrink-0" aria-hidden />
+        <span className="inline-block max-w-0 overflow-hidden whitespace-nowrap text-xs font-medium opacity-0 transition-[max-width,opacity,margin] duration-200 ease-out group-hover:ml-1.5 group-hover:max-w-[8rem] group-hover:opacity-100 group-focus-visible:ml-1.5 group-focus-visible:max-w-[8rem] group-focus-visible:opacity-100">
+          {tutorialLabel}
+        </span>
       </Button>
     );
   }

@@ -24,6 +24,7 @@ import CollectionsOutlined from "@mui/icons-material/CollectionsOutlined";
 import ConstructionOutlined from "@mui/icons-material/ConstructionOutlined";
 import ContactsOutlined from "@mui/icons-material/ContactsOutlined";
 import ContentCopyOutlined from "@mui/icons-material/ContentCopyOutlined";
+import CreditCardOutlined from "@mui/icons-material/CreditCardOutlined";
 import CropSquareOutlined from "@mui/icons-material/CropSquareOutlined";
 import DarkModeOutlined from "@mui/icons-material/DarkModeOutlined";
 import DataObjectOutlined from "@mui/icons-material/DataObjectOutlined";
@@ -88,10 +89,12 @@ import PauseOutlined from "@mui/icons-material/PauseOutlined";
 import PeopleOutlined from "@mui/icons-material/PeopleOutlined";
 import PercentOutlined from "@mui/icons-material/PercentOutlined";
 import PersonOutlined from "@mui/icons-material/PersonOutlined";
+import PhoneOutlined from "@mui/icons-material/PhoneOutlined";
 import PieChartOutlined from "@mui/icons-material/PieChartOutlined";
 import PinOutlined from "@mui/icons-material/PinOutlined";
 import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
 import RadioButtonUncheckedOutlined from "@mui/icons-material/RadioButtonUncheckedOutlined";
+import ReceiptOutlined from "@mui/icons-material/ReceiptOutlined";
 import RedoOutlined from "@mui/icons-material/RedoOutlined";
 import RefreshOutlined from "@mui/icons-material/RefreshOutlined";
 import RemoveOutlined from "@mui/icons-material/RemoveOutlined";
@@ -118,6 +121,7 @@ import TextFieldsOutlined from "@mui/icons-material/TextFieldsOutlined";
 import ThumbUpOutlined from "@mui/icons-material/ThumbUpOutlined";
 import TrackChangesOutlined from "@mui/icons-material/TrackChangesOutlined";
 import TrendingUpOutlined from "@mui/icons-material/TrendingUpOutlined";
+import TuneOutlined from "@mui/icons-material/TuneOutlined";
 import UndoOutlined from "@mui/icons-material/UndoOutlined";
 import UnfoldMoreOutlined from "@mui/icons-material/UnfoldMoreOutlined";
 import VideocamOutlined from "@mui/icons-material/VideocamOutlined";
@@ -163,6 +167,7 @@ export const MATERIAL_OUTLINED_COMPONENTS = {
   "CalendarDays": CalendarMonthOutlined,
   "CalendarRange": DateRangeOutlined,
   "CaseSensitive": TextFieldsOutlined,
+  "ChatText": HelpOutlined,
   "Check": CheckOutlined,
   "CheckCircle2": CheckCircleOutlined,
   "ChevronDown": KeyboardArrowDownOutlined,
@@ -193,6 +198,7 @@ export const MATERIAL_OUTLINED_COMPONENTS = {
   "Copy": ContentCopyOutlined,
   "CopyPlus": HelpOutlined,
   "CornerUpRight": HelpOutlined,
+  "CreditCard": CreditCardOutlined,
   "Crosshair": HelpOutlined,
   "Crown": HelpOutlined,
   "Database": StorageOutlined,
@@ -226,10 +232,12 @@ export const MATERIAL_OUTLINED_COMPONENTS = {
   "History": HistoryOutlined,
   "Home": HomeOutlined,
   "Hourglass": HelpOutlined,
+  "IdentificationCard": HelpOutlined,
   "Image": ImageOutlined,
   "ImageIcon": ImageOutlined,
   "Images": CollectionsOutlined,
   "Info": HelpOutlined,
+  "Invoice": HelpOutlined,
   "Italic": FormatItalicOutlined,
   "Languages": HelpOutlined,
   "Layers": LayersOutlined,
@@ -262,6 +270,7 @@ export const MATERIAL_OUTLINED_COMPONENTS = {
   "MoreVertical": MoreVertOutlined,
   "MousePointerClick": HelpOutlined,
   "Move": OpenWithOutlined,
+  "Package": HelpOutlined,
   "Palette": PaletteOutlined,
   "PanelLeft": ViewSidebarOutlined,
   "PanelLeftClose": HelpOutlined,
@@ -272,6 +281,7 @@ export const MATERIAL_OUTLINED_COMPONENTS = {
   "Pencil": EditOutlined,
   "PenLine": HelpOutlined,
   "Percent": PercentOutlined,
+  "Phone": PhoneOutlined,
   "PictureInPicture2": HelpOutlined,
   "PieChart": PieChartOutlined,
   "Pin": PinOutlined,
@@ -282,6 +292,7 @@ export const MATERIAL_OUTLINED_COMPONENTS = {
   "PlusCircle": HelpOutlined,
   "Printer": HelpOutlined,
   "Puzzle": HelpOutlined,
+  "Receipt": ReceiptOutlined,
   "RectangleHorizontal": HelpOutlined,
   "Redo2": RedoOutlined,
   "RefreshCw": RefreshOutlined,
@@ -301,6 +312,7 @@ export const MATERIAL_OUTLINED_COMPONENTS = {
   "Shield": ShieldOutlined,
   "Shirt": HelpOutlined,
   "ShoppingCart": ShoppingCartOutlined,
+  "SlidersHorizontal": TuneOutlined,
   "Smartphone": SmartphoneOutlined,
   "Sparkles": AutoAwesomeOutlined,
   "Square": CropSquareOutlined,
