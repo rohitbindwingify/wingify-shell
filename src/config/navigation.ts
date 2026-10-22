@@ -74,6 +74,10 @@ import {
   ShellRocketLaunchIcon,
 } from "@/components/icons/shell/RocketLaunchIcons";
 import {
+  ShellSparkleFillIcon,
+  ShellSparkleIcon,
+} from "@/components/icons/shell/SparkleIcons";
+import {
   ShellUserFocusFillIcon,
   ShellUserFocusIcon,
 } from "@/components/icons/shell/UserFocusIcons";
@@ -213,7 +217,14 @@ export const NAV: NavItem[] = [
       { label: "Account Overview", path: "/home/account-overview", hideCreate: true },
     ]},
   ]},
-  { label: "Wingz", path: "/wingz", icon: Wand2, group: 1, hideCreate: true, sections: [
+  {
+    label: "Wingz",
+    path: "/wingz",
+    icon: ShellSparkleIcon as LucideIcon,
+    activeIcon: ShellSparkleFillIcon as LucideIcon,
+    group: 1,
+    hideCreate: true,
+    sections: [
     { heading: "Assistant", items: [{ label: "Chat", path: "/wingz/chat", hideCreate: true }]},
     { heading: "Automation", items: [
       { label: "Agents", path: "/wingz/agents" },
