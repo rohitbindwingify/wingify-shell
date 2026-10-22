@@ -273,7 +273,6 @@ export const NAV: NavItem[] = [
     sections: [
     { items: [
       { label: "Feature Flags", path: "/feature-management/feature-flags" },
-      { label: "Holdouts", path: "/feature-management/holdout", hideCreate: true },
     ]},
     { items: [
       { label: "Feature Rollout", path: "/feature-management/flag-rollout" },
@@ -282,6 +281,7 @@ export const NAV: NavItem[] = [
       { label: "Feature Personalization", path: "/feature-management/flag-personalize" },
     ]},
     { items: [
+      { label: "Holdouts", path: "/feature-management/holdout", hideCreate: true },
       { label: "Tech Debt", path: "/feature-management/tech-debt", hideCreate: true },
     ]},
   ]},
