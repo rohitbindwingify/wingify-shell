@@ -44,10 +44,10 @@ export default function ProfileAvatar({
         role="img"
         aria-label={initials}
         className={cn(
-          "inline-flex items-center justify-center overflow-hidden rounded-full",
+          "inline-flex items-center justify-center overflow-hidden rounded-full ring-1 ring-border",
           SIZE[size],
           hasPhoto
-            ? "ring-1 ring-inset ring-border"
+            ? null
             : onDark
               ? "bg-rail-active-foreground/15 font-medium text-rail-active-foreground"
               : "bg-muted font-medium text-foreground",
@@ -64,7 +64,7 @@ export default function ProfileAvatar({
       </span>
       {showUnreadDot ? (
         <span
-          className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-[var(--status-running-fg)] ring-2 ring-panel"
+          className="absolute right-0 top-0 size-2.5 translate-x-1/3 -translate-y-1/3 rounded-full border-2 border-background bg-[var(--status-running-fg)]"
           aria-hidden
         />
       ) : null}
