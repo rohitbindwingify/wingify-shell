@@ -213,8 +213,8 @@ export const NAV: NavItem[] = [
     { items: [
       { label: "Dashboard", path: "/home/dashboard", hideCreate: true },
       { label: "Get Started", path: "/home/get-started", hideCreate: true },
-      { label: "ROI Dashboard", path: "/home/roi-dashboard", hideCreate: true },
-      { label: "Account Overview", path: "/home/account-overview", hideCreate: true },
+      { label: "Campaigns Overview", path: "/home/roi-dashboard", hideCreate: true },
+      { label: "Impact Dashboard", path: "/home/account-overview", hideCreate: true },
     ]},
   ]},
   {
@@ -235,7 +235,7 @@ export const NAV: NavItem[] = [
     // { heading: "Discover", items: [{ label: "What's New", path: "/wingz/whats-new", hideCreate: true }]},
   ]},
   {
-    label: "Experimentation",
+    label: "Web Experimentation",
     path: "/experimentation",
     icon: ShellFlaskIcon as LucideIcon,
     activeIcon: ShellFlaskFillIcon as LucideIcon,
@@ -256,7 +256,7 @@ export const NAV: NavItem[] = [
     group: 2,
   },
   {
-    label: "Personalize",
+    label: "Web Personalization",
     path: "/personalize",
     icon: ShellUserFocusIcon as LucideIcon,
     activeIcon: ShellUserFocusFillIcon as LucideIcon,
@@ -273,7 +273,7 @@ export const NAV: NavItem[] = [
     sections: [
     { items: [
       { label: "Feature Flags", path: "/feature-management/feature-flags" },
-      { label: "Holdout", path: "/feature-management/holdout", hideCreate: true },
+      { label: "Holdouts", path: "/feature-management/holdout", hideCreate: true },
     ]},
     { items: [
       { label: "Feature Rollout", path: "/feature-management/flag-rollout" },
@@ -365,19 +365,15 @@ export const NAV: NavItem[] = [
     ],
   },
   {
-    label: "Insights",
+    label: "Behavior Analytics",
     path: "/insights",
     icon: ShellInsightsIcon as LucideIcon,
     activeIcon: ShellInsightsFillIcon as LucideIcon,
     group: 2,
     pinnable: true,
     sections: [
-    { heading: "Overview", items: [{ label: "Dashboard", path: "/insights/dashboard", hideCreate: true }]},
-    { heading: "Reports", items: [
-      { label: "Metric Reports", path: "/insights/metric-reports" },
-      { label: "Funnel Reports", path: "/insights/funnel-reports" },
-    ]},
-    { heading: "Behavior", items: [
+    { items: [
+      { label: "Dashboard", path: "/insights/dashboard", hideCreate: true },
       { label: "Heatmaps", path: "/insights/heatmaps", hideCreate: true },
       {
         label: "Session Recordings",
@@ -402,26 +398,30 @@ export const NAV: NavItem[] = [
         },
       },
       { label: "Mobile Recordings", path: "/insights/mobile-recordings", hideCreate: true },
+      { label: "Form Analytics", path: "/insights/forms" },
     ]},
-    { heading: "Feedback", items: [{ label: "Forms", path: "/insights/forms" }]},
+    { heading: "Reports", items: [
+      { label: "Metric Reports", path: "/insights/metric-reports" },
+      { label: "Funnel Reports", path: "/insights/funnel-reports" },
+    ]},
   ]},
   {
-    label: "Pulse",
+    label: "User Feedback",
     path: "/pulse",
     icon: ShellUserSoundIcon as LucideIcon,
     activeIcon: ShellUserSoundFillIcon as LucideIcon,
     group: 2,
     pinnable: true,
     sections: [
-    { heading: "Research", items: [
+    { items: [
       { label: "Surveys", path: "/pulse/surveys" },
       { label: "Concept Test", path: "/pulse/concept-test" },
+      { label: "Templates", path: "/pulse/templates", hideCreate: true },
+      { label: "Settings", path: "/pulse/settings", hideCreate: true },
     ]},
-    { heading: "Resources", items: [{ label: "Templates", path: "/pulse/templates", hideCreate: true }]},
-    { heading: "Administration", items: [{ label: "Settings", path: "/pulse/settings", hideCreate: true }]},
   ]},
   {
-    label: "Engage",
+    label: "Push notification",
     path: "/engage",
     icon: ShellMegaphoneIcon as LucideIcon,
     activeIcon: ShellMegaphoneFillIcon as LucideIcon,
@@ -430,26 +430,23 @@ export const NAV: NavItem[] = [
   },
 
   {
-    label: "Data360",
+    label: "Data Platform",
     path: "/data-360",
     icon: ShellHardDrivesIcon as LucideIcon,
     activeIcon: ShellHardDrivesFillIcon as LucideIcon,
     group: 2,
     pinnable: true,
     sections: [
-    { heading: "Customer Data", items: [
+    { items: [
+      { label: "Introduction", path: "/data-360/introduction", hideCreate: true },
       { label: "Profiles", path: "/data-360/profiles" },
       { label: "Attributes", path: "/data-360/attributes" },
       { label: "Events", path: "/data-360/events" },
       { label: "Segments", path: "/data-360/segments" },
-    ]},
-    { heading: "Measurement", items: [
+      { label: "Triggers", path: "/data-360/triggers" },
+      { label: "Audiences", path: "/data-360/audiences" },
       { label: "Metrics", path: "/data-360/metrics" },
       { label: "Funnels", path: "/data-360/funnels" },
-      { label: "Data Studio", path: "/data-360/data-studio" },
-    ]},
-    { heading: "Operations", items: [
-      { label: "Triggers", path: "/data-360/triggers" },
       { label: "Audit", path: "/data-360/audit", hideCreate: true },
     ]},
   ]},
@@ -471,7 +468,7 @@ export const NAV: NavItem[] = [
     ],
   },
   { label: "Activity", path: "/activity-timeline", icon: Activity, group: 3, flyoutOnly: true, hideCreate: true },
-  { label: "Help", path: "/helpdesk", icon: Headphones, group: 3, flyoutOnly: true, hideCreate: true },
+  { label: "Need Help?", path: "/helpdesk", icon: Headphones, group: 3, flyoutOnly: true, hideCreate: true },
   // Settings lives in the Profile flyout (no rail gear). Avatar expands options; does not navigate.
   { label: "John Doe", path: "/profile", icon: UserCircle, group: 3, initials: "JD", flyoutOnly: true, sections: [
     // Filled after PROFILE_MODES is declared — see profileFlyoutSections below.

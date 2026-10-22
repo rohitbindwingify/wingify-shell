@@ -49,7 +49,7 @@ export const UPGRADE_SECTIONS: UpgradeSection[] = [
     ],
   },
   {
-    heading: "Personalize",
+    heading: "Web Personalization",
     items: [
       {
         label: "Web Personalization",
@@ -108,10 +108,10 @@ export const UPGRADE_SECTIONS: UpgradeSection[] = [
     ],
   },
   {
-    heading: "Engage",
+    heading: "Push notification",
     items: [
       {
-        label: "Push Notifications",
+        label: "Push notification",
         description: "Push Notifications",
         path: "/upgrade/engage",
         icon: MessageSquare,

@@ -25,11 +25,11 @@ export const SHELL_ONBOARDING_SLIDES: ShellOnboardingSlide[] = [
       "Experimentation, personalization, insights, commerce, and data — connected in a single workspace built for teams who ship faster.",
     highlights: [
       "Web Experimentation",
-      "Personalize",
-      "Insights",
-      "Commerce",
-      "Data360",
-      "Wandz",
+      "Web Personalization",
+      "Behavior Analytics",
+      "User Feedback",
+      "Data Platform",
+      "Wingz",
     ],
   },
 ];
