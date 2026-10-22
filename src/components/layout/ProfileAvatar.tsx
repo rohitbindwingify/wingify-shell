@@ -1,31 +1,35 @@
 import { cn } from "@/lib/utils";
-import avatarLight from "@/assets/icons/avatar-light.png";
 
 type ProfileAvatarSize = "sm" | "md" | "lg";
 
-/** Placeholder + photo share the same footprint; ~2px above size-5 / 6 / 7. */
+/** Initials + photo share the same footprint; ~2px above size-5 / 6 / 7. */
 const SIZE: Record<ProfileAvatarSize, string> = {
   sm: "size-[22px]",
   md: "size-[26px]",
   lg: "size-[30px]",
 };
 
+const TEXT: Record<ProfileAvatarSize, string> = {
+  sm: "text-[9px]",
+  md: "text-[10px]",
+  lg: "text-[11px]",
+};
+
 /**
- * Current-user mark. Uploaded photo when `src` is set; otherwise the
- * Avatar Light placeholder. Pass `onDark` inside the collapsed active pill.
+ * Current-user mark. Uploaded photo when `src` is set; otherwise username
+ * initials. Pass `onDark` inside the collapsed active pill.
  * Pass `showUnreadDot` for the green unread-notifications indicator.
  */
 export default function ProfileAvatar({
   initials,
   src,
   size = "md",
-  onDark: _onDark = false,
+  onDark = false,
   showUnreadDot = false,
   className,
 }: {
-  /** Used for accessible label when no photo. */
   initials: string;
-  /** Profile photo URL — omit / null / empty → placeholder icon. */
+  /** Profile photo URL — omit / null / empty → initials monogram. */
   src?: string | null;
   size?: ProfileAvatarSize;
   onDark?: boolean;
@@ -42,14 +46,21 @@ export default function ProfileAvatar({
         className={cn(
           "inline-flex items-center justify-center overflow-hidden rounded-full",
           SIZE[size],
-          hasPhoto && "ring-1 ring-inset ring-border"
+          hasPhoto
+            ? "ring-1 ring-inset ring-border"
+            : onDark
+              ? "bg-rail-active-foreground/15 font-medium text-rail-active-foreground"
+              : "bg-muted font-medium text-foreground",
+          !hasPhoto && TEXT[size]
         )}
       >
-        <img
-          src={hasPhoto ? src! : avatarLight}
-          alt=""
-          className="size-full object-cover"
-        />
+        {hasPhoto ? (
+          <img src={src!} alt="" className="size-full object-cover" />
+        ) : (
+          <span aria-hidden className="leading-none tracking-tight">
+            {initials}
+          </span>
+        )}
       </span>
       {showUnreadDot ? (
         <span

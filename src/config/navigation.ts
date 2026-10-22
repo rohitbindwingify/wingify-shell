@@ -372,8 +372,8 @@ export const NAV: NavItem[] = [
     group: 2,
     pinnable: true,
     sections: [
+    { items: [{ label: "Dashboard", path: "/insights/dashboard", hideCreate: true }]},
     { items: [
-      { label: "Dashboard", path: "/insights/dashboard", hideCreate: true },
       { label: "Heatmaps", path: "/insights/heatmaps", hideCreate: true },
       {
         label: "Session Recordings",
@@ -416,9 +416,9 @@ export const NAV: NavItem[] = [
     { items: [
       { label: "Surveys", path: "/pulse/surveys" },
       { label: "Concept Test", path: "/pulse/concept-test" },
-      { label: "Templates", path: "/pulse/templates", hideCreate: true },
-      { label: "Settings", path: "/pulse/settings", hideCreate: true },
     ]},
+    { items: [{ label: "Templates", path: "/pulse/templates", hideCreate: true }]},
+    { items: [{ label: "Settings", path: "/pulse/settings", hideCreate: true }]},
   ]},
   {
     label: "Push notification",
@@ -443,10 +443,14 @@ export const NAV: NavItem[] = [
       { label: "Attributes", path: "/data-360/attributes" },
       { label: "Events", path: "/data-360/events" },
       { label: "Segments", path: "/data-360/segments" },
+    ]},
+    { items: [
       { label: "Triggers", path: "/data-360/triggers" },
       { label: "Audiences", path: "/data-360/audiences" },
       { label: "Metrics", path: "/data-360/metrics" },
       { label: "Funnels", path: "/data-360/funnels" },
+    ]},
+    { items: [
       { label: "Audit", path: "/data-360/audit", hideCreate: true },
     ]},
   ]},
