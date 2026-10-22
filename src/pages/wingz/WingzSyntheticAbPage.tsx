@@ -2,11 +2,9 @@ import { useState } from "react";
 import {
   ChevronDown,
   Filter,
-  FlaskConical,
   Search,
   Trophy,
 } from "@/components/icons/protoLucide";
-import PageHeader from "@/components/layout/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,8 +98,6 @@ export default function WingzSyntheticAbPage() {
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto pb-16">
-      <PageHeader title="Synthetic A/B" icon={FlaskConical} />
-
       <div className="space-y-6 px-12 pt-8">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex w-72 items-center gap-2 rounded-md border border-input bg-background px-2.5 py-1.5">

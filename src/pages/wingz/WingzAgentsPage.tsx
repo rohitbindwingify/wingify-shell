@@ -5,7 +5,6 @@ import {
   Flame,
   TrendingUp,
 } from "@/components/icons/protoLucide";
-import PageHeader from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -36,8 +35,6 @@ const TEMPLATES = [
 export default function WingzAgentsPage() {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto pb-16">
-      <PageHeader title="Agents" icon={Bot} />
-
       <div className="space-y-12 px-12 pt-8">
         <section className="flex flex-col items-center rounded-xl border border-dashed border-border bg-background px-8 py-14 text-center">
           <span className="mb-5 flex size-12 items-center justify-center rounded-xl border border-border bg-background text-foreground shadow-sm">

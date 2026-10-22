@@ -10,10 +10,8 @@ import {
   Clock,
   MoreHorizontal,
   Search,
-  Share2,
   Sparkles,
 } from "@/components/icons/protoLucide";
-import PageHeader from "@/components/layout/PageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,8 +109,6 @@ export default function WingzWorkflowsPage() {
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto pb-16">
-      <PageHeader title="Workflows" icon={Share2} />
-
       <div className="space-y-8 px-12 pt-8">
         <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">

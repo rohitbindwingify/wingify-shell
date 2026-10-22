@@ -1,31 +1,7 @@
-// Product switcher stubs omit PageHeader; Profile drill-ins omit it too (crumb is enough).
+// Crumb is enough — no PageHeader title (matches product list pages).
 import { useLocation } from "react-router-dom";
-import { PRODUCT_SWITCHER_PATHS, WEB_EXPERIMENT_OLD_PATH } from "../config/navigation";
-import { findItemByPath, iconForPath, isProfileModePath, pageLabel } from "../lib/nav";
-import PageHeader from "../components/layout/PageHeader";
+import { iconForPath, pageLabel } from "../lib/nav";
 import ComingSoonState from "../components/empty/ComingSoonState";
-
-function isProductPath(pathname: string): boolean {
-  if (
-    pathname === WEB_EXPERIMENT_OLD_PATH ||
-    pathname.startsWith(`${WEB_EXPERIMENT_OLD_PATH}/`)
-  ) {
-    return true;
-  }
-  if (
-    PRODUCT_SWITCHER_PATHS.some(
-      (p) => pathname === p || pathname.startsWith(`${p}/`)
-    )
-  ) {
-    return true;
-  }
-  // Experimentation leaves (e.g. /web-rollouts) sit outside the parent path prefix.
-  const item = findItemByPath(pathname);
-  return Boolean(
-    item &&
-      (PRODUCT_SWITCHER_PATHS as readonly string[]).includes(item.path)
-  );
-}
 
 function isAccountsPath(pathname: string): boolean {
   return (
@@ -39,12 +15,9 @@ export default function PlaceholderPage() {
   const accountsStub = isAccountsPath(pathname);
   const title = accountsStub ? "Coming soon" : pageLabel(pathname);
   const icon = accountsStub ? undefined : iconForPath(pathname);
-  // @undo — profile drill-ins used to show PageHeader; crumb + ComingSoonState cover it
-  const showHeader = !isProductPath(pathname) && !isProfileModePath(pathname);
 
   return (
     <div className="flex min-h-full flex-col">
-      {showHeader && <PageHeader title={title} icon={icon} />}
       <ComingSoonState title={title} icon={icon} />
     </div>
   );
