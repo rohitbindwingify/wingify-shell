@@ -346,14 +346,14 @@ export default function ExpandedNav({
     const showUnpin = !inMore && item.pinnable && canUnpin(item.path);
     const navDisabled = navLocked && item.path !== "/home";
 
+    const iconTone =
+      isActive && !expanded
+        ? "text-rail-active-foreground"
+        : "text-foreground";
+    const ActiveIcon = item.activeIcon;
     const iconEl = (
       <Icon
-        className={cn(
-          "h-4 w-4 shrink-0",
-          isActive && !expanded
-            ? "text-rail-active-foreground"
-            : "text-foreground"
-        )}
+        className={cn("h-4 w-4 shrink-0", iconTone)}
         strokeWidth={1.75}
       />
     );
@@ -366,6 +366,8 @@ export default function ExpandedNav({
           item.path === "/profile" ? hasUnreadNotifications : false
         }
       />
+    ) : isActive && ActiveIcon ? (
+      <ActiveIcon className={cn("h-4 w-4 shrink-0", iconTone)} />
     ) : isActive ? (
       <IconVariantOverride libraryId="phosphor" variant="fill">
         {iconEl}

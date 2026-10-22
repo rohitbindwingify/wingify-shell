@@ -1,49 +1,55 @@
 import { cn } from "@/lib/utils";
+import avatarLight from "@/assets/icons/avatar-light.png";
 
 type ProfileAvatarSize = "sm" | "md" | "lg";
 
+/** Placeholder + photo share the same footprint; ~2px above size-5 / 6 / 7. */
 const SIZE: Record<ProfileAvatarSize, string> = {
-  sm: "h-7 w-7 text-[10px]",
-  md: "h-8 w-8 text-[11px]",
-  lg: "h-9 w-9 text-xs",
+  sm: "size-[22px]",
+  md: "size-[26px]",
+  lg: "size-[30px]",
 };
 
 /**
- * Current-user mark: soft neutral wash, hairline ring, and weighty initials.
- * Pass `onDark` when it sits inside the collapsed active pill.
+ * Current-user mark. Uploaded photo when `src` is set; otherwise the
+ * Avatar Light placeholder. Pass `onDark` inside the collapsed active pill.
  * Pass `showUnreadDot` for the green unread-notifications indicator.
  */
 export default function ProfileAvatar({
   initials,
+  src,
   size = "md",
-  onDark = false,
+  onDark: _onDark = false,
   showUnreadDot = false,
   className,
 }: {
+  /** Used for accessible label when no photo. */
   initials: string;
+  /** Profile photo URL — omit / null / empty → placeholder icon. */
+  src?: string | null;
   size?: ProfileAvatarSize;
   onDark?: boolean;
   showUnreadDot?: boolean;
   className?: string;
 }) {
+  const hasPhoto = Boolean(src?.trim());
+
   return (
     <span className={cn("relative inline-flex shrink-0", className)}>
       <span
+        role="img"
+        aria-label={initials}
         className={cn(
-          "inline-flex items-center justify-center rounded-full font-semibold uppercase tracking-[0.06em]",
+          "inline-flex items-center justify-center overflow-hidden rounded-full",
           SIZE[size],
-          onDark
-            ? "bg-background text-foreground ring-1 ring-inset ring-border"
-            : [
-                "bg-muted",
-                "text-foreground",
-                "ring-1 ring-inset ring-border",
-                "shadow-[inset_0_1px_0_rgb(from var(--background) r g b / 0.85),0_1px_2px_rgb(from var(--foreground) r g b / 0.06)]",
-              ]
+          hasPhoto && "ring-1 ring-inset ring-border"
         )}
-        aria-hidden
       >
-        {initials}
+        <img
+          src={hasPhoto ? src! : avatarLight}
+          alt=""
+          className="size-full object-cover"
+        />
       </span>
       {showUnreadDot ? (
         <span

@@ -2,9 +2,6 @@ import type { LucideIcon } from "@/components/icons/protoLucide";
 import {
   Home,
   Wand2,
-  FlaskConical,
-  Target,
-  Flag,
   ShoppingCart,
   BarChart3,
   HeartPulse,
@@ -48,6 +45,42 @@ import {
   Lightbulb,
   Sparkles,
 } from "@/components/icons/protoLucide";
+import {
+  ShellAnalyticsCustomFillIcon,
+  ShellAnalyticsCustomIcon,
+} from "@/components/icons/shell/AnalyticsCustomIcons";
+import {
+  ShellCalendarBlankFillIcon,
+  ShellCalendarBlankIcon,
+} from "@/components/icons/shell/CalendarBlankIcons";
+import {
+  ShellFlaskFillIcon,
+  ShellFlaskIcon,
+} from "@/components/icons/shell/FlaskIcons";
+import {
+  ShellHardDrivesFillIcon,
+  ShellHardDrivesIcon,
+} from "@/components/icons/shell/HardDrivesIcons";
+import {
+  ShellInsightsFillIcon,
+  ShellInsightsIcon,
+} from "@/components/icons/shell/InsightsIcons";
+import {
+  ShellMegaphoneFillIcon,
+  ShellMegaphoneIcon,
+} from "@/components/icons/shell/MegaphoneIcons";
+import {
+  ShellRocketLaunchFillIcon,
+  ShellRocketLaunchIcon,
+} from "@/components/icons/shell/RocketLaunchIcons";
+import {
+  ShellUserFocusFillIcon,
+  ShellUserFocusIcon,
+} from "@/components/icons/shell/UserFocusIcons";
+import {
+  ShellUserSoundFillIcon,
+  ShellUserSoundIcon,
+} from "@/components/icons/shell/UserSoundIcons";
 import { UPGRADE_ADDONS_PATH, UPGRADE_SECTIONS } from "./upgradeNav";
 
 /** Page-orientation helpers shown after the last breadcrumb (replaces title-adjacent chrome). */
@@ -89,6 +122,8 @@ export type NavItem = {
   label: string;
   path: string;
   icon: LucideIcon;
+  /** When set, used on the rail while this item is active (instead of library fill). */
+  activeIcon?: LucideIcon;
   group: 1 | 2 | 3;
   pinnable?: boolean;
   /** Rendered as a circular avatar with these initials instead of the icon. */
@@ -188,16 +223,43 @@ export const NAV: NavItem[] = [
     // @undo — What's New removed from Wingz leaf nav
     // { heading: "Discover", items: [{ label: "What's New", path: "/wingz/whats-new", hideCreate: true }]},
   ]},
-  { label: "Experimentation", path: "/experimentation", icon: FlaskConical, group: 2, pinnable: true, sections: [
+  {
+    label: "Experimentation",
+    path: "/experimentation",
+    icon: ShellFlaskIcon as LucideIcon,
+    activeIcon: ShellFlaskFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+    sections: [
     { items: [
       { label: "Web Experimentation", path: "/web-experiment" },
       { label: "Web Rollouts", path: "/web-rollouts", hideCreate: true },
       { label: "Mobile App A/B", path: "/mobile-app-ab", hideCreate: true },
     ]},
   ]},
-  { label: "Web experimentation (Old)", path: "/web-experiment-old", icon: FlaskConical, group: 2 },
-  { label: "Personalize", path: "/personalize", icon: Target, group: 2, pinnable: true },
-  { label: "Feature Management", path: "/feature-management", icon: Flag, group: 2, pinnable: true, sections: [
+  {
+    label: "Web experimentation (Old)",
+    path: "/web-experiment-old",
+    icon: ShellFlaskIcon as LucideIcon,
+    activeIcon: ShellFlaskFillIcon as LucideIcon,
+    group: 2,
+  },
+  {
+    label: "Personalize",
+    path: "/personalize",
+    icon: ShellUserFocusIcon as LucideIcon,
+    activeIcon: ShellUserFocusFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+  },
+  {
+    label: "Feature Management",
+    path: "/feature-management",
+    icon: ShellRocketLaunchIcon as LucideIcon,
+    activeIcon: ShellRocketLaunchFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+    sections: [
     { items: [
       { label: "Feature Flags", path: "/feature-management/feature-flags" },
       { label: "Holdout", path: "/feature-management/holdout", hideCreate: true },
@@ -270,7 +332,8 @@ export const NAV: NavItem[] = [
   {
     label: "Journey Analytics",
     path: "/analytics",
-    icon: AppWindow,
+    icon: ShellAnalyticsCustomIcon as LucideIcon,
+    activeIcon: ShellAnalyticsCustomFillIcon as LucideIcon,
     group: 2,
     pinnable: true,
     sections: [
@@ -290,7 +353,14 @@ export const NAV: NavItem[] = [
       },
     ],
   },
-  { label: "Insights", path: "/insights", icon: BarChart3, group: 2, pinnable: true, sections: [
+  {
+    label: "Insights",
+    path: "/insights",
+    icon: ShellInsightsIcon as LucideIcon,
+    activeIcon: ShellInsightsFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+    sections: [
     { heading: "Overview", items: [{ label: "Dashboard", path: "/insights/dashboard", hideCreate: true }]},
     { heading: "Reports", items: [
       { label: "Metric Reports", path: "/insights/metric-reports" },
@@ -324,7 +394,14 @@ export const NAV: NavItem[] = [
     ]},
     { heading: "Feedback", items: [{ label: "Forms", path: "/insights/forms" }]},
   ]},
-  { label: "Pulse", path: "/pulse", icon: HeartPulse, group: 2, pinnable: true, sections: [
+  {
+    label: "Pulse",
+    path: "/pulse",
+    icon: ShellUserSoundIcon as LucideIcon,
+    activeIcon: ShellUserSoundFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+    sections: [
     { heading: "Research", items: [
       { label: "Surveys", path: "/pulse/surveys" },
       { label: "Concept Test", path: "/pulse/concept-test" },
@@ -332,8 +409,23 @@ export const NAV: NavItem[] = [
     { heading: "Resources", items: [{ label: "Templates", path: "/pulse/templates", hideCreate: true }]},
     { heading: "Administration", items: [{ label: "Settings", path: "/pulse/settings", hideCreate: true }]},
   ]},
-  { label: "Engage", path: "/engage", icon: Megaphone, group: 2, pinnable: true },
-  { label: "Data360", path: "/data-360", icon: Database, group: 2, pinnable: true, sections: [
+  {
+    label: "Engage",
+    path: "/engage",
+    icon: ShellMegaphoneIcon as LucideIcon,
+    activeIcon: ShellMegaphoneFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+  },
+
+  {
+    label: "Data360",
+    path: "/data-360",
+    icon: ShellHardDrivesIcon as LucideIcon,
+    activeIcon: ShellHardDrivesFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+    sections: [
     { heading: "Customer Data", items: [
       { label: "Profiles", path: "/data-360/profiles" },
       { label: "Attributes", path: "/data-360/attributes" },
@@ -353,7 +445,8 @@ export const NAV: NavItem[] = [
   {
     label: "Plan",
     path: "/plan",
-    icon: ClipboardList,
+    icon: ShellCalendarBlankIcon as LucideIcon,
+    activeIcon: ShellCalendarBlankFillIcon as LucideIcon,
     group: 2,
     pinnable: true,
     sections: [
