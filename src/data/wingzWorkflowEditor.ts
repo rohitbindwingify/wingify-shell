@@ -110,8 +110,8 @@ export const WORKFLOW_EDITOR_SCENARIOS: Record<
     label: "Previous version",
     workflowName: "Weekly AB Campaign Visitor Report",
     banner: {
-      tone: "warning",
-      message: "You’re viewing a previous version of this workflow.",
+      tone: "info",
+      message: "You're viewing a previous version of this workflow.",
       action: "Return to saved",
     },
     headerActions: "edit",

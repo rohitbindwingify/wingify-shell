@@ -125,23 +125,30 @@ export default function WingzWorkflowEditorPage() {
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-canvas">
       {scenario.banner ? (
         <div
+          role="status"
           className={cn(
-            "flex flex-wrap items-center justify-center gap-2 border-b px-4 py-2 text-center text-sm",
-            scenario.banner.tone === "warning"
-              ? "border-border bg-muted/60 text-foreground"
-              : "border-border bg-[var(--info-bg)] text-[var(--info-fg)]"
+            "flex flex-wrap items-center justify-end gap-x-3 gap-y-1 border-b px-4 py-2 text-sm",
+            scenario.banner.tone === "info"
+              ? "border-[var(--info-fg)]/15 bg-[var(--info-bg)] text-[var(--info-fg)]"
+              : "border-border bg-muted/60 text-foreground"
           )}
         >
-          <span>{scenario.banner.message}</span>
+          <span className="text-pretty">{scenario.banner.message}</span>
           {scenario.banner.action ? (
-            <button
+            <Button
               type="button"
-              className="inline-flex items-center gap-1.5 font-medium underline-offset-2 hover:underline"
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "h-auto gap-1.5 px-1.5 py-0.5 font-medium",
+                scenario.banner.tone === "info" &&
+                  "text-[var(--info-fg)] hover:bg-[var(--info-fg)]/10 hover:text-[var(--info-fg)]"
+              )}
               onClick={() => setScene("draft")}
             >
               <AlignLeft className="size-3.5" strokeWidth={1.75} aria-hidden />
               {scenario.banner.action}
-            </button>
+            </Button>
           ) : null}
         </div>
       ) : null}
