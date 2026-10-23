@@ -25,8 +25,8 @@ type Props = {
 export default function DetailCrumbOverflow({ product, earlier = [] }: Props) {
   const navLocked = useIsGetStartedLocked();
   const [open, setOpen] = useState(false);
-  const openTimer = useRef<number>();
-  const closeTimer = useRef<number>();
+  const openTimer = useRef<number | undefined>(undefined);
+  const closeTimer = useRef<number | undefined>(undefined);
   /** Nested menus portal outside this popover — keep overflow open while any are open. */
   const nestedCountRef = useRef(0);
 

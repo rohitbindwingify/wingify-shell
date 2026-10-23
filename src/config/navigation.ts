@@ -1,12 +1,8 @@
 import type { LucideIcon } from "@/components/icons/protoLucide";
 import {
   Home,
-  Wand2,
   ShoppingCart,
   BarChart3,
-  HeartPulse,
-  Megaphone,
-  Database,
   Activity,
   Headphones,
   UserCircle,
@@ -40,7 +36,6 @@ import {
   Award,
   Search,
   Puzzle,
-  ClipboardList,
   Eye,
   Lightbulb,
   Sparkles,
