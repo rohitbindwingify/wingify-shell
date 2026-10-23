@@ -235,7 +235,7 @@ export const NAV: NavItem[] = [
     // { heading: "Discover", items: [{ label: "What's New", path: "/wingz/whats-new", hideCreate: true }]},
   ]},
   {
-    label: "Web Experimentation",
+    label: "Experimentation",
     path: "/experimentation",
     icon: ShellFlaskIcon as LucideIcon,
     activeIcon: ShellFlaskFillIcon as LucideIcon,
@@ -244,7 +244,7 @@ export const NAV: NavItem[] = [
     sections: [
     { items: [
       { label: "Web Experimentation", path: "/web-experiment" },
-      { label: "Web Rollouts", path: "/web-rollouts", hideCreate: true },
+      { label: "Web Rollout", path: "/web-rollouts", hideCreate: true },
       { label: "Mobile App A/B", path: "/mobile-app-ab", hideCreate: true },
     ]},
   ]},
