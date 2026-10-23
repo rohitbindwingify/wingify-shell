@@ -353,8 +353,8 @@ export default function WorkflowEditorTopBar() {
               </Link>
             </Button>
             <Button type="button" size="sm" asChild>
-              <Link to={`/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=draft`}>
-                Back to draft
+              <Link to={`/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=history`}>
+                Back to run history
               </Link>
             </Button>
           </>
