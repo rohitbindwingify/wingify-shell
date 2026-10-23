@@ -13,3 +13,9 @@
   mask: url('/feature-flags/report-layout/environment.svg') center / contain no-repeat;
   -webkit-mask: url('/feature-flags/report-layout/environment.svg') center / contain no-repeat;
 }
+
+.flag-report-environment-outline.flag-report-environment-outline {
+  --appearance-dropdown-background: var(--background);
+  --appearance-dropdown-hover-background: var(--semantic-bg-selected);
+  border: 1px solid var(--border-strong);
+}

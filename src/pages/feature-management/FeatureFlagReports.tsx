@@ -1,12 +1,12 @@
 import FlagEnvironmentSelect from '@/components/feature-flags/FlagEnvironmentSelect';
 import { Badge } from '@/components/ui/badge';
 import './FeatureFlagReports.css';
-import { ArrowRight, UserRound } from '@/components/icons/protoLucide';
+import { ArrowUpRight, Target, FlaskConical } from '@/components/icons/protoLucide';
 import FlagGroupedResults from "./FlagGroupedResults";
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ReportsPage from '@/pages/reports/ReportsPage';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel, SelectSeparator } from '@/components/ui/select';
 import { CAMPAIGNS, type Campaign } from '@/data/campaigns';
 import { FLAG_ENVIRONMENTS, ruleStatus, type FlagRule } from '@/data/featureFlagRules';
 import { useFlagEnvironmentsStore } from '@/store/flagEnvironments';
@@ -48,20 +48,27 @@ export default function FeatureFlagReports({ flagId }: { flagId: string }) {
   const isLive = (items: FlagRule[]) => items.some(rule => ruleStatus(rule, environmentEnabled) === 'Active');
   const trackingStatus = (items: FlagRule[]) => isLive(items) ? 'Collecting data' : items.some(rule => rule.visitors > 0) ? 'Tracking paused' : 'No data';
   const status = trackingStatus(selected);
+  const reportName = selectedRule?.name ?? (type === 'Rollout' ? 'Rollout Report' : type === 'Personalization' ? 'Personalisation Report' : 'Experimentation Report');
+  const reportIcon = (kind: FlagRule['type']) => kind === 'Rollout' ? <ArrowUpRight className="size-4 shrink-0" /> : kind === 'Testing' ? <FlaskConical className="size-4 shrink-0" /> : <Target className="size-4 shrink-0" />;
   const statusLabel = (items: FlagRule[]) => {
-    const label = trackingStatus(items);
-    return <span className={`shrink-0 whitespace-nowrap text-xs font-medium ${label === 'Collecting data' ? 'text-[var(--success-fg)]' : label === 'Tracking paused' ? 'text-[var(--warning-fg)]' : 'text-muted-foreground'}`}>{label}</span>;
+    const states = items.map(rule => ruleStatus(rule, environmentEnabled));
+    const label = states.includes('Active') ? 'Running' : states.includes('Paused') || states.includes('Inactive') ? 'Paused' : states.includes('Scheduled') ? 'Scheduled' : states.includes('Completed') ? 'Completed' : states.length ? 'Draft' : 'No data';
+    return <span className={`flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-normal ${label === 'Running' ? 'text-[var(--success-fg)]' : 'text-muted-foreground'}`}><span aria-hidden="true" className="size-1.5 rounded-full bg-current" />{label}</span>;
   };
+  const optionClass = "pr-3 [&>span:first-child]:hidden [&>span:last-child]:min-w-0 [&>span:last-child]:w-full data-[state=checked]:bg-[var(--semantic-bg-selected-hover)]";
   const controls = <div className="flex w-full min-w-0 items-center gap-1">
-    <FlagEnvironmentSelect value={environment} onValueChange={value => update('environment', value)} isEnabled={isEnvironmentEnabled} label="Report environment" />
+    <FlagEnvironmentSelect value={environment} onValueChange={value => update('environment', value)} isEnabled={isEnvironmentEnabled} label="Report environment" reportStyle />
     <Select value={selection} onValueChange={value => update('rule', value)}>
-      <SelectTrigger aria-label={`Report rule: ${selectedRule?.name ?? type}, ${status}`} className="h-8 w-[156px] min-w-[156px] max-w-[156px] shrink-0 gap-1 rounded-sm border-0 px-3 py-1.5 bg-transparent text-sm shadow-none [&>span]:min-w-0 [&>span]:flex-1 [&>span]:truncate [&>span]:text-left">
-        <div className="shrink-0 text-muted-foreground" aria-hidden="true">{type === 'Rollout' ? <ArrowRight className="size-4" /> : type === 'Testing' ? <img src="/feature-flags/report-layout/testing.svg" alt="" /> : <UserRound className="size-4" />}</div>
-        <SelectValue><span className="flex min-w-0 items-center gap-2"><span className="min-w-0 flex-1 truncate" title={selectedRule ? `Testing · ${selectedRule.name}` : type}>{selectedRule ? `Testing · ${selectedRule.name}` : type}</span></span></SelectValue>
+      <SelectTrigger aria-label={`Report rule: ${reportName}`} className="h-8 w-auto min-w-[156px] max-w-[260px] shrink-0 gap-2 rounded-sm border-0 bg-transparent px-3 py-1.5 text-sm shadow-none [&>span]:min-w-0 [&>span]:truncate [&>span]:text-left">
+        <span aria-hidden="true">{reportIcon(type)}</span><SelectValue><span title={reportName}>{reportName}</span></SelectValue>
       </SelectTrigger>
-      <SelectContent className="w-[320px]">
-        {TYPES.filter(item => item !== 'Testing').map(item => <SelectItem key={item} value={item} textValue={item} className="pr-2 [&>span:first-child]:hidden [&>span:last-child]:min-w-0 [&>span:last-child]:w-full data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground"><span className="flex w-full items-center justify-between gap-3">{item}{statusLabel(rules.filter(rule => rule.type === item))}</span></SelectItem>)}
-        {rules.filter(rule => rule.type === 'Testing').map(rule => <SelectItem key={rule.id} value={`rule:${rule.id}`} textValue={`Testing · ${rule.name}`} className="pr-2 [&>span:first-child]:hidden [&>span:last-child]:min-w-0 [&>span:last-child]:w-full data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground"><span className="flex w-full items-center justify-between gap-3"><span className="max-w-[140px] truncate" title={`Testing · ${rule.name}`}>Testing · {rule.name}</span>{statusLabel([rule])}</span></SelectItem>)}
+      <SelectContent className="w-[370px] max-w-[calc(100vw-32px)]">
+        {(['Rollout', 'Personalization'] as const).map(item => <SelectItem key={item} value={item} textValue={item === 'Rollout' ? 'Rollout Report' : 'Personalisation Report'} className={optionClass}><span className="flex w-full items-center justify-between gap-3"><span className="flex min-w-0 items-center gap-2">{reportIcon(item)}<span>{item === 'Rollout' ? 'Rollout Report' : 'Personalisation Report'}</span></span>{statusLabel(rules.filter(rule => rule.type === item))}</span></SelectItem>)}
+        <SelectSeparator />
+        <SelectGroup><SelectLabel className="px-3 py-2 text-xs font-normal text-muted-foreground">Experimentation (AB/MVT) Reports</SelectLabel>
+          {rules.filter(rule => rule.type === 'Testing').map(rule => <SelectItem key={rule.id} value={`rule:${rule.id}`} textValue={rule.name} className={optionClass}><span className="flex w-full items-center justify-between gap-3"><span className="flex min-w-0 items-center gap-2">{reportIcon(rule.type)}<span className="truncate" title={rule.name}>{rule.name}</span></span>{statusLabel([rule])}</span></SelectItem>)}
+          {!rules.some(rule => rule.type === 'Testing') && <div className="px-3 py-2 text-xs text-muted-foreground">No experimentation reports</div>}
+        </SelectGroup>
       </SelectContent>
     </Select>
 
