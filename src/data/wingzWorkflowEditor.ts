@@ -36,7 +36,15 @@ export type WorkflowEditorScenario = {
   id: WorkflowScene;
   label: string;
   workflowName: string;
-  banner?: { tone: "warning" | "info"; message: string; action?: string };
+  banner?: {
+    tone: "warning" | "info";
+    /** Leading glyph — defaults to info. */
+    icon?: "info" | "history";
+    message: string;
+    action?: string;
+    /** When set, date/time renders as a dropdown after the message. */
+    timestamps?: string[];
+  };
   headerActions: "edit" | "history";
   showChat: boolean;
   nodes: WorkflowNode[];
@@ -81,7 +89,7 @@ const CHAT_THREAD: WorkflowChatMessage[] = [
       { label: "Schedule", value: "Weekly" },
       { label: "Agent", value: "Wingz" },
       { label: "Delivery", value: "Email to a@temp.com" },
-      { label: "Status", value: "Draft" },
+      { label: "Status", value: "Active" },
     ],
     card: {
       title: "Email weekly campaign visitor reports",
@@ -127,12 +135,13 @@ export const WORKFLOW_EDITOR_SCENARIOS: Record<
           { label: "Schedule", value: "Weekly" },
           { label: "Agent", value: "Wingz" },
           { label: "Delivery", value: "Email to a@temp.com" },
-          { label: "Status", value: "Saved" },
+          { label: "Status", value: "Active" },
         ],
         card: {
           title: "Email weekly campaign visitor reports",
           tag: "Workflow Editor",
-          actionLabel: "View Version",
+          status: "Active",
+          actionLabel: "Open",
         },
       },
     ],
@@ -143,8 +152,14 @@ export const WORKFLOW_EDITOR_SCENARIOS: Record<
     workflowName: "Weekly AB Campaign Visitor Report",
     banner: {
       tone: "info",
+      icon: "history",
       message:
-        "You are currently viewing the history log for the workflow Weekly AB Campaign Visitor Report — 21 Oct 2028, 15:19",
+        "You are currently viewing the history log for the workflow Weekly AB Campaign Visitor Report —",
+      timestamps: [
+        "21 Oct 2026, 15:19",
+        "18 Oct 2026, 11:04",
+        "12 Oct 2026, 09:32",
+      ],
     },
     headerActions: "history",
     showChat: false,
@@ -184,32 +199,62 @@ export const WORKFLOW_EDITOR_ID = "weekly-ab-report";
 export const WORKFLOW_SWITCHER_ITEMS = [
   {
     id: WORKFLOW_EDITOR_ID,
-    name: "Weekly AB Campaign Visitor Report — Draft with AI",
+    name: "Draft with AI — Weekly AB Campaign Visitor Report",
     displayId: "1842",
     href: `/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=draft`,
   },
   {
     id: "1",
-    name: "Weekly AB Campaign Visitor Report — Previous version",
+    name: "Previous version — Weekly AB Campaign Visitor Report",
     displayId: "1",
-    href: `/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=previous`,
+    href: `/wingz/workflows/1?scene=previous`,
   },
   {
     id: "2",
-    name: "Weekly AB Campaign Visitor Report — Run history",
+    name: "Run history — Weekly AB Campaign Visitor Report",
     displayId: "2",
-    href: `/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=history`,
+    href: `/wingz/workflows/2?scene=history`,
   },
   {
     id: "3",
     name: "New winner announcements",
     displayId: "3",
-    href: `/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=draft`,
+    href: `/wingz/workflows/3?scene=draft`,
   },
   {
     id: "4",
     name: "Nightly heatmap snapshot",
     displayId: "4",
-    href: `/wingz/workflows/${WORKFLOW_EDITOR_ID}?scene=draft`,
+    href: `/wingz/workflows/4?scene=draft`,
   },
 ] as const;
+
+/** Active switcher row for the editor crumb (by route id + scene). */
+export function resolveWorkflowSwitcherItem(
+  id: string,
+  scene: WorkflowScene
+): (typeof WORKFLOW_SWITCHER_ITEMS)[number] {
+  const exact = WORKFLOW_SWITCHER_ITEMS.find((w) => {
+    const url = new URL(w.href, "http://local");
+    const hrefId = url.pathname.split("/").pop() ?? w.id;
+    const hrefScene =
+      (url.searchParams.get("scene") as WorkflowScene | null) ?? "draft";
+    return hrefId === id && hrefScene === scene;
+  });
+  if (exact) return exact;
+
+  // List / deep links keep the canonical editor id and only change ?scene=
+  if (id === WORKFLOW_EDITOR_ID) {
+    const byScene = WORKFLOW_SWITCHER_ITEMS.find((w) => {
+      const hrefScene =
+        new URL(w.href, "http://local").searchParams.get("scene") ?? "draft";
+      return hrefScene === scene;
+    });
+    if (byScene) return byScene;
+  }
+
+  return (
+    WORKFLOW_SWITCHER_ITEMS.find((w) => w.id === id) ??
+    WORKFLOW_SWITCHER_ITEMS[0]
+  );
+}

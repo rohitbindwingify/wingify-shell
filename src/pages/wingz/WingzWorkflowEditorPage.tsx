@@ -2,7 +2,7 @@
  * Wingz workflow editor — light-theme canvas + AI chat for draft / previous / history.
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   AlignLeft,
@@ -10,6 +10,8 @@ import {
   Check,
   Copy,
   Crosshair,
+  History,
+  Info,
   Lock,
   Mail,
   Maximize2,
@@ -25,6 +27,13 @@ import {
 } from "@/components/icons/protoLucide";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   WORKFLOW_EDITOR_SCENARIOS,
@@ -114,6 +123,14 @@ export default function WingzWorkflowEditorPage() {
     : "draft";
   const scenario = WORKFLOW_EDITOR_SCENARIOS[scene];
   const [draft, setDraft] = useState("");
+  const bannerTimestamps = scenario.banner?.timestamps ?? [];
+  const [bannerTimestamp, setBannerTimestamp] = useState(
+    () => bannerTimestamps[0] ?? ""
+  );
+
+  useEffect(() => {
+    setBannerTimestamp(bannerTimestamps[0] ?? "");
+  }, [scene, bannerTimestamps[0]]);
 
   const setScene = (next: WorkflowScene) => {
     const nextParams = new URLSearchParams(params);
@@ -121,19 +138,47 @@ export default function WingzWorkflowEditorPage() {
     setParams(nextParams, { replace: true });
   };
 
+  const BannerIcon =
+    scenario.banner?.icon === "history" ? History : Info;
+
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-canvas">
       {scenario.banner ? (
         <div
           role="status"
           className={cn(
-            "flex flex-wrap items-center justify-end gap-x-3 gap-y-1 border-b px-4 py-2 text-sm",
+            "flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1.5 border-b px-4 py-2 text-center text-sm",
             scenario.banner.tone === "info"
               ? "border-[var(--info-fg)]/15 bg-[var(--info-bg)] text-[var(--info-fg)]"
               : "border-border bg-muted/60 text-foreground"
           )}
         >
+          <BannerIcon className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
           <span className="text-pretty">{scenario.banner.message}</span>
+          {bannerTimestamps.length > 0 ? (
+            <Select
+              value={bannerTimestamp || bannerTimestamps[0]}
+              onValueChange={setBannerTimestamp}
+            >
+              <SelectTrigger
+                aria-label="Run timestamp"
+                className={cn(
+                  "h-auto w-auto min-w-0 gap-1 px-2 py-0.5 text-sm leading-5 shadow-none [&>svg]:size-3.5",
+                  scenario.banner.tone === "info" &&
+                    "border-[var(--info-fg)]/35 bg-background/60 text-[var(--info-fg)] hover:bg-background/80 focus:ring-[var(--info-fg)]/30"
+                )}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="center">
+                {bannerTimestamps.map((ts) => (
+                  <SelectItem key={ts} value={ts}>
+                    {ts}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : null}
           {scenario.banner.action ? (
             <Button
               type="button"

@@ -45,7 +45,7 @@ const TEMPLATES = [
 const WORKFLOWS = [
   {
     id: WORKFLOW_EDITOR_ID,
-    name: "Weekly AB Campaign Visitor Report — Draft with AI",
+    name: "Draft with AI — Weekly AB Campaign Visitor Report",
     description:
       "Fetches visitor info for running A/B campaigns weekly and emails a report.",
     status: "Draft" as const,
@@ -56,7 +56,7 @@ const WORKFLOWS = [
   },
   {
     id: "1",
-    name: "Weekly AB Campaign Visitor Report — Previous version",
+    name: "Previous version — Weekly AB Campaign Visitor Report",
     description: "Pulls live campaign metrics and flags at-risk tests.",
     status: "Paused" as const,
     trigger: "Event Based" as const,
@@ -66,7 +66,7 @@ const WORKFLOWS = [
   },
   {
     id: "2",
-    name: "Weekly AB Campaign Visitor Report — Run history",
+    name: "Run history — Weekly AB Campaign Visitor Report",
     description: "Emails a digest when a variation underperforms control.",
     status: "Paused" as const,
     trigger: "Time Based" as const,

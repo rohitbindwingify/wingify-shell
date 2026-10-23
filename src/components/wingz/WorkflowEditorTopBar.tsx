@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   ChevronDown,
   GitBranch,
+  History,
   Pencil,
   Play,
   Save,
@@ -29,6 +30,7 @@ import {
   WORKFLOW_EDITOR_SCENARIOS,
   WORKFLOW_SCENES,
   WORKFLOW_SWITCHER_ITEMS,
+  resolveWorkflowSwitcherItem,
   type WorkflowScene,
 } from "@/data/wingzWorkflowEditor";
 import { resolveBreadcrumb } from "@/lib/nav";
@@ -51,11 +53,10 @@ export default function WorkflowEditorTopBar() {
   const { item, leaf, siblings } = resolveBreadcrumb(LIST_PATH);
   const navLocked = useIsGetStartedLocked();
 
-  const switcherItem =
-    WORKFLOW_SWITCHER_ITEMS.find((w) => w.id === id) ??
-    WORKFLOW_SWITCHER_ITEMS[0];
+  const switcherItem = resolveWorkflowSwitcherItem(id, scene);
 
-  const defaultName = scenario.workflowName || switcherItem.name;
+  // Prefer the selected switcher row name so the crumb updates on change.
+  const defaultName = switcherItem.name;
   const [nameOverride, setNameOverride] = useState<string | null>(null);
   const [publish, setPublish] = useState(false);
   const [entityOpen, setEntityOpen] = useState(false);
@@ -305,6 +306,27 @@ export default function WorkflowEditorTopBar() {
       <div className="flex shrink-0 items-center gap-2">
         {scenario.headerActions === "edit" ? (
           <>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 shrink-0"
+                    asChild
+                  >
+                    <Link
+                      to={`/wingz/workflows/${id}?scene=previous`}
+                      aria-label="Version history"
+                    >
+                      <History className="size-4" strokeWidth={1.75} aria-hidden />
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Version history</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <label className="mr-1 flex items-center gap-2 text-sm text-muted-foreground">
               Publish
               <Switch
