@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import FontController from "./FontController";
 import { GetStartedGate } from "./GetStartedGate";
+import NavIntroModal from "./NavIntroModal";
 import PlaygroundBanner from "./PlaygroundBanner";
 import RebrandingIntroModal from "./RebrandingIntroModal";
 import WorkspaceStatusBanner from "./WorkspaceStatusBanner";
@@ -21,6 +22,7 @@ export default function RootChrome() {
       </div>
       <FontController />
       <RebrandingIntroModal />
+      <NavIntroModal />
     </div>
   );
 }

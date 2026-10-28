@@ -1,7 +1,13 @@
 import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import { ChevronRight, MoreVertical, Plus } from "@/components/icons/protoLucide";
+import {
+  ChevronRight,
+  Lock,
+  MoreVertical,
+  Plus,
+  Sparkles,
+} from "@/components/icons/protoLucide";
 import { Button } from "@/components/ui/button";
 import SplitSaveButton from "@/components/ui/SplitSaveButton";
 import {
@@ -333,42 +339,56 @@ export default function ViewBar() {
           </DropdownMenu.Root>
         </div>
 
-        {/* SAVE CONTROLS — right-aligned, while the active view is dirty or unsaved */}
-        {showSaveControls && (
-          <div className="mb-1 flex shrink-0 animate-fade-in items-center gap-2 duration-150">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={discardActiveViewDraft}
-            >
-              Discard
-            </Button>
-            {isUnsaved ? (
+        <div className="mb-1 flex shrink-0 items-center gap-2">
+          {/* SAVE CONTROLS — while the active view is dirty or unsaved */}
+          {showSaveControls && (
+            <div className="flex animate-fade-in items-center gap-2 duration-150">
               <Button
                 type="button"
+                variant="ghost"
                 size="sm"
-                onClick={() => saveDraftAsNewView(activeView?.name ?? "New view")}
+                onClick={discardActiveViewDraft}
               >
-                Save view
+                Discard
               </Button>
-            ) : (
-              <SplitSaveButton
-                existingLabel={activeView?.name ?? "View"}
-                onSaveExisting={() => saveDraftToActiveView()}
-                onSaveAsNew={() => {
-                  const copyName = `${activeView?.name ?? "View"} copy`;
-                  const id = saveDraftAsNewView(copyName);
-                  startRenameSoon(id, copyName);
-                }}
-                // "Save as new view" opens the inline name editor — don't let
-                // Radix pull focus back to the trigger and blur it.
-                onCloseAutoFocus={(e) => e.preventDefault()}
-                menuClassName={MENU_CONTENT}
-              />
-            )}
-          </div>
-        )}
+              {isUnsaved ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() =>
+                    saveDraftAsNewView(activeView?.name ?? "New view")
+                  }
+                >
+                  Save view
+                </Button>
+              ) : (
+                <SplitSaveButton
+                  existingLabel={activeView?.name ?? "View"}
+                  onSaveExisting={() => saveDraftToActiveView()}
+                  onSaveAsNew={() => {
+                    const copyName = `${activeView?.name ?? "View"} copy`;
+                    const id = saveDraftAsNewView(copyName);
+                    startRenameSoon(id, copyName);
+                  }}
+                  // "Save as new view" opens the inline name editor — don't let
+                  // Radix pull focus back to the trigger and blur it.
+                  onCloseAutoFocus={(e) => e.preventDefault()}
+                  menuClassName={MENU_CONTENT}
+                />
+              )}
+            </div>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5"
+          >
+            <Sparkles className="size-3.5 text-highlight-fg" aria-hidden />
+            Summarize
+            <Lock className="size-3 text-muted-foreground" aria-hidden />
+          </Button>
+        </div>
       </div>
 
       {/* Delete confirmation */}
