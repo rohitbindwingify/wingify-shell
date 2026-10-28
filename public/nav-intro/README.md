@@ -1,9 +1,13 @@
 # Navigation intro images
 
-## Product photos (Old vs New)
+## Product photos
 
-- `shell-new.png` — new shell; **New** tab in the intro comparison
-- `shell-old.png` — previous shell; **Old** tab in the intro comparison
+- `shell-intro.png` — first tour step (overview)
+- `shell-breadcrumbs.png` — breadcrumbs step
+- `shell-pin.png` — pin / unpin step
+- `shell-settings.png` — settings and configuration step
+- `shell-new.png` — new shell crops for later steps
+- `shell-old.png` — previous shell reference
 
 ## Generated captures
 

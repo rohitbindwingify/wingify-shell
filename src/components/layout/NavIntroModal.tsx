@@ -1,9 +1,8 @@
-// @summary Navigation introduction — one screen, no stepper. Opens once per
-// NAV_INTRO_VERSION after the boot splash clears, and again on demand via
-// openNavIntro(). Right panel is an annotated shell with callouts.
-// Esc / X / Got it all count as seen: we never re-nag.
+// @summary Wide navigation tour — intro + feature steps. Opens once per
+// NAV_INTRO_VERSION after the boot splash clears, and again via openNavIntro().
+// Esc / X / Skip / Got it all count as seen.
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Sparkles } from "@/components/icons/protoLucide";
+import { ChevronRight } from "@/components/icons/protoLucide";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,14 +10,40 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { NAV_INTRO_HEADING, NAV_INTRO_POINTS } from "@/config/navIntro";
+import {
+  NAV_INTRO_FEATURE_COUNT,
+  NAV_INTRO_STEPS,
+} from "@/config/navIntro";
 import { shouldShowNavIntro, useNavIntroStore } from "@/store/navIntro";
 import { useWorkspaceStore } from "@/store/workspace";
 import { cn } from "@/lib/utils";
 import NavIntroSchematic from "./NavIntroSchematic";
 
-/** Give up waiting on the boot splash and open anyway. */
 const BOOT_SPLASH_FALLBACK_MS = 3500;
+
+function StepDots({
+  index,
+  total,
+}: {
+  index: number;
+  total: number;
+}) {
+  return (
+    <div className="flex items-center gap-1.5" aria-hidden>
+      {Array.from({ length: total }, (_, i) => (
+        <span
+          key={i}
+          className={cn(
+            "rounded-full transition-all duration-200",
+            i === index
+              ? "h-1.5 w-5 bg-foreground"
+              : "size-1.5 bg-border"
+          )}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function NavIntroModal() {
   const seenVersion = useNavIntroStore((s) => s.seenVersion);
@@ -28,10 +53,18 @@ export default function NavIntroModal() {
   const rebrandingOpen = useWorkspaceStore((s) => s.rebrandingModalOpen);
 
   const [open, setOpen] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
   const primaryRef = useRef<HTMLButtonElement>(null);
 
-  // Queue behind the boot splash and the rebranding intro so the user only ever
-  // faces one modal at a time.
+  const step = NAV_INTRO_STEPS[stepIndex] ?? NAV_INTRO_STEPS[0];
+  const isFirst = stepIndex === 0;
+  const isLast = stepIndex === NAV_INTRO_STEPS.length - 1;
+  const featureOrdinal =
+    step.kind === "feature"
+      ? NAV_INTRO_STEPS.slice(0, stepIndex + 1).filter((s) => s.kind === "feature")
+          .length
+      : 0;
+
   useEffect(() => {
     if (open) return;
     if (!replayRequested && !shouldShowNavIntro(seenVersion)) return;
@@ -41,6 +74,7 @@ export default function NavIntroModal() {
 
     const tryOpen = () => {
       if (cancelled || document.getElementById("boot-splash")) return false;
+      setStepIndex(0);
       setOpen(true);
       return true;
     };
@@ -53,7 +87,10 @@ export default function NavIntroModal() {
 
     const timeout = window.setTimeout(() => {
       window.clearInterval(interval);
-      if (!cancelled) setOpen(true);
+      if (!cancelled) {
+        setStepIndex(0);
+        setOpen(true);
+      }
     }, BOOT_SPLASH_FALLBACK_MS);
 
     return () => {
@@ -67,7 +104,17 @@ export default function NavIntroModal() {
     markSeen();
     clearReplay();
     setOpen(false);
+    setStepIndex(0);
   }, [markSeen, clearReplay]);
+
+  const goNext = () => {
+    if (isLast) finish();
+    else setStepIndex((i) => Math.min(i + 1, NAV_INTRO_STEPS.length - 1));
+  };
+
+  const goBack = () => {
+    setStepIndex((i) => Math.max(i - 1, 0));
+  };
 
   if (!open) return null;
 
@@ -84,80 +131,91 @@ export default function NavIntroModal() {
           primaryRef.current?.focus();
         }}
         className={cn(
-          "max-h-[92vh] gap-0 overflow-y-auto border-border p-0 shadow-xl sm:max-w-[64rem] sm:rounded-2xl",
-          "[&>button]:right-5 [&>button]:top-5 [&>button]:z-20 [&>button]:opacity-50 [&>button]:hover:opacity-100"
+          "max-h-[92vh] w-[min(52rem,calc(100vw-2rem))] max-w-none gap-0 overflow-hidden border-border p-0 shadow-xl sm:rounded-2xl",
+          "[&>button]:right-4 [&>button]:top-4 [&>button]:z-20 [&>button]:flex [&>button]:size-8 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:border [&>button]:border-border [&>button]:bg-background [&>button]:opacity-100 [&>button]:shadow-sm"
         )}
       >
-        <div className="grid md:grid-cols-[22rem_1fr]">
-          {/* Copy */}
-          <div className="flex flex-col px-8 py-8">
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[0.6875rem] font-medium text-foreground">
-              <Sparkles className="size-3" aria-hidden />
-              {NAV_INTRO_HEADING.eyebrow}
-            </span>
+        <div className="flex max-h-[92vh] flex-col overflow-y-auto">
+          {/* Illustration */}
+          <div className="relative shrink-0 border-b border-border bg-muted p-4 md:p-5">
+            <NavIntroSchematic media={step.media} className="w-full shadow-sm" />
+          </div>
+
+          {/* Copy — fixed min height so shorter steps don’t shrink the modal */}
+          <div className="flex min-h-[9.5rem] flex-col px-7 pb-2 pt-6 md:min-h-[10rem] md:px-8 md:pt-7">
+            {step.kind === "intro" ? (
+              <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                {step.eyebrow}
+              </p>
+            ) : (
+              <p className="text-[0.8125rem] tabular-nums text-muted-foreground">
+                {featureOrdinal} / {NAV_INTRO_FEATURE_COUNT}
+              </p>
+            )}
 
             <DialogTitle
-              className="mt-4 text-[1.875rem] font-semibold leading-[1.15] tracking-tight text-foreground"
+              className="mt-3 text-[1.75rem] font-semibold leading-[1.15] tracking-tight text-foreground md:text-[1.875rem]"
               style={{
                 fontFamily: '"Ergon", ui-sans-serif, system-ui, sans-serif',
               }}
             >
-              {NAV_INTRO_HEADING.title}
+              {step.title}
             </DialogTitle>
 
-            <DialogDescription className="mt-3.5 text-sm leading-relaxed text-muted-foreground">
-              {NAV_INTRO_HEADING.description}
+            <DialogDescription className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              {step.description}
             </DialogDescription>
 
-            <ul className="mt-7 space-y-[1.125rem]">
-              {NAV_INTRO_POINTS.map((point) => {
-                const Icon = point.icon;
-                return (
-                  <li key={point.id} className="flex gap-3.5">
-                    <span className="mt-px flex size-8 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground">
-                      <Icon className="size-4" aria-hidden />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium leading-snug text-foreground">
-                        {point.title}
-                      </p>
-                      <p className="mt-1 text-[0.8125rem] leading-relaxed text-muted-foreground">
-                        {point.description}
-                      </p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-
-            <div className="mt-8">
-              <Button ref={primaryRef} type="button" onClick={finish}>
-                Got it
-              </Button>
-            </div>
+            {step.footnote ? (
+              <p className="mt-4 text-sm text-muted-foreground/80">
+                {step.footnote}
+              </p>
+            ) : null}
           </div>
 
-          {/* Annotated shell */}
-          <div className="relative flex flex-col justify-center overflow-hidden border-t border-border bg-muted p-6 md:border-l md:border-t-0 md:p-8">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                backgroundImage: `
-                  radial-gradient(
-                    ellipse 90% 70% at 50% 40%,
-                    color-mix(in srgb, var(--background) 90%, transparent),
-                    transparent 70%
-                  ),
-                  radial-gradient(
-                    color-mix(in srgb, var(--foreground) 8%, transparent) 1px,
-                    transparent 1px
-                  )
-                `,
-                backgroundSize: "auto, 18px 18px",
-              }}
-            />
-            <NavIntroSchematic className="relative z-10 h-[36rem] w-full shadow-[0_24px_48px_-20px_color-mix(in_srgb,var(--foreground)_28%,transparent)] ring-1 ring-border" />
+          {/* CTA */}
+          <div className="mt-auto flex items-center justify-between gap-3 px-7 pb-5 pt-5 md:px-8 md:pb-6">
+            <StepDots index={stepIndex} total={NAV_INTRO_STEPS.length} />
+
+            <div className="flex items-center gap-2">
+              {isFirst ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground"
+                  onClick={finish}
+                >
+                  Skip tour
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground"
+                  onClick={goBack}
+                >
+                  Back
+                </Button>
+              )}
+              <Button
+                ref={primaryRef}
+                type="button"
+                size="sm"
+                className="gap-1"
+                onClick={goNext}
+              >
+                {isLast ? (
+                  "Got it"
+                ) : (
+                  <>
+                    Next
+                    <ChevronRight className="size-3.5" aria-hidden />
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>

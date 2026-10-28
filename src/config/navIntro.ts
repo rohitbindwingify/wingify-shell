@@ -1,67 +1,68 @@
-// @summary Content for the navigation introduction modal — one screen, no stepper.
+// @summary Copy + media for the navigation tour modal (intro + feature steps).
 // Bump NAV_INTRO_VERSION whenever the copy changes materially; the persisted store
 // keys off it, so everyone sees the modal again.
-import {
-  Compass,
-  Layers,
-  LayoutGrid,
-  Pin,
-  type LucideIcon,
-} from "@/components/icons/protoLucide";
 
-/** Which region of the annotated shell a callout marks. */
-export type NavIntroFocus = "rail" | "panel" | "more" | "breadcrumb";
+export const NAV_INTRO_VERSION = 12;
 
-export type NavIntroTone = "amber" | "ocean" | "green" | "berry";
+export type NavIntroMedia = {
+  src: string;
+};
 
-export type NavIntroPoint = {
+export type NavIntroStep = {
   id: string;
-  focus: NavIntroFocus;
-  tone: NavIntroTone;
-  icon: LucideIcon;
+  /** Intro uses eyebrow; feature steps use "n / N". */
+  kind: "intro" | "feature";
+  eyebrow?: string;
   title: string;
   description: string;
+  /** Only on intro. */
+  footnote?: string;
+  media: NavIntroMedia;
 };
 
-export const NAV_INTRO_VERSION = 5;
-
-export const NAV_INTRO_HEADING = {
-  eyebrow: "New",
-  title: "A simpler way to move around",
-  description: "Products, pages, and settings are closer together in one place.",
-};
-
-export const NAV_INTRO_POINTS: NavIntroPoint[] = [
+export const NAV_INTRO_STEPS: NavIntroStep[] = [
   {
-    id: "breadcrumb",
-    focus: "breadcrumb",
-    tone: "amber",
-    icon: Compass,
-    title: "Breadcrumbs that do more",
-    description: "Jump across products and open page help from the trail.",
+    id: "intro",
+    kind: "intro",
+    eyebrow: "What's new",
+    title: "A simpler way to move around",
+    description:
+      "Your products now sit in one rail on the left, each with its own menu. Nothing was removed; it is all closer together.",
+    media: {
+      src: "/nav-intro/shell-intro.png",
+    },
   },
   {
-    id: "rail",
-    focus: "rail",
-    tone: "ocean",
-    icon: LayoutGrid,
-    title: "All products in one place",
-    description: "Switch products from a single left rail.",
+    id: "breadcrumbs",
+    kind: "feature",
+    title: "Breadcrumbs that jump",
+    description:
+      "The trail at the top is new. Use it to switch campaigns, products and pages in place, and to open help for whatever you're on.",
+    media: {
+      src: "/nav-intro/shell-breadcrumbs.png",
+    },
   },
   {
-    id: "more",
-    focus: "more",
-    tone: "green",
-    icon: Pin,
+    id: "pin",
+    kind: "feature",
     title: "Pin what you use",
-    description: "Keep favorites on the rail; the rest go in More.",
+    description:
+      "You can now choose which products stay on the sidebar. Unpin the rest and they tuck into More; pin them back any time.",
+    media: {
+      src: "/nav-intro/shell-pin.png",
+    },
   },
   {
-    id: "panel",
-    focus: "panel",
-    tone: "berry",
-    icon: Layers,
-    title: "Clearer structure",
-    description: "Related pages stay grouped by product.",
+    id: "settings",
+    kind: "feature",
+    title: "Settings moved down here",
+    description:
+      "Account, workspace and configuration now sit at the bottom of the left sidebar, not in the top menus.",
+    media: {
+      src: "/nav-intro/shell-settings.png",
+    },
   },
 ];
+export const NAV_INTRO_FEATURE_COUNT = NAV_INTRO_STEPS.filter(
+  (s) => s.kind === "feature"
+).length;
