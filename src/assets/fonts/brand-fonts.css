@@ -1,4 +1,41 @@
-/* Brand experiment fonts — Lyon Display (optional). UI uses Google DM Sans. */
+/* Brand experiment fonts — Lyon Display + Ergon (optional). UI uses Google DM Sans. */
+
+/* ── Ergon — display / hero (nav intro title, etc.) ──────────────────── */
+@font-face {
+  font-family: "Ergon";
+  src: url("./ergon/Ergon-Light-Trial.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ergon";
+  src: url("./ergon/Ergon-Regular-Trial.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ergon";
+  src: url("./ergon/Ergon-Medium-Trial.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ergon";
+  src: url("./ergon/Ergon-Bold-Trial.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ergon";
+  src: url("./ergon/Ergon-Black-Trial.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* ── Lyon Display — large display / hero (optional) ──────────────────── */
 @font-face {

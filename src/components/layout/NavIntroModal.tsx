@@ -1,6 +1,6 @@
 // @summary Navigation introduction — one screen, no stepper. Opens once per
 // NAV_INTRO_VERSION after the boot splash clears, and again on demand via
-// openNavIntro(). Hovering a point lights that region of the shell schematic.
+// openNavIntro(). Right panel is an annotated shell with callouts.
 // Esc / X / Got it all count as seen: we never re-nag.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Sparkles } from "@/components/icons/protoLucide";
@@ -11,16 +11,11 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  NAV_INTRO_HEADING,
-  NAV_INTRO_POINTS,
-  type NavIntroFocus,
-} from "@/config/navIntro";
+import { NAV_INTRO_HEADING, NAV_INTRO_POINTS } from "@/config/navIntro";
 import { shouldShowNavIntro, useNavIntroStore } from "@/store/navIntro";
 import { useWorkspaceStore } from "@/store/workspace";
 import { cn } from "@/lib/utils";
-import NavIntroSchematic, { type NavIntroMode } from "./NavIntroSchematic";
+import NavIntroSchematic from "./NavIntroSchematic";
 
 /** Give up waiting on the boot splash and open anyway. */
 const BOOT_SPLASH_FALLBACK_MS = 3500;
@@ -33,9 +28,6 @@ export default function NavIntroModal() {
   const rebrandingOpen = useWorkspaceStore((s) => s.rebrandingModalOpen);
 
   const [open, setOpen] = useState(false);
-  /** Null means nothing is hovered, so the whole shell stays lit. */
-  const [hovered, setHovered] = useState<NavIntroFocus | null>(null);
-  const [mode, setMode] = useState<NavIntroMode>("after");
   const primaryRef = useRef<HTMLButtonElement>(null);
 
   // Queue behind the boot splash and the rebranding intro so the user only ever
@@ -49,8 +41,6 @@ export default function NavIntroModal() {
 
     const tryOpen = () => {
       if (cancelled || document.getElementById("boot-splash")) return false;
-      setHovered(null);
-      setMode("after");
       setOpen(true);
       return true;
     };
@@ -63,11 +53,7 @@ export default function NavIntroModal() {
 
     const timeout = window.setTimeout(() => {
       window.clearInterval(interval);
-      if (!cancelled) {
-        setHovered(null);
-        setMode("after");
-        setOpen(true);
-      }
+      if (!cancelled) setOpen(true);
     }, BOOT_SPLASH_FALLBACK_MS);
 
     return () => {
@@ -98,11 +84,11 @@ export default function NavIntroModal() {
           primaryRef.current?.focus();
         }}
         className={cn(
-          "max-h-[92vh] gap-0 overflow-y-auto border-border p-0 shadow-xl sm:max-w-[60rem] sm:rounded-2xl",
+          "max-h-[92vh] gap-0 overflow-y-auto border-border p-0 shadow-xl sm:max-w-[64rem] sm:rounded-2xl",
           "[&>button]:right-5 [&>button]:top-5 [&>button]:z-20 [&>button]:opacity-50 [&>button]:hover:opacity-100"
         )}
       >
-        <div className="grid md:grid-cols-[24rem_1fr]">
+        <div className="grid md:grid-cols-[22rem_1fr]">
           {/* Copy */}
           <div className="flex flex-col px-8 py-8">
             <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[0.6875rem] font-medium text-foreground">
@@ -110,7 +96,12 @@ export default function NavIntroModal() {
               {NAV_INTRO_HEADING.eyebrow}
             </span>
 
-            <DialogTitle className="font-title mt-4 text-[1.875rem] font-semibold leading-[1.15] tracking-tight text-foreground">
+            <DialogTitle
+              className="mt-4 text-[1.875rem] font-semibold leading-[1.15] tracking-tight text-foreground"
+              style={{
+                fontFamily: '"Ergon", ui-sans-serif, system-ui, sans-serif',
+              }}
+            >
               {NAV_INTRO_HEADING.title}
             </DialogTitle>
 
@@ -118,27 +109,12 @@ export default function NavIntroModal() {
               {NAV_INTRO_HEADING.description}
             </DialogDescription>
 
-            <ul
-              className="mt-7 space-y-[1.125rem]"
-              onMouseLeave={() => setHovered(null)}
-            >
+            <ul className="mt-7 space-y-[1.125rem]">
               {NAV_INTRO_POINTS.map((point) => {
                 const Icon = point.icon;
-                const active = hovered === point.focus;
                 return (
-                  <li
-                    key={point.id}
-                    onMouseEnter={() => setHovered(point.focus)}
-                    className="flex gap-3.5"
-                  >
-                    <span
-                      className={cn(
-                        "mt-px flex size-8 shrink-0 items-center justify-center rounded-lg border transition-colors duration-200 motion-reduce:transition-none",
-                        active
-                          ? "border-foreground/25 bg-foreground/[0.06] text-foreground"
-                          : "border-border text-muted-foreground"
-                      )}
-                    >
+                  <li key={point.id} className="flex gap-3.5">
+                    <span className="mt-px flex size-8 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground">
                       <Icon className="size-4" aria-hidden />
                     </span>
                     <div className="min-w-0">
@@ -154,70 +130,34 @@ export default function NavIntroModal() {
               })}
             </ul>
 
-            <div className="mt-auto flex justify-end pt-8">
+            <div className="mt-8">
               <Button ref={primaryRef} type="button" onClick={finish}>
                 Got it
               </Button>
             </div>
           </div>
 
-          {/* The shell, with the hovered point lit */}
-          <div className="relative flex flex-col justify-center gap-4 overflow-hidden border-t border-border bg-muted/40 p-8 md:border-l md:border-t-0">
-            {/* Backdrop so the panel is not a flat slab: a fine dot grid and two
-                soft glows, one tinted with the product's own selected-state
-                accent — the same colour the screenshot already carries. */}
+          {/* Annotated shell */}
+          <div className="relative flex flex-col justify-center overflow-hidden border-t border-border bg-muted p-6 md:border-l md:border-t-0 md:p-8">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0"
               style={{
-                backgroundImage:
-                  "radial-gradient(color-mix(in srgb, var(--foreground) 9%, transparent) 1px, transparent 1px)",
-                backgroundSize: "18px 18px",
+                backgroundImage: `
+                  radial-gradient(
+                    ellipse 90% 70% at 50% 40%,
+                    color-mix(in srgb, var(--background) 90%, transparent),
+                    transparent 70%
+                  ),
+                  radial-gradient(
+                    color-mix(in srgb, var(--foreground) 8%, transparent) 1px,
+                    transparent 1px
+                  )
+                `,
+                backgroundSize: "auto, 18px 18px",
               }}
             />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-24 -top-28 size-[24rem] rounded-full blur-3xl"
-              style={{
-                background:
-                  "radial-gradient(circle, color-mix(in srgb, var(--accent) 60%, transparent), transparent 70%)",
-              }}
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -bottom-32 -left-28 size-[22rem] rounded-full blur-3xl"
-              style={{
-                background:
-                  "radial-gradient(circle, color-mix(in srgb, var(--foreground) 12%, transparent), transparent 70%)",
-              }}
-            />
-
-            <div className="relative z-10 flex items-center justify-between gap-3 pr-10">
-              <p className="text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                {mode === "before" ? "Previous navigation" : "New navigation"}
-              </p>
-              <Tabs
-                value={mode}
-                onValueChange={(value) => setMode(value as NavIntroMode)}
-              >
-                <TabsList className="h-7 p-0.5">
-                  <TabsTrigger value="before" className="h-6 px-2.5 text-xs">
-                    Before
-                  </TabsTrigger>
-                  <TabsTrigger value="after" className="h-6 px-2.5 text-xs">
-                    After
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
-
-            <div className="relative z-10 flex flex-col">
-              <NavIntroSchematic
-                mode={mode}
-                focus={hovered ?? "shell"}
-                className="h-[34rem] w-full shadow-2xl ring-1 ring-foreground/10"
-              />
-            </div>
+            <NavIntroSchematic className="relative z-10 h-[36rem] w-full shadow-[0_24px_48px_-20px_color-mix(in_srgb,var(--foreground)_28%,transparent)] ring-1 ring-border" />
           </div>
         </div>
       </DialogContent>
