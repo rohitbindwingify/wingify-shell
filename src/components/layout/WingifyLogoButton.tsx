@@ -13,7 +13,6 @@ import {
   mascotForPath,
   type MascotId,
 } from "../../config/mascots";
-import { useMascotPreviewStore } from "../../store/mascotPreview";
 import { useThemeStore } from "../../store/theme";
 import { cn } from "../../lib/utils";
 import type { ColorMode } from "../../config/themes";
@@ -34,8 +33,7 @@ function preloadMascots() {
 }
 
 /**
- * Opacity-only crossfade between product poses. Queues the latest target if a
- * fade is already running so rapid product-row hovers don't thrash mid-transition.
+ * Opacity-only crossfade between product poses when the active route changes.
  */
 function MascotMark({
   id,
@@ -159,8 +157,7 @@ function MascotMark({
 
 /**
  * Home button carrying the flow-aware Wingify mascot.
- * - Active route sets the pose
- * - Product-row hover previews that product's pose
+ * - Active route sets the pose (same marks that used to preview on nav hover)
  * - Logo hover keeps the same mark and plays a subtle quirky idle motion
  * - `showWordmark` adds the wingify wordmark beside the same-size bird
  */
@@ -175,15 +172,13 @@ export default function WingifyLogoButton({
   const { pathname } = useLocation();
   const navLocked = useIsGetStartedLocked();
   const colorMode = useThemeStore((s) => s.colorMode);
-  const previewId = useMascotPreviewStore((s) => s.previewId);
-  const routeId = mascotForPath(pathname);
+  const mascotId = mascotForPath(pathname);
   const [logoHover, setLogoHover] = useState(false);
 
   useEffect(() => {
     preloadMascots();
   }, []);
 
-  const mascotId = previewId ?? routeId;
   const pose = MASCOT_LABELS[mascotId];
 
   return (

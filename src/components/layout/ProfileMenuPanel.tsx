@@ -26,7 +26,7 @@ function ProfileMenuDivider() {
 
 /**
  * Avatar flyout — max 3 dividers (no line after the profile card):
- * 1. User card + destinations (Configuration / Settings / Upgrade)
+ * 1. User card + destinations (Upgrade; Settings/Configuration are on the rail gear)
  * 2. Product updates + Language / Theme
  * 3. Navigation switch
  * 4. Logout

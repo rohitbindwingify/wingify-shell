@@ -1,6 +1,6 @@
 // @summary Copy + media for the navigation tour modal (intro + feature steps).
-// Bump NAV_INTRO_VERSION whenever the copy changes materially; the persisted store
-// keys off it, so everyone sees the modal again.
+// Once a user dismisses a version, it stays dismissed. Only bump NAV_INTRO_VERSION
+// when we intentionally want everyone to see the tour again (or call openNavIntro()).
 
 export const NAV_INTRO_VERSION = 12;
 
@@ -45,9 +45,9 @@ export const NAV_INTRO_STEPS: NavIntroStep[] = [
   {
     id: "pin",
     kind: "feature",
-    title: "Pin what you use",
+    title: "Keep what you use",
     description:
-      "You can now choose which products stay on the sidebar. Unpin the rest and they tuck into More; pin them back any time.",
+      "Choose which products stay on the sidebar. Hide the rest under Other; show them in sidebar again any time.",
     media: {
       src: "/nav-intro/shell-pin.png",
     },

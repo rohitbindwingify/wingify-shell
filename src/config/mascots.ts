@@ -75,6 +75,7 @@ const MASCOT_ROUTE_PREFIXES: { prefix: string; mascot: FlowMascotId }[] = [
   { prefix: "/personalize", mascot: "choose" },
   { prefix: "/commerce", mascot: "choose" },
   { prefix: "/insights", mascot: "look" },
+  { prefix: "/experimentation", mascot: "act" },
   { prefix: "/web-experiment", mascot: "act" },
   { prefix: "/engage", mascot: "act" },
   { prefix: "/feature-management", mascot: "act" },

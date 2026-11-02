@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { PINNABLE_PATHS } from "../config/navigation";
+import { DEFAULT_PINNED_PATHS, PINNABLE_PATHS } from "../config/navigation";
 
-/** At least this many pinnable products must stay on the main rail (outside More). */
+/** At least this many pinnable products must stay on the main rail (outside Other). */
 export const MIN_PINNED_PRODUCTS = 2;
 
 export function canUnpinPath(pinnedPaths: string[], path: string): boolean {
@@ -25,6 +25,7 @@ type UIState = {
   /** Only pinnable paths may ever appear here. */
   pinnedPaths: string[];
   toggleDock: () => void;
+  setDocked: (docked: boolean) => void;
   unpin: (path: string) => void;
   pin: (path: string) => void;
 };
@@ -33,8 +34,9 @@ export const useUIStore = create<UIState>()(
   persist(
     (set) => ({
       isDocked: false,
-      pinnedPaths: [...PINNABLE_PATHS],
+      pinnedPaths: [...DEFAULT_PINNED_PATHS],
       toggleDock: () => set((s) => ({ isDocked: !s.isDocked })),
+      setDocked: (docked) => set({ isDocked: docked }),
       unpin: (path) =>
         set((s) => {
           if (!canUnpinPath(s.pinnedPaths, path)) return s;
@@ -55,8 +57,8 @@ export const useUIStore = create<UIState>()(
         ),
     }),
     {
-      // Key bumped so stale pin sets below the new floor are re-normalized.
-      name: "wingify-ui-v3",
+      // v4: smaller default pin set + Hide from / Show in sidebar copy.
+      name: "wingify-ui-v4",
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<UIState>;
         return {

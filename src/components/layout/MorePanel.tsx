@@ -21,7 +21,7 @@ export default function MorePanel() {
     <Tooltip.Provider delayDuration={300}>
       <nav className="h-full w-[248px] shrink-0 overflow-y-auto border-r border-panel-border bg-panel py-6 text-panel-foreground [scrollbar-width:thin]">
         <div className="px-5 pb-4 text-sm font-semibold text-foreground">
-          More
+          Other
         </div>
         <div className="flex flex-col px-3">
           {unpinned.map((item, groupIndex) => {
@@ -46,7 +46,7 @@ export default function MorePanel() {
                     <Tooltip.Trigger asChild>
                       <button
                         type="button"
-                        aria-label={`Pin ${item.label} to sidebar`}
+                        aria-label={`Show ${item.label} in sidebar`}
                         onClick={(e) => {
                           e.stopPropagation();
                           pin(item.path);
@@ -62,7 +62,7 @@ export default function MorePanel() {
                         sideOffset={4}
                         className="z-50 rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md"
                       >
-                        Pin to sidebar
+                        Show in sidebar
                       </Tooltip.Content>
                     </Tooltip.Portal>
                   </Tooltip.Root>

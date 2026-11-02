@@ -1,7 +1,7 @@
 /*
- * Change summary: Configuration is now a group-3 rail item above Activity (reuses the existing
- * Settings2 icon and /configuration drill-in) and is removed from the profile flyout; the
- * drill-in mode switcher (jdSwitcherGroups) still lists it.
+ * Change summary: Settings + Configuration open from a bottom-rail gear flyout;
+ * profile menu keeps Upgrade (and profile/logout). Configuration is not a
+ * separate group-3 rail item.
  */
 import type { LucideIcon } from "@/components/icons/protoLucide";
 import {
@@ -471,11 +471,19 @@ export const NAV: NavItem[] = [
       },
     ],
   },
-  // Direct item; "/configuration" index redirects to the first Configuration leaf.
-  { label: "Configuration", path: "/configuration", icon: Settings2, group: 3, hideCreate: true },
   { label: "Activity", path: "/activity-timeline", icon: Activity, group: 3, flyoutOnly: true, hideCreate: true },
   { label: "Need Help?", path: "/helpdesk", icon: Headphones, group: 3, flyoutOnly: true, hideCreate: true },
-  // Settings lives in the Profile flyout (no rail gear). Avatar expands options; does not navigate.
+  // Settings gear — flyout with Settings + Configuration. Filled after PROFILE_MODES.
+  {
+    label: "Settings",
+    path: "/settings",
+    icon: Settings,
+    group: 3,
+    flyoutOnly: true,
+    hideCreate: true,
+    sections: [{ items: [] }],
+  },
+  // Avatar expands account options; does not navigate.
   { label: "John Doe", path: "/profile", icon: UserCircle, group: 3, initials: "JD", flyoutOnly: true, sections: [
     // Filled after PROFILE_MODES is declared — see profileFlyoutSections below.
     { items: [] },
@@ -743,6 +751,18 @@ const modeLeaf = (id: string): NavLeaf => {
   };
 };
 
+/** Settings gear flyout — Settings + Configuration at the bottom of the rail. */
+const settingsFlyoutSections: NavSection[] = [
+  {
+    items: [modeLeaf("settings"), modeLeaf("configuration")],
+  },
+];
+
+const settingsItem = NAV.find((i) => i.path === "/settings" && i.flyoutOnly);
+if (settingsItem) {
+  settingsItem.sections = settingsFlyoutSections;
+}
+
 // Profile is its own flyout entry but lands inside the Settings shell.
 // Sections map 1:1 to flyout divider groups (user card is rendered separately).
 const profileFlyoutSections: NavSection[] = [
@@ -751,13 +771,9 @@ const profileFlyoutSections: NavSection[] = [
       { label: "Profile", path: PROFILE_DETAILS_PATH, hideCreate: true, icon: Contact },
     ],
   },
-  // Destinations — Settings / Upgrade (Configuration moved to the rail above Activity)
+  // Destinations — Upgrade (Settings / Configuration live on the rail gear)
   {
-    items: [
-      // modeLeaf("configuration"), // @undo
-      modeLeaf("settings"),
-      modeLeaf("upgrade"),
-    ],
+    items: [modeLeaf("upgrade")],
   },
   // Session
   {
@@ -782,32 +798,16 @@ export type JdSwitcherItem = {
   icon?: LucideIcon;
 };
 
-/** Same order/grouping as the Profile flyout, minus Logout and Profile (user card only). */
+/** Settings / Configuration / Upgrade — used by the drill-in mode breadcrumb. */
 export function jdSwitcherGroups(): JdSwitcherItem[][] {
-  // Configuration left the profile menu for the rail, but the drill-in switcher still lists it.
-  const switcherSections = profileFlyoutSections.map((section) =>
-    section.items.some((i) => i.path === "/settings")
-      ? { ...section, items: [modeLeaf("configuration"), ...section.items] }
-      : section
-  );
-  return switcherSections
-    .map((section) =>
-      section.items
-        .filter(
-          (item) =>
-            item.path !== LOGOUT_PATH && item.path !== PROFILE_DETAILS_PATH
-        )
-        .map((item) => {
-          const mode = PROFILE_MODES.find((m) => m.path === item.path);
-          return {
-            id: item.path,
-            label: item.label,
-            path: mode ? firstModePath(mode) : item.path,
-            icon: item.icon,
-          };
-        })
-    )
-    .filter((group) => group.length > 0);
+  return [
+    PROFILE_MODES.map((mode) => ({
+      id: mode.path,
+      label: mode.label,
+      path: firstModePath(mode),
+      icon: MODE_ICONS[mode.id],
+    })),
+  ];
 }
 
 /** Flat list of JD switcher destinations. */
@@ -830,6 +830,18 @@ export function resolveJdSwitcherItem(pathname: string): JdSwitcherItem | undefi
 }
 
 export const PINNABLE_PATHS = NAV.filter((i) => i.pinnable).map((i) => i.path);
+
+/**
+ * Default sidebar products (rest start in Other). Keep this short so "Hide from sidebar"
+ * is optional cleanup, not the first action on every product.
+ */
+export const DEFAULT_PINNED_PATHS = [
+  "/experimentation",
+  "/personalize",
+  "/feature-management",
+  "/insights",
+  "/plan",
+].filter((path) => PINNABLE_PATHS.includes(path));
 
 /**
  * Destinations in the TopBar product crumb switcher (Home + Wingz + group-2 products).

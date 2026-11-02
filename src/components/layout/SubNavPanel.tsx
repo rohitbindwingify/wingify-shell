@@ -1,7 +1,7 @@
 // Product sub-nav (docked / flyout) — nested accordion leaves, premium
 // crown badge, section separators. Sub-leaf leading icons omitted.
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
@@ -16,12 +16,14 @@ import {
   type NavLeaf,
 } from "../../config/navigation";
 import { canUnpinPath, useUIStore } from "../../store/ui";
+import { navDescriptionFor } from "../../config/navDescriptions";
 import { GET_STARTED_PATH } from "@/lib/getStartedGate";
 import {
   useGetStartedNavLockTooltip,
   useIsGetStartedLocked,
 } from "@/store/getStartedOnboarding";
 import { cn } from "../../lib/utils";
+import NavDescriptiveTooltip from "./NavDescriptiveTooltip";
 
 const lockTooltipClass =
   "z-50 max-w-[240px] rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md";
@@ -116,6 +118,18 @@ function LeafRow({
       isActive && "bg-accent font-medium text-accent-foreground hover:bg-accent"
     );
 
+  const withDescription = (node: ReactElement) => {
+    const description = navDescriptionFor(leaf.path);
+    if (!description) return node;
+    // Trigger must be a plain element — asChild on NavLink breaks its
+    // function className (and hover:bg-muted with it).
+    return (
+      <NavDescriptiveTooltip description={description}>
+        <div className="w-full min-w-0">{node}</div>
+      </NavDescriptiveTooltip>
+    );
+  };
+
   if (leaf.external) {
     if (disabled) {
       return withLockTooltip(
@@ -131,7 +145,7 @@ function LeafRow({
         lockTooltip
       );
     }
-    return (
+    return withDescription(
       <a
         href={leaf.path}
         target="_blank"
@@ -162,7 +176,7 @@ function LeafRow({
     );
   }
 
-  return (
+  return withDescription(
     <NavLink
       to={leaf.path}
       onClick={() => onRequestClose?.()}
@@ -289,7 +303,7 @@ export default function SubNavPanel({
               <Tooltip.Trigger asChild>
                 <button
                   type="button"
-                  aria-label="Unpin from sidebar"
+                  aria-label="Hide from sidebar"
                   onClick={() => {
                     unpin(item.path);
                     onRequestClose?.();
@@ -305,7 +319,7 @@ export default function SubNavPanel({
                   sideOffset={4}
                   className="z-50 rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md"
                 >
-                  Unpin from sidebar
+                  Hide from sidebar
                 </Tooltip.Content>
               </Tooltip.Portal>
             </Tooltip.Root>
@@ -319,6 +333,11 @@ export default function SubNavPanel({
               {i > 0 && (
                 <div className="my-3 h-px bg-panel-border" aria-hidden="true" />
               )}
+              {section.heading ? (
+                <div className="px-2.5 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {section.heading}
+                </div>
+              ) : null}
               {section.items.map((leaf) =>
                 leaf.items?.length ? (
                   <AccordionLeaf

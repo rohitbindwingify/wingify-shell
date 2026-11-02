@@ -1,14 +1,7 @@
 /*
- * Change summary: the expand/collapse navigation toggle no longer occupies a row under the
- * profile item. It is now a small round handle straddling the nav's right border, centred on the
- * Activity separator line (zero-height anchor, so no slot is used), revealed only while
- * hovering the nav (or keyboard-focusing it). Reuses the shadcn `Button` (outline variant), the
- * existing Radix tooltip styling, and `toggleDock`. Old markup is kept commented out (@undo).
- * Icon: ChevronRight (expand) / ChevronLeft (collapse) from the existing protoLucide set.
- * The open nav's "More" section is renamed "Unpinned" and is now a collapsible header
- * (collapsed by default), reusing the existing ChevronDown + grid accordion transition.
- * The bottom profile row shows the active workspace (reused `WorkspaceKindIcon` + workspace
- * store label) instead of the JD avatar; it still opens the same profile menu.
+ * Change summary: expand/collapse is a dwell-armed full-height seam on the nav
+ * edge (click or drag). Overflow products live under "Other". Profile row shows
+ * the active workspace; Settings/Configuration open from the rail gear flyout.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -16,12 +9,9 @@ import * as HoverCard from "@radix-ui/react-hover-card";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Crown,
   ExternalLink,
   MoreHorizontal,
-  // PanelLeft, // @undo — replaced by ChevronLeft/ChevronRight on the edge handle
   Pin,
   PinOff,
 } from "@/components/icons/protoLucide";
@@ -37,11 +27,10 @@ import {
   useIsGetStartedLocked,
 } from "@/store/getStartedOnboarding";
 import { canUnpinPath, useUIStore } from "../../store/ui";
-import { useMascotPreviewStore } from "../../store/mascotPreview";
-import { mascotForPath } from "../../config/mascots";
+import { navDescriptionFor } from "../../config/navDescriptions";
 import { cn } from "../../lib/utils";
-import { Button } from "@/components/ui/button";
 import { IconVariantOverride } from "../icons/IconLibraryProvider";
+import NavDescriptiveTooltip from "./NavDescriptiveTooltip";
 import SubNavPanel from "./SubNavPanel";
 import ProfileMenuPanel from "./ProfileMenuPanel";
 import OldNavFeedbackDialog from "./OldNavFeedbackDialog";
@@ -73,6 +62,26 @@ const accordionTransition = `grid-template-rows ${WIDTH_MS}ms ${WIDTH_EASE}, opa
 
 const tooltipContentClass =
   "z-50 rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md";
+
+/** Seam cursor: vertical line with left + right arrows. Hotspot at center. */
+const SEAM_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <g stroke="#fff" stroke-width="3.25" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 5v22"/>
+      <path d="M12 16H5M8 12.5 5 16l3 3.5"/>
+      <path d="M20 16h7M24 12.5 27 16l-3 3.5"/>
+    </g>
+    <g stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 5v22"/>
+      <path d="M12 16H5M8 12.5 5 16l3 3.5"/>
+      <path d="M20 16h7M24 12.5 27 16l-3 3.5"/>
+    </g>
+  </svg>`
+)}") 16 16, col-resize`;
+
+/** Dwell before showing the blue line + custom cursor on the seam. */
+/** Short dwell; pass-by is filtered by resetting when the pointer keeps moving. */
+const SEAM_HOVER_DELAY_MS = 50;
 
 function withNavLockTooltip(
   node: React.ReactElement,
@@ -128,23 +137,16 @@ export default function ExpandedNav({
   const navigate = useNavigate();
   const isDocked = useUIStore((s) => s.isDocked);
   const toggleDock = useUIStore((s) => s.toggleDock);
+  const setDocked = useUIStore((s) => s.setDocked);
   const pinnedPaths = useUIStore((s) => s.pinnedPaths);
   const pin = useUIStore((s) => s.pin);
   const unpin = useUIStore((s) => s.unpin);
-  const setMascotPreview = useMascotPreviewStore((s) => s.setPreview);
-  const previewMascot = useMascotPreviewStore((s) => s.preview);
-  const scheduleMascotClear = useMascotPreviewStore((s) => s.scheduleClear);
   const canUnpin = (path: string) => canUnpinPath(pinnedPaths, path);
   const nav = visibleNav();
   const navLocked = useIsGetStartedLocked();
   const lockTooltip = useGetStartedNavLockTooltip();
   const hasUnreadNotifications = useHasUnreadNotifications();
   const profileSubmenuOpen = useProfileSubmenuStore((s) => s.openCount > 0);
-
-  const previewMascotFor = (item: NavItem) => {
-    previewMascot(mascotForPath(item.path));
-  };
-  const clearMascotPreview = () => setMascotPreview(null);
 
   const expanded = !forceCollapsed && isDocked;
   const activeItem = findItemByPath(pathname);
@@ -159,11 +161,6 @@ export default function ExpandedNav({
   );
   const [oldNavFeedbackOpen, setOldNavFeedbackOpen] = useState(false);
   const activeWorkspace = useActiveWorkspace();
-  // Unpinned section in the open nav starts collapsed each time the nav opens.
-  const [unpinnedOpen, setUnpinnedOpen] = useState(false);
-  useEffect(() => {
-    if (!expanded) setUnpinnedOpen(false);
-  }, [expanded]);
   const closeTimer = useRef<number | undefined>(undefined);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const [moreFlyout, setMoreFlyout] = useState<{ top: number } | null>(null);
@@ -171,9 +168,45 @@ export default function ExpandedNav({
     path: string;
     top: number;
   } | null>(null);
+  /** Expanded-rail More accordion — collapsed by default. */
+  const [moreOpen, setMoreOpen] = useState(false);
   const moreCloseTimer = useRef<number | undefined>(undefined);
   const moreFlyoutRef = useRef<HTMLDivElement>(null);
   const moreNestedRef = useRef<HTMLDivElement>(null);
+  /** Seam drag: expand/collapse when the pointer crosses a horizontal threshold. */
+  const seamDragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startDocked: boolean;
+    didDrag: boolean;
+  } | null>(null);
+  const seamHoverTimer = useRef<number | undefined>(undefined);
+  const seamHoverOrigin = useRef<{ x: number; y: number } | null>(null);
+  const [seamDragging, setSeamDragging] = useState(false);
+  /** True after dwelling still on the seam — unlocks cursor, line, click/drag. */
+  const [seamArmed, setSeamArmed] = useState(false);
+  const seamActive = seamArmed || seamDragging;
+
+  const armSeamAfterDwell = (x: number, y: number) => {
+    window.clearTimeout(seamHoverTimer.current);
+    seamHoverOrigin.current = { x, y };
+    seamHoverTimer.current = window.setTimeout(() => {
+      setSeamArmed(true);
+    }, SEAM_HOVER_DELAY_MS);
+  };
+
+  useEffect(() => {
+    if (!seamDragging) return;
+    const prev = document.body.style.cursor;
+    document.body.style.cursor = SEAM_CURSOR;
+    return () => {
+      document.body.style.cursor = prev;
+    };
+  }, [seamDragging]);
+
+  useEffect(() => {
+    return () => window.clearTimeout(seamHoverTimer.current);
+  }, []);
 
   useEffect(() => {
     if (!expanded) return;
@@ -209,6 +242,7 @@ export default function ExpandedNav({
       setFlyout(null);
       setMoreFlyout(null);
       setMoreNested(null);
+      setMoreOpen(false);
       return;
     }
     // Keep accordion mounted while the rail clips shut so content slides away
@@ -221,7 +255,6 @@ export default function ExpandedNav({
     window.clearTimeout(moreCloseTimer.current);
     setMoreFlyout(null);
     setMoreNested(null);
-    clearMascotPreview();
   };
   const scheduleMoreClose = () => {
     window.clearTimeout(moreCloseTimer.current);
@@ -235,7 +268,6 @@ export default function ExpandedNav({
     if (navLocked && item.path !== "/home") return;
     window.clearTimeout(closeTimer.current);
     closeMore();
-    previewMascotFor(item);
     setFlyout(
       item.sections
         ? { path: item.path, top: target.getBoundingClientRect().top }
@@ -247,7 +279,6 @@ export default function ExpandedNav({
     window.clearTimeout(closeTimer.current);
     closeTimer.current = window.setTimeout(() => {
       setFlyout(null);
-      clearMascotPreview();
     }, FLYOUT_CLOSE_GRACE_MS);
   };
   const cancelClose = () => window.clearTimeout(closeTimer.current);
@@ -261,7 +292,6 @@ export default function ExpandedNav({
       if (e.key === "Escape") {
         closeMore();
         setFlyout(null);
-        clearMascotPreview();
       }
     };
     window.addEventListener("keydown", onKey);
@@ -269,9 +299,8 @@ export default function ExpandedNav({
       window.removeEventListener("keydown", onKey);
       window.clearTimeout(moreCloseTimer.current);
       window.clearTimeout(closeTimer.current);
-      clearMascotPreview();
     };
-  }, [setMascotPreview]);
+  }, []);
 
   // Expanded profile menu: click-outside dismisses the floating panel.
   useEffect(() => {
@@ -290,11 +319,10 @@ export default function ExpandedNav({
         return;
       }
       setFlyout(null);
-      clearMascotPreview();
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [expanded, flyout, clearMascotPreview]);
+  }, [expanded, flyout]);
 
   useClampedFlyoutTop(flyoutRef, flyout);
   useClampedFlyoutTop(moreFlyoutRef, moreFlyout);
@@ -323,6 +351,7 @@ export default function ExpandedNav({
   const unpinnedActivePath = unpinned.find(
     (i) => activeItem?.path === i.path
   )?.path;
+
   const flyoutItem = flyout
     ? nav.find((i) => i.path === flyout.path)
     : undefined;
@@ -438,21 +467,17 @@ export default function ExpandedNav({
         )}
         onMouseEnter={(e) => {
           if (navDisabled) return;
-          previewMascotFor(item);
           if (!expanded && !tooltipOnly) openFlyout(item, e.currentTarget);
         }}
         onMouseLeave={() => {
           if (!expanded && !tooltipOnly) scheduleClose();
-          else scheduleMascotClear();
         }}
         onFocus={(e) => {
           if (navDisabled) return;
-          previewMascotFor(item);
           if (!expanded && !tooltipOnly) openFlyout(item, e.currentTarget);
         }}
         onBlur={() => {
           if (!expanded && !tooltipOnly) scheduleClose();
-          else scheduleMascotClear();
         }}
       >
         <button
@@ -472,7 +497,6 @@ export default function ExpandedNav({
               if (!rowEl) return;
               if (flyout?.path === item.path) {
                 setFlyout(null);
-                clearMascotPreview();
               } else {
                 openFlyout(item, rowEl);
               }
@@ -517,8 +541,8 @@ export default function ExpandedNav({
                 type="button"
                 aria-label={
                   inMore
-                    ? `Pin ${item.label} to sidebar`
-                    : `Unpin ${item.label} from sidebar`
+                    ? `Show ${item.label} in sidebar`
+                    : `Hide ${item.label} from sidebar`
                 }
                 onClick={(e) => {
                   e.stopPropagation();
@@ -547,7 +571,7 @@ export default function ExpandedNav({
                 sideOffset={4}
                 className={tooltipContentClass}
               >
-                {inMore ? "Pin to sidebar" : "Unpin from sidebar"}
+                {inMore ? "Show in sidebar" : "Hide from sidebar"}
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
@@ -582,7 +606,9 @@ export default function ExpandedNav({
     // Collapsed rail: an icon alone doesn't name itself. Items with a sub-nav
     // flyout are labelled there; direct items get a tooltip, and pinnable ones
     // carry an inline unpin next to the label (hidden at the pin minimum).
+    // When a description exists, use Mixpanel-style title + blurb; else label only.
     let hoverRow = row;
+    const description = navDescriptionFor(item.path);
     if (navDisabled && lockTooltip) {
       hoverRow = withNavLockTooltip(row, lockTooltip, true);
     } else if (
@@ -591,45 +617,79 @@ export default function ExpandedNav({
       !hasSections &&
       item.path !== "/activity-timeline"
     ) {
-      hoverRow = item.pinnable ? (
-        <HoverCard.Root openDelay={150} closeDelay={150}>
-          <HoverCard.Trigger asChild>{row}</HoverCard.Trigger>
-          <HoverCard.Portal>
-            <HoverCard.Content
-              side="right"
-              sideOffset={8}
-              className={cn(tooltipContentClass, "flex items-center gap-2")}
-            >
-              <span className="font-main-menu">{item.label}</span>
-              {canUnpin(item.path) && (
+      if (description) {
+        hoverRow = item.pinnable ? (
+          <NavDescriptiveTooltip
+            title={item.label}
+            description={description}
+            trailing={
+              canUnpin(item.path) ? (
                 <button
                   type="button"
-                  aria-label={`Unpin ${item.label} from sidebar`}
+                  aria-label={`Hide ${item.label} from sidebar`}
                   onClick={(e) => {
                     e.stopPropagation();
                     unpin(item.path);
                   }}
-                  className="flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <PinOff className="h-3 w-3" />
                 </button>
-              )}
-            </HoverCard.Content>
-          </HoverCard.Portal>
-        </HoverCard.Root>
-      ) : (
-        <Tooltip.Root>
-          <Tooltip.Trigger asChild>{row}</Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content
-              side="right"
-              sideOffset={8}
-              className={tooltipContentClass}
-            >
-              <span className="font-main-menu">{item.label}</span>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+              ) : undefined
+            }
+          >
+            {row}
+          </NavDescriptiveTooltip>
+        ) : (
+          <NavDescriptiveTooltip title={item.label} description={description}>
+            {row}
+          </NavDescriptiveTooltip>
+        );
+      } else {
+        hoverRow = item.pinnable ? (
+          <HoverCard.Root openDelay={150} closeDelay={150}>
+            <HoverCard.Trigger asChild>{row}</HoverCard.Trigger>
+            <HoverCard.Portal>
+              <HoverCard.Content
+                side="right"
+                sideOffset={8}
+                className={cn(tooltipContentClass, "flex items-center gap-2")}
+              >
+                <span className="font-main-menu">{item.label}</span>
+                {canUnpin(item.path) && (
+                  <button
+                    type="button"
+                    aria-label={`Hide ${item.label} from sidebar`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      unpin(item.path);
+                    }}
+                    className="flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <PinOff className="h-3 w-3" />
+                  </button>
+                )}
+              </HoverCard.Content>
+            </HoverCard.Portal>
+          </HoverCard.Root>
+        ) : (
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>{row}</Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content
+                side="right"
+                sideOffset={8}
+                className={tooltipContentClass}
+              >
+                <span className="font-main-menu">{item.label}</span>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        );
+      }
+    } else if (expanded && !inMore && !expandOnly && description) {
+      hoverRow = (
+        <NavDescriptiveTooltip description={description}>{row}</NavDescriptiveTooltip>
       );
     }
 
@@ -863,12 +923,13 @@ export default function ExpandedNav({
   return (
     <Tooltip.Provider delayDuration={300} skipDelayDuration={100}>
       <div
-        className="group/nav relative h-full shrink-0 overflow-hidden"
+        className="group/nav relative h-full shrink-0"
         style={{
           width: expanded ? EXPANDED_NAV_WIDTH : RAIL_WIDTH,
           transition: widthTransition,
         }}
       >
+        <div className="h-full overflow-hidden">
         <nav
           data-slot="app-nav"
           className="flex h-full flex-col overflow-hidden border-r border-panel-border bg-panel pb-4 text-panel-foreground"
@@ -913,39 +974,57 @@ export default function ExpandedNav({
                     aria-hidden={!expanded}
                   >
                     <div className="min-h-0 overflow-hidden">
-                      {/* @undo — was a static "More" label with items always listed:
-                      <div className="px-2.5 pb-1 pt-4 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                        More
-                      </div>
-                      {unpinned.map((i) => renderItem(i, true))}
-                      */}
                       <button
                         type="button"
-                        aria-expanded={unpinnedOpen}
+                        aria-expanded={moreOpen}
+                        aria-label={
+                          moreOpen ? "Collapse Other" : "Expand Other"
+                        }
                         tabIndex={expanded ? undefined : -1}
-                        onClick={() => setUnpinnedOpen((o) => !o)}
-                        // pr-0 + size-4 chevron lines up with the row chevrons (8px from nav edge).
-                        className="flex w-full items-center justify-between pb-1 pl-2.5 pr-0 pt-8 text-[11px] font-medium uppercase tracking-wide text-muted-foreground hover:text-foreground"
+                        onClick={() => setMoreOpen((open) => !open)}
+                        className={cn(
+                          "mt-3 flex w-full items-center gap-0.5 rounded-md px-0 py-0 text-left hover:bg-muted",
+                          !!unpinnedActivePath && !moreOpen && "bg-muted"
+                        )}
                       >
-                        Unpinned
-                        <ChevronDown
+                        <span
                           className={cn(
-                            "size-4 transition-transform duration-200",
-                            unpinnedOpen && "rotate-180"
+                            "flex h-9 min-w-0 flex-1 items-center gap-2 text-sm",
+                            unpinnedActivePath
+                              ? "font-medium text-foreground"
+                              : "text-muted-foreground"
                           )}
-                        />
+                        >
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center">
+                            <MoreHorizontal
+                              className="h-4 w-4"
+                              strokeWidth={1.75}
+                            />
+                          </span>
+                          <span className="font-medium">Other</span>
+                        </span>
+                        <span className="flex size-4 shrink-0 items-center justify-center text-muted-foreground">
+                          <ChevronDown
+                            className={cn(
+                              "size-4 transition-transform duration-[280ms]",
+                              moreOpen && "rotate-180"
+                            )}
+                          />
+                        </span>
                       </button>
                       <div
                         className="grid"
                         style={{
-                          gridTemplateRows: unpinnedOpen ? "1fr" : "0fr",
-                          opacity: unpinnedOpen ? 1 : 0,
+                          gridTemplateRows: moreOpen ? "1fr" : "0fr",
+                          opacity: moreOpen ? 1 : 0,
                           transition: accordionTransition,
                         }}
-                        aria-hidden={!unpinnedOpen}
+                        aria-hidden={!moreOpen}
                       >
                         <div className="min-h-0 overflow-hidden">
-                          {unpinned.map((i) => renderItem(i, true))}
+                          <div className="flex flex-col gap-0.5 pb-1">
+                            {unpinned.map((i) => renderItem(i, true))}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -962,7 +1041,7 @@ export default function ExpandedNav({
                     <div className="min-h-0 overflow-hidden">
                       <button
                         type="button"
-                        aria-label="Unpinned navigation items"
+                        aria-label="Other products"
                         tabIndex={expanded ? -1 : undefined}
                         onClick={(e) => openMoreFlyout(e.currentTarget)}
                         onMouseEnter={(e) => openMoreFlyout(e.currentTarget)}
@@ -986,58 +1065,15 @@ export default function ExpandedNav({
                 </>
               )}
             </div>
-            {/* Zero-height anchor: the toggle is centred on the Activity separator's rule
-                (mt = separator's my-2.5 + half the 1px rule) without taking a nav slot. It's
-                fixed (top left at its static position) so it can straddle the nav's right
-                border despite the clipping wrappers. */}
-            {!forceCollapsed && !welcomeChrome && (
-              <div className="relative h-0 shrink-0">
-                <div>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        aria-label={
-                          isDocked ? "Collapse navigation" : "Expand navigation"
-                        }
-                        aria-pressed={isDocked}
-                        onClick={toggleDock}
-                        className={cn(
-                          "pointer-events-none fixed z-30 mt-[calc(0.625rem+0.5px)] h-[22px] w-[22px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 shadow-sm transition-opacity duration-150 focus-visible:pointer-events-auto focus-visible:opacity-100 [&_svg]:size-[11px]",
-                          // Stay hidden while a nav flyout is open so it never sits on top of one.
-                          !flyout &&
-                            !moreFlyout &&
-                            "group-hover/nav:pointer-events-auto group-hover/nav:opacity-100"
-                        )}
-                        style={{
-                          left: expanded ? EXPANDED_NAV_WIDTH : RAIL_WIDTH,
-                          transition: `left ${WIDTH_MS}ms ${WIDTH_EASE}, opacity 150ms`,
-                        }}
-                      >
-                        {/* @undo — was: <PanelLeft strokeWidth={1.75} /> */}
-                        {isDocked ? (
-                          <ChevronLeft strokeWidth={1.75} />
-                        ) : (
-                          <ChevronRight strokeWidth={1.75} />
-                        )}
-                      </Button>
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content
-                        side="right"
-                        sideOffset={8}
-                        className={tooltipContentClass}
-                      >
-                        {isDocked ? "Collapse navigation" : "Expand navigation"}
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </div>
-              </div>
-            )}
-            {separator}
+            <div className="my-2.5 shrink-0 px-2" aria-hidden="true">
+              <div
+                className="h-px bg-panel-border"
+                style={{
+                  width: expanded ? "100%" : RAIL_ICON_SLOT,
+                  transition: widthTransition,
+                }}
+              />
+            </div>
             <div
               className={cn(
                 "flex shrink-0 flex-col gap-0.5",
@@ -1045,50 +1081,104 @@ export default function ExpandedNav({
               )}
             >
               {group3.map((i) => renderItem(i))}
-              {/* @undo — previous in-list expand/collapse row (took a nav slot under profile).
-              Expand/collapse under profile: icon-only, left-aligned with nav icons when open.
-              {!forceCollapsed && !welcomeChrome && (
-                <div
-                  className={cn(
-                    "mt-0.5 flex items-center gap-0.5 rounded-md transition-[background-color,width] duration-[280ms]",
-                    // Match nav rows: same icon slot open or collapsed.
-                    expanded ? "w-full" : "w-9 justify-start"
-                  )}
-                >
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <button
-                        type="button"
-                        aria-label={
-                          isDocked
-                            ? "Collapse navigation"
-                            : "Expand navigation"
-                        }
-                        aria-pressed={isDocked}
-                        onClick={toggleDock}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center text-foreground outline-none transition-colors hover:bg-muted"
-                      >
-                        <PanelLeft className="h-4 w-4" strokeWidth={1.75} />
-                      </button>
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content
-                        side={expanded ? "top" : "right"}
-                        sideOffset={expanded ? 4 : 8}
-                        className={tooltipContentClass}
-                      >
-                        {isDocked
-                          ? "Collapse navigation"
-                          : "Expand navigation"}
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </div>
-              )}
-              */}
             </div>
           </div>
         </nav>
+        </div>
+
+        {/* Seam hit target — click or drag to expand/collapse. Blue line is
+            inset by --radius so it stops at the content sheet’s rounded corners. */}
+        {!forceCollapsed && !welcomeChrome && (
+          <Tooltip.Root open={seamArmed && !seamDragging} delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <button
+                type="button"
+                aria-label={
+                  isDocked ? "Collapse navigation" : "Expand navigation"
+                }
+                aria-pressed={isDocked}
+                onPointerEnter={(e) => {
+                  if (seamDragRef.current) return;
+                  armSeamAfterDwell(e.clientX, e.clientY);
+                }}
+                onPointerLeave={() => {
+                  window.clearTimeout(seamHoverTimer.current);
+                  seamHoverOrigin.current = null;
+                  if (!seamDragRef.current) setSeamArmed(false);
+                }}
+                onPointerDown={(e) => {
+                  // Entire seam UX (click/drag) only after a still dwell.
+                  if (e.button !== 0 || !seamArmed) return;
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                  seamDragRef.current = {
+                    pointerId: e.pointerId,
+                    startX: e.clientX,
+                    startDocked: isDocked,
+                    didDrag: false,
+                  };
+                  setSeamDragging(true);
+                }}
+                onPointerMove={(e) => {
+                  const drag = seamDragRef.current;
+                  if (drag && e.pointerId === drag.pointerId) {
+                    const dx = e.clientX - drag.startX;
+                    if (Math.abs(dx) > 4) drag.didDrag = true;
+                    // Drag right → expand; drag left → collapse.
+                    if (dx >= 48) setDocked(true);
+                    else if (dx <= -48) setDocked(false);
+                    else if (drag.didDrag) setDocked(drag.startDocked);
+                    return;
+                  }
+                  // Still moving through the seam — keep resetting the dwell.
+                  if (seamArmed) return;
+                  const origin = seamHoverOrigin.current;
+                  if (!origin) return;
+                  const dist = Math.hypot(
+                    e.clientX - origin.x,
+                    e.clientY - origin.y
+                  );
+                  if (dist > 12) armSeamAfterDwell(e.clientX, e.clientY);
+                }}
+                onPointerUp={(e) => {
+                  const drag = seamDragRef.current;
+                  if (!drag || e.pointerId !== drag.pointerId) return;
+                  const didDrag = drag.didDrag;
+                  seamDragRef.current = null;
+                  setSeamDragging(false);
+                  try {
+                    e.currentTarget.releasePointerCapture(e.pointerId);
+                  } catch {
+                    /* already released */
+                  }
+                  if (!didDrag) toggleDock();
+                }}
+                onPointerCancel={() => {
+                  seamDragRef.current = null;
+                  seamHoverOrigin.current = null;
+                  setSeamDragging(false);
+                  setSeamArmed(false);
+                }}
+                style={{ cursor: seamActive ? SEAM_CURSOR : "default" }}
+                className={cn(
+                  "absolute inset-y-0 right-0 z-50 w-3 translate-x-1/2 cursor-default touch-none border-0 bg-transparent outline-none",
+                  "after:pointer-events-none after:absolute after:left-1/2 after:w-px after:-translate-x-1/2 after:rounded-full after:bg-transparent after:transition-[width,background-color]",
+                  // Start below top-bar + body radius so the line stops at the sheet’s curve.
+                  "after:top-[calc(56px+var(--radius))] after:bottom-[var(--radius)]",
+                  seamActive && "after:w-[2px] after:bg-[var(--ocean-500)]"
+                )}
+              />
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content
+                side="right"
+                sideOffset={10}
+                className={tooltipContentClass}
+              >
+                Click or drag to expand/collapse
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        )}
 
         {flyout && flyoutItem?.sections && (
           <div
@@ -1098,10 +1188,7 @@ export default function ExpandedNav({
               left: expanded ? EXPANDED_NAV_WIDTH : RAIL_WIDTH,
               top: flyout.top,
             }}
-            onMouseEnter={() => {
-              cancelClose();
-              if (flyoutItem) previewMascotFor(flyoutItem);
-            }}
+            onMouseEnter={cancelClose}
             onMouseLeave={scheduleClose}
           >
             {flyoutItem.path === "/profile" ? (
@@ -1141,11 +1228,9 @@ export default function ExpandedNav({
                   <div
                     key={item.path}
                     onMouseEnter={(e) => {
-                      previewMascotFor(item);
                       revealMoreNested(item, e.currentTarget);
                     }}
                     onFocus={(e) => {
-                      previewMascotFor(item);
                       revealMoreNested(item, e.currentTarget);
                     }}
                     className={cn(
@@ -1170,7 +1255,7 @@ export default function ExpandedNav({
                       <Tooltip.Trigger asChild>
                         <button
                           type="button"
-                          aria-label={`Pin ${item.label} to sidebar`}
+                          aria-label={`Show ${item.label} in sidebar`}
                           onClick={(e) => {
                             e.stopPropagation();
                             pin(item.path);
@@ -1186,7 +1271,7 @@ export default function ExpandedNav({
                           sideOffset={4}
                           className={tooltipContentClass}
                         >
-                          Pin to sidebar
+                          Show in sidebar
                         </Tooltip.Content>
                       </Tooltip.Portal>
                     </Tooltip.Root>

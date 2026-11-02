@@ -48,6 +48,7 @@ function StepDots({
 export default function NavIntroModal() {
   const seenVersion = useNavIntroStore((s) => s.seenVersion);
   const replayRequested = useNavIntroStore((s) => s.replayRequested);
+  const hasHydrated = useNavIntroStore((s) => s._hasHydrated);
   const markSeen = useNavIntroStore((s) => s.markSeen);
   const clearReplay = useNavIntroStore((s) => s.clearReplay);
   const rebrandingOpen = useWorkspaceStore((s) => s.rebrandingModalOpen);
@@ -66,6 +67,8 @@ export default function NavIntroModal() {
       : 0;
 
   useEffect(() => {
+    // Wait for persist rehydrate so a previously dismissed tour does not flash open.
+    if (!hasHydrated) return;
     if (open) return;
     if (!replayRequested && !shouldShowNavIntro(seenVersion)) return;
     if (rebrandingOpen) return;
@@ -98,7 +101,7 @@ export default function NavIntroModal() {
       window.clearInterval(interval);
       window.clearTimeout(timeout);
     };
-  }, [open, replayRequested, seenVersion, rebrandingOpen]);
+  }, [open, hasHydrated, replayRequested, seenVersion, rebrandingOpen]);
 
   const finish = useCallback(() => {
     markSeen();
@@ -131,18 +134,18 @@ export default function NavIntroModal() {
           primaryRef.current?.focus();
         }}
         className={cn(
-          "max-h-[92vh] w-[min(52rem,calc(100vw-2rem))] max-w-none gap-0 overflow-hidden border-border p-0 shadow-xl sm:rounded-2xl",
-          "[&>button]:right-4 [&>button]:top-4 [&>button]:z-20 [&>button]:flex [&>button]:size-8 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:border [&>button]:border-border [&>button]:bg-background [&>button]:opacity-100 [&>button]:shadow-sm"
+          "max-h-[92vh] w-[min(34rem,calc(100vw-2rem))] max-w-none gap-0 overflow-hidden border-border p-0 shadow-xl sm:rounded-2xl",
+          "[&>button]:right-3 [&>button]:top-3 [&>button]:z-20 [&>button]:flex [&>button]:size-7 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:border [&>button]:border-border [&>button]:bg-background [&>button]:opacity-100 [&>button]:shadow-sm"
         )}
       >
         <div className="flex max-h-[92vh] flex-col overflow-y-auto">
-          {/* Illustration */}
-          <div className="relative shrink-0 border-b border-border bg-muted p-4 md:p-5">
+          {/* Illustration — width-driven; image keeps its natural aspect */}
+          <div className="relative shrink-0 border-b border-border bg-muted p-3 md:p-3.5">
             <NavIntroSchematic media={step.media} className="w-full shadow-sm" />
           </div>
 
           {/* Copy — fixed min height so shorter steps don’t shrink the modal */}
-          <div className="flex min-h-[9.5rem] flex-col px-7 pb-2 pt-6 md:min-h-[10rem] md:px-8 md:pt-7">
+          <div className="flex min-h-[7.75rem] flex-col px-5 pb-1.5 pt-4 md:min-h-[8.25rem] md:px-6 md:pt-5">
             {step.kind === "intro" ? (
               <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                 {step.eyebrow}
@@ -154,7 +157,7 @@ export default function NavIntroModal() {
             )}
 
             <DialogTitle
-              className="mt-3 text-[1.75rem] font-semibold leading-[1.15] tracking-tight text-foreground md:text-[1.875rem]"
+              className="mt-2 text-[1.375rem] font-semibold leading-[1.15] tracking-tight text-foreground md:text-[1.5rem]"
               style={{
                 fontFamily: '"Ergon", ui-sans-serif, system-ui, sans-serif',
               }}
@@ -162,19 +165,19 @@ export default function NavIntroModal() {
               {step.title}
             </DialogTitle>
 
-            <DialogDescription className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            <DialogDescription className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {step.description}
             </DialogDescription>
 
             {step.footnote ? (
-              <p className="mt-4 text-sm text-muted-foreground/80">
+              <p className="mt-2.5 text-sm text-muted-foreground/80">
                 {step.footnote}
               </p>
             ) : null}
           </div>
 
           {/* CTA */}
-          <div className="mt-auto flex items-center justify-between gap-3 px-7 pb-5 pt-5 md:px-8 md:pb-6">
+          <div className="mt-auto flex items-center justify-between gap-3 px-5 pb-4 pt-3.5 md:px-6 md:pb-4.5">
             <StepDots index={stepIndex} total={NAV_INTRO_STEPS.length} />
 
             <div className="flex items-center gap-2">
