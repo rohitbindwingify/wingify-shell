@@ -28,10 +28,8 @@ import {
   useIsGetStartedLocked,
 } from "@/store/getStartedOnboarding";
 import { canUnpinPath, useUIStore } from "../../store/ui";
-import { navDescriptionFor } from "../../config/navDescriptions";
 import { cn } from "../../lib/utils";
 import { IconVariantOverride } from "../icons/IconLibraryProvider";
-import NavDescriptiveTooltip from "./NavDescriptiveTooltip";
 import SubNavPanel from "./SubNavPanel";
 import ProfileMenuPanel from "./ProfileMenuPanel";
 import OldNavFeedbackDialog from "./OldNavFeedbackDialog";
@@ -587,9 +585,7 @@ export default function ExpandedNav({
     // Collapsed rail: an icon alone doesn't name itself. Items with a sub-nav
     // flyout are labelled there; direct items get a tooltip, and pinnable ones
     // carry an inline unpin next to the label (hidden at the pin minimum).
-    // When a description exists, use Mixpanel-style title + blurb; else label only.
     let hoverRow = row;
-    const description = navDescriptionFor(item.path);
     if (navDisabled && lockTooltip) {
       hoverRow = withNavLockTooltip(row, lockTooltip, true);
     } else if (
@@ -598,13 +594,17 @@ export default function ExpandedNav({
       !hasSections &&
       item.path !== "/activity-timeline"
     ) {
-      if (description) {
-        hoverRow = item.pinnable ? (
-          <NavDescriptiveTooltip
-            title={item.label}
-            description={description}
-            trailing={
-              canUnpin(item.path) ? (
+      hoverRow = item.pinnable ? (
+        <HoverCard.Root openDelay={150} closeDelay={150}>
+          <HoverCard.Trigger asChild>{row}</HoverCard.Trigger>
+          <HoverCard.Portal>
+            <HoverCard.Content
+              side="right"
+              sideOffset={8}
+              className={cn(tooltipContentClass, "flex items-center gap-2")}
+            >
+              <span className="font-main-menu">{item.label}</span>
+              {canUnpin(item.path) && (
                 <button
                   type="button"
                   aria-label={`Hide ${item.label} from sidebar`}
@@ -612,65 +612,27 @@ export default function ExpandedNav({
                     e.stopPropagation();
                     unpin(item.path);
                   }}
-                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <PinOff className="h-3 w-3" />
                 </button>
-              ) : undefined
-            }
-          >
-            {row}
-          </NavDescriptiveTooltip>
-        ) : (
-          <NavDescriptiveTooltip title={item.label} description={description}>
-            {row}
-          </NavDescriptiveTooltip>
-        );
-      } else {
-        hoverRow = item.pinnable ? (
-          <HoverCard.Root openDelay={150} closeDelay={150}>
-            <HoverCard.Trigger asChild>{row}</HoverCard.Trigger>
-            <HoverCard.Portal>
-              <HoverCard.Content
-                side="right"
-                sideOffset={8}
-                className={cn(tooltipContentClass, "flex items-center gap-2")}
-              >
-                <span className="font-main-menu">{item.label}</span>
-                {canUnpin(item.path) && (
-                  <button
-                    type="button"
-                    aria-label={`Hide ${item.label} from sidebar`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      unpin(item.path);
-                    }}
-                    className="flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <PinOff className="h-3 w-3" />
-                  </button>
-                )}
-              </HoverCard.Content>
-            </HoverCard.Portal>
-          </HoverCard.Root>
-        ) : (
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>{row}</Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content
-                side="right"
-                sideOffset={8}
-                className={tooltipContentClass}
-              >
-                <span className="font-main-menu">{item.label}</span>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        );
-      }
-    } else if (expanded && !inMore && !expandOnly && description) {
-      hoverRow = (
-        <NavDescriptiveTooltip description={description}>{row}</NavDescriptiveTooltip>
+              )}
+            </HoverCard.Content>
+          </HoverCard.Portal>
+        </HoverCard.Root>
+      ) : (
+        <Tooltip.Root>
+          <Tooltip.Trigger asChild>{row}</Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content
+              side="right"
+              sideOffset={8}
+              className={tooltipContentClass}
+            >
+              <span className="font-main-menu">{item.label}</span>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       );
     }
 
