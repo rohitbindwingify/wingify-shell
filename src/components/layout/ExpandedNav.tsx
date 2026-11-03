@@ -1,8 +1,8 @@
 /*
  * Change summary: expand/collapse is a dwell-armed full-height seam on the nav
  * edge (click or drag). Overflow products live under "Other". Profile row shows
- * the active workspace name with user initials; Configuration is on the rail;
- * Settings is in the profile menu.
+ * the active workspace name with user initials; Settings + Configuration
+ * open from the gear flyout.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -261,7 +261,7 @@ export default function ExpandedNav({
   const cancelMoreClose = () => window.clearTimeout(moreCloseTimer.current);
 
   const openFlyout = (item: NavItem, target: HTMLElement) => {
-    // Profile stays a floating panel in expanded mode; other flyouts are collapsed-only.
+    // Settings/Profile float in both modes; product flyouts are collapsed-only.
     if (expanded && !(item.flyoutOnly && item.sections)) return;
     if (navLocked && item.path !== "/home") return;
     window.clearTimeout(closeTimer.current);
@@ -300,14 +300,20 @@ export default function ExpandedNav({
     };
   }, []);
 
-  // Expanded profile menu: click-outside dismisses the floating panel.
+  // Expanded Settings/Profile flyouts: click-outside dismisses the floating panel.
   useEffect(() => {
-    if (!expanded || !flyout || flyout.path !== "/profile") return;
+    if (
+      !expanded ||
+      !flyout ||
+      (flyout.path !== "/profile" && flyout.path !== "/settings")
+    ) {
+      return;
+    }
     const onPointerDown = (e: PointerEvent) => {
       const target = e.target as Node | null;
       if (!(target instanceof Element) && !(target instanceof Node)) return;
       if (flyoutRef.current?.contains(target)) return;
-      const row = document.querySelector('[data-nav-item="/profile"]');
+      const row = document.querySelector(`[data-nav-item="${flyout.path}"]`);
       if (row?.contains(target)) return;
       // Language / Notifications popovers portal outside the flyout.
       if (
@@ -446,17 +452,22 @@ export default function ExpandedNav({
         )}
         onMouseEnter={(e) => {
           if (navDisabled) return;
-          if (!expanded && !tooltipOnly) openFlyout(item, e.currentTarget);
+          // Collapsed product flyouts + Settings/Profile in either rail state.
+          if ((!expanded && !tooltipOnly) || expandOnly) {
+            openFlyout(item, e.currentTarget);
+          }
         }}
         onMouseLeave={() => {
-          if (!expanded && !tooltipOnly) scheduleClose();
+          if ((!expanded && !tooltipOnly) || expandOnly) scheduleClose();
         }}
         onFocus={(e) => {
           if (navDisabled) return;
-          if (!expanded && !tooltipOnly) openFlyout(item, e.currentTarget);
+          if ((!expanded && !tooltipOnly) || expandOnly) {
+            openFlyout(item, e.currentTarget);
+          }
         }}
         onBlur={() => {
-          if (!expanded && !tooltipOnly) scheduleClose();
+          if ((!expanded && !tooltipOnly) || expandOnly) scheduleClose();
         }}
       >
         <button
@@ -467,18 +478,7 @@ export default function ExpandedNav({
             if (navDisabled) return;
             if (tooltipOnly) return;
             if (expandOnly) {
-              // Floating profile menu in both rail and expanded — click toggles
-              // when expanded; collapsed still opens on hover.
-              if (!expanded) return;
-              const rowEl = (e.currentTarget as HTMLElement).closest(
-                "[data-nav-item]"
-              ) as HTMLElement | null;
-              if (!rowEl) return;
-              if (flyout?.path === item.path) {
-                setFlyout(null);
-              } else {
-                openFlyout(item, rowEl);
-              }
+              // Hover opens Settings/Profile; click is a no-op.
               return;
             }
             if (navLocked && item.path === "/home") {
@@ -1228,8 +1228,9 @@ export default function ExpandedNav({
         {!expanded && moreFlyout && moreNested && moreNestedItem?.sections && (
           <div
             ref={moreNestedRef}
-            className="fixed z-40 animate-scale-in pl-1.5 duration-200"
+            className="fixed z-40 animate-scale-in duration-200"
             style={{
+              // Sit flush against the Other list (no gutter between the two panels).
               left: RAIL_WIDTH + 6 + MORE_FLYOUT_WIDTH,
               top: moreNested.top,
             }}

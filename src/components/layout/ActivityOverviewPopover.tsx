@@ -3,6 +3,8 @@
 // does not dismiss Wingz or Quick View. Dummy data; View Details → settings paths.
 import {
   cloneElement,
+  useEffect,
+  useRef,
   useState,
   type ReactElement,
 } from "react";
@@ -208,6 +210,8 @@ function ActivityOverviewContent({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+const HOVER_CLOSE_MS = 120;
+
 export default function ActivityOverviewPopover({
   children,
   side = "right",
@@ -218,6 +222,17 @@ export default function ActivityOverviewPopover({
   align?: "start" | "center" | "end";
 }) {
   const [open, setOpen] = useState(false);
+  const closeTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    return () => window.clearTimeout(closeTimer.current);
+  }, []);
+
+  const cancelClose = () => window.clearTimeout(closeTimer.current);
+  const scheduleClose = () => {
+    window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setOpen(false), HOVER_CLOSE_MS);
+  };
 
   const trigger = cloneElement(children, {
     "aria-expanded": open,
@@ -233,17 +248,27 @@ export default function ActivityOverviewPopover({
   });
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent
-        side={side}
-        align={align}
-        sideOffset={10}
-        collisionPadding={12}
-        className="z-50 w-auto max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-lg"
-      >
-        <ActivityOverviewContent onNavigate={() => setOpen(false)} />
-      </PopoverContent>
-    </Popover>
+    <div
+      onMouseEnter={() => {
+        cancelClose();
+        setOpen(true);
+      }}
+      onMouseLeave={scheduleClose}
+    >
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+        <PopoverContent
+          side={side}
+          align={align}
+          sideOffset={10}
+          collisionPadding={12}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+          className="z-50 w-auto max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-lg"
+        >
+          <ActivityOverviewContent onNavigate={() => setOpen(false)} />
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

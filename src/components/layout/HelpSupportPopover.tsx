@@ -2,6 +2,8 @@
 // Opens from main-nav Help and detail utility-rail Help (same pattern as Activity).
 import {
   cloneElement,
+  useEffect,
+  useRef,
   useState,
   type ReactElement,
 } from "react";
@@ -87,6 +89,8 @@ function HelpPopoverContent() {
   );
 }
 
+const HOVER_CLOSE_MS = 120;
+
 export default function HelpSupportPopover({
   children,
   side = "right",
@@ -97,6 +101,17 @@ export default function HelpSupportPopover({
   align?: "start" | "center" | "end";
 }) {
   const [open, setOpen] = useState(false);
+  const closeTimer = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    return () => window.clearTimeout(closeTimer.current);
+  }, []);
+
+  const cancelClose = () => window.clearTimeout(closeTimer.current);
+  const scheduleClose = () => {
+    window.clearTimeout(closeTimer.current);
+    closeTimer.current = window.setTimeout(() => setOpen(false), HOVER_CLOSE_MS);
+  };
 
   const trigger = cloneElement(children, {
     "aria-expanded": open,
@@ -112,17 +127,27 @@ export default function HelpSupportPopover({
   });
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-      <PopoverContent
-        side={side}
-        align={align}
-        sideOffset={10}
-        collisionPadding={12}
-        className="z-50 w-auto max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-lg"
-      >
-        <HelpPopoverContent />
-      </PopoverContent>
-    </Popover>
+    <div
+      onMouseEnter={() => {
+        cancelClose();
+        setOpen(true);
+      }}
+      onMouseLeave={scheduleClose}
+    >
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+        <PopoverContent
+          side={side}
+          align={align}
+          sideOffset={10}
+          collisionPadding={12}
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+          className="z-50 w-auto max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-lg"
+        >
+          <HelpPopoverContent />
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

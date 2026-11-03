@@ -120,8 +120,8 @@ function LeafRow({
   );
 
   const leafClass = cn(
-    "flex items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted",
-    nested && "py-1.5"
+    "flex items-center gap-3 rounded-md px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted",
+    nested && "py-1"
   );
 
   const className = ({ isActive }: { isActive: boolean }) =>
@@ -208,7 +208,7 @@ function AccordionLeaf({
             if (!open) onNavigate();
           }}
           className={cn(
-            "flex min-w-0 flex-1 items-center gap-3 px-2.5 py-2 text-left text-sm font-medium text-foreground outline-none",
+            "flex min-w-0 flex-1 items-center gap-3 px-2.5 py-1.5 text-left text-sm font-medium text-foreground outline-none",
             sectionActive && "text-accent-foreground"
           )}
         >
@@ -279,14 +279,14 @@ export default function SubNavPanel({
   return (
     <nav
       className={cn(
-        "w-[248px] shrink-0 overflow-y-auto py-4",
+        "w-[248px] shrink-0 overflow-y-auto py-2.5",
         variant === "docked" &&
           "h-full bg-panel text-panel-foreground border-r border-panel-border",
         variant === "flyout" &&
           "max-h-[calc(100vh-2rem)] rounded-lg border border-border bg-popover text-popover-foreground shadow-lg"
       )}
     >
-      <div className="flex items-center justify-between gap-2 px-5 pb-3">
+      <div className="flex items-center justify-between gap-2 px-5 pb-1.5">
         <div className="truncate text-sm font-normal text-muted-foreground">
           {toSentenceCase(item.label)}
         </div>
@@ -322,12 +322,12 @@ export default function SubNavPanel({
       <Tooltip.Provider delayDuration={300}>
         <div className="flex flex-col px-3">
           {item.sections.map((section, i) => (
-            <div key={section.heading ?? i} className="flex flex-col gap-1">
+            <div key={section.heading ?? i} className="flex flex-col gap-0.5">
               {i > 0 && (
-                <div className="my-2 h-px bg-panel-border" aria-hidden="true" />
+                <div className="my-1 h-px bg-panel-border" aria-hidden="true" />
               )}
               {section.heading ? (
-                <div className="px-2.5 pb-1 pt-1 text-sm font-normal text-muted-foreground">
+                <div className="px-2.5 pb-0.5 pt-0.5 text-sm font-normal text-muted-foreground">
                   {toSentenceCase(section.heading)}
                 </div>
               ) : null}
