@@ -1,7 +1,6 @@
 /*
- * Change summary: Settings + Configuration open from a bottom-rail gear flyout;
- * profile menu keeps Upgrade (and profile/logout). Configuration is not a
- * separate group-3 rail item.
+ * Change summary: Configuration is a group-3 rail item above Activity.
+ * Settings lives in the profile flyout with Upgrade (no rail gear).
  */
 import type { LucideIcon } from "@/components/icons/protoLucide";
 import {
@@ -12,7 +11,6 @@ import {
   Headphones,
   UserCircle,
   Settings,
-  Settings2,
   Layers,
   FileText,
   Contact,
@@ -471,19 +469,11 @@ export const NAV: NavItem[] = [
       },
     ],
   },
+  // Direct item; "/configuration" index redirects to the first Configuration leaf.
+  { label: "Configuration", path: "/configuration", icon: SlidersHorizontal, group: 3, hideCreate: true },
   { label: "Activity", path: "/activity-timeline", icon: Activity, group: 3, flyoutOnly: true, hideCreate: true },
   { label: "Need Help?", path: "/helpdesk", icon: Headphones, group: 3, flyoutOnly: true, hideCreate: true },
-  // Settings gear — flyout with Settings + Configuration. Filled after PROFILE_MODES.
-  {
-    label: "Settings",
-    path: "/settings",
-    icon: Settings,
-    group: 3,
-    flyoutOnly: true,
-    hideCreate: true,
-    sections: [{ items: [] }],
-  },
-  // Avatar expands account options; does not navigate.
+  // Settings lives in the Profile flyout (no rail gear). Avatar expands options; does not navigate.
   { label: "John Doe", path: "/profile", icon: UserCircle, group: 3, initials: "JD", flyoutOnly: true, sections: [
     // Filled after PROFILE_MODES is declared — see profileFlyoutSections below.
     { items: [] },
@@ -736,7 +726,7 @@ export const PROFILE_DETAILS_PATH = "/settings/profile-details";
 export const LOGOUT_PATH = "/logout";
 
 const MODE_ICONS: Record<string, LucideIcon> = {
-  configuration: Settings2,
+  configuration: SlidersHorizontal,
   settings: Settings,
   upgrade: Zap,
 };
@@ -751,18 +741,6 @@ const modeLeaf = (id: string): NavLeaf => {
   };
 };
 
-/** Settings gear flyout — Settings + Configuration at the bottom of the rail. */
-const settingsFlyoutSections: NavSection[] = [
-  {
-    items: [modeLeaf("settings"), modeLeaf("configuration")],
-  },
-];
-
-const settingsItem = NAV.find((i) => i.path === "/settings" && i.flyoutOnly);
-if (settingsItem) {
-  settingsItem.sections = settingsFlyoutSections;
-}
-
 // Profile is its own flyout entry but lands inside the Settings shell.
 // Sections map 1:1 to flyout divider groups (user card is rendered separately).
 const profileFlyoutSections: NavSection[] = [
@@ -771,9 +749,9 @@ const profileFlyoutSections: NavSection[] = [
       { label: "Profile", path: PROFILE_DETAILS_PATH, hideCreate: true, icon: Contact },
     ],
   },
-  // Destinations — Upgrade (Settings / Configuration live on the rail gear)
+  // Destinations — Settings / Upgrade (Configuration is on the rail above Activity)
   {
-    items: [modeLeaf("upgrade")],
+    items: [modeLeaf("settings"), modeLeaf("upgrade")],
   },
   // Session
   {

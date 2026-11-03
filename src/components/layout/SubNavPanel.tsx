@@ -1,7 +1,7 @@
 // Product sub-nav (docked / flyout) — nested accordion leaves, premium
 // crown badge, section separators. Sub-leaf leading icons omitted.
 
-import { useEffect, useState, type ReactElement } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
@@ -16,17 +16,23 @@ import {
   type NavLeaf,
 } from "../../config/navigation";
 import { canUnpinPath, useUIStore } from "../../store/ui";
-import { navDescriptionFor } from "../../config/navDescriptions";
 import { GET_STARTED_PATH } from "@/lib/getStartedGate";
 import {
   useGetStartedNavLockTooltip,
   useIsGetStartedLocked,
 } from "@/store/getStartedOnboarding";
 import { cn } from "../../lib/utils";
-import NavDescriptiveTooltip from "./NavDescriptiveTooltip";
 
 const lockTooltipClass =
   "z-50 max-w-[240px] rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md";
+
+/** "Feature Management" → "Feature management" for flyout chrome. */
+function toSentenceCase(label: string): string {
+  const trimmed = label.trim();
+  if (!trimmed) return label;
+  const lower = trimmed.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
 
 function withLockTooltip(node: React.ReactNode, tooltip: string | null) {
   if (!tooltip) return node;
@@ -99,7 +105,9 @@ function LeafRow({
 }) {
   const content = (
     <>
-      <span className="min-w-0 flex-1 truncate">{leaf.label}</span>
+      <span className="min-w-0 flex-1 truncate">
+        {toSentenceCase(leaf.label)}
+      </span>
       {leaf.badge === "premium" && <PremiumBadge />}
       {leaf.external && (
         <ExternalLink
@@ -111,50 +119,36 @@ function LeafRow({
     </>
   );
 
+  const leafClass = cn(
+    "flex items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted",
+    nested && "py-1.5"
+  );
+
   const className = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "flex items-center gap-3 rounded-md px-2.5 py-2 text-sm text-foreground transition-colors hover:bg-muted",
-      nested && "py-1.5",
-      isActive && "bg-accent font-medium text-accent-foreground hover:bg-accent"
+      leafClass,
+      isActive && "bg-accent text-accent-foreground hover:bg-accent"
     );
-
-  const withDescription = (node: ReactElement) => {
-    const description = navDescriptionFor(leaf.path);
-    if (!description) return node;
-    // Trigger must be a plain element — asChild on NavLink breaks its
-    // function className (and hover:bg-muted with it).
-    return (
-      <NavDescriptiveTooltip description={description}>
-        <div className="w-full min-w-0">{node}</div>
-      </NavDescriptiveTooltip>
-    );
-  };
 
   if (leaf.external) {
     if (disabled) {
       return withLockTooltip(
         <span
           aria-disabled="true"
-          className={cn(
-            "flex cursor-not-allowed items-center gap-3 rounded-md px-2.5 py-2 text-sm text-foreground opacity-40",
-            nested && "py-1.5"
-          )}
+          className={cn(leafClass, "cursor-not-allowed opacity-40 hover:bg-transparent")}
         >
           {content}
         </span>,
         lockTooltip
       );
     }
-    return withDescription(
+    return (
       <a
         href={leaf.path}
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => onRequestClose?.()}
-        className={cn(
-          "flex items-center gap-3 rounded-md px-2.5 py-2 text-sm text-foreground transition-colors hover:bg-muted",
-          nested && "py-1.5"
-        )}
+        className={leafClass}
       >
         {content}
       </a>
@@ -165,10 +159,7 @@ function LeafRow({
     return withLockTooltip(
       <span
         aria-disabled="true"
-        className={cn(
-          "flex cursor-not-allowed items-center gap-3 rounded-md px-2.5 py-2 text-sm text-foreground opacity-40",
-          nested && "py-1.5"
-        )}
+        className={cn(leafClass, "cursor-not-allowed opacity-40 hover:bg-transparent")}
       >
         {content}
       </span>,
@@ -176,7 +167,7 @@ function LeafRow({
     );
   }
 
-  return withDescription(
+  return (
     <NavLink
       to={leaf.path}
       onClick={() => onRequestClose?.()}
@@ -217,11 +208,13 @@ function AccordionLeaf({
             if (!open) onNavigate();
           }}
           className={cn(
-            "flex min-w-0 flex-1 items-center gap-3 px-2.5 py-2 text-left text-sm text-foreground outline-none",
-            sectionActive && "font-medium"
+            "flex min-w-0 flex-1 items-center gap-3 px-2.5 py-2 text-left text-sm font-medium text-foreground outline-none",
+            sectionActive && "text-accent-foreground"
           )}
         >
-          <span className="min-w-0 flex-1 truncate">{leaf.label}</span>
+          <span className="min-w-0 flex-1 truncate">
+            {toSentenceCase(leaf.label)}
+          </span>
           {leaf.badge === "premium" && <PremiumBadge />}
         </button>
         <button
@@ -286,16 +279,16 @@ export default function SubNavPanel({
   return (
     <nav
       className={cn(
-        "w-[248px] shrink-0 overflow-y-auto py-6",
+        "w-[248px] shrink-0 overflow-y-auto py-4",
         variant === "docked" &&
           "h-full bg-panel text-panel-foreground border-r border-panel-border",
         variant === "flyout" &&
           "max-h-[calc(100vh-2rem)] rounded-lg border border-border bg-popover text-popover-foreground shadow-lg"
       )}
     >
-      <div className="flex items-center justify-between gap-2 px-5 pb-4">
-        <div className="truncate text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          {item.label}
+      <div className="flex items-center justify-between gap-2 px-5 pb-3">
+        <div className="truncate text-sm font-normal text-muted-foreground">
+          {toSentenceCase(item.label)}
         </div>
         {item.pinnable && pinnedPaths.includes(item.path) && canUnpin(item.path) && (
           <Tooltip.Provider delayDuration={300}>
@@ -329,13 +322,13 @@ export default function SubNavPanel({
       <Tooltip.Provider delayDuration={300}>
         <div className="flex flex-col px-3">
           {item.sections.map((section, i) => (
-            <div key={section.heading ?? i} className="flex flex-col gap-0.5">
+            <div key={section.heading ?? i} className="flex flex-col gap-1">
               {i > 0 && (
-                <div className="my-3 h-px bg-panel-border" aria-hidden="true" />
+                <div className="my-2 h-px bg-panel-border" aria-hidden="true" />
               )}
               {section.heading ? (
-                <div className="px-2.5 pb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {section.heading}
+                <div className="px-2.5 pb-1 pt-1 text-sm font-normal text-muted-foreground">
+                  {toSentenceCase(section.heading)}
                 </div>
               ) : null}
               {section.items.map((leaf) =>

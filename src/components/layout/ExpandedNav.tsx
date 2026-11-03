@@ -1,7 +1,8 @@
 /*
  * Change summary: expand/collapse is a dwell-armed full-height seam on the nav
  * edge (click or drag). Overflow products live under "Other". Profile row shows
- * the active workspace; Settings/Configuration open from the rail gear flyout.
+ * the active workspace name with user initials; Configuration is on the rail;
+ * Settings is in the profile menu.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -38,7 +39,6 @@ import ActivityOverviewPopover from "./ActivityOverviewPopover";
 import HelpSupportPopover from "./HelpSupportPopover";
 import WingifyLogoButton from "./WingifyLogoButton";
 import ProfileAvatar from "./ProfileAvatar";
-import { WorkspaceKindIcon } from "./WorkspaceSwitcher";
 import { useActiveWorkspace } from "@/store/workspace";
 import { useHasUnreadNotifications } from "@/store/notifications";
 import { useProfileSubmenuStore } from "@/store/profileSubmenu";
@@ -411,31 +411,12 @@ export default function ExpandedNav({
     );
     const isProfile = item.path === "/profile";
     const label = isProfile ? activeWorkspace.label : item.label;
-    const leadingIcon = isProfile ? (
-      <span className="relative inline-flex shrink-0">
-        <WorkspaceKindIcon
-          workspace={activeWorkspace}
-          className={
-            isActive && !expanded && !activeWorkspace.isMainAccount
-              ? "text-rail-active-foreground"
-              : undefined
-          }
-        />
-        {hasUnreadNotifications ? (
-          <span
-            className="absolute -right-1 -top-1 size-2 rounded-full bg-[var(--status-running-fg)] ring-2 ring-panel"
-            aria-hidden
-          />
-        ) : null}
-      </span>
-    ) : item.initials ? (
+    const leadingIcon = item.initials ? (
       <ProfileAvatar
         initials={item.initials}
         size="sm"
         onDark={isActive && !expanded}
-        showUnreadDot={
-          item.path === "/profile" ? hasUnreadNotifications : false
-        }
+        showUnreadDot={isProfile ? hasUnreadNotifications : false}
       />
     ) : isActive && ActiveIcon ? (
       <ActiveIcon className={cn("h-4 w-4 shrink-0", iconTone)} />
