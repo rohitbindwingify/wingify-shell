@@ -8,7 +8,7 @@ import {
   ChevronDown,
   Crown,
   ExternalLink,
-  PinOff,
+  EyeOff,
 } from "@/components/icons/protoLucide";
 import {
   leafLandPath,
@@ -303,7 +303,7 @@ export default function SubNavPanel({
                   }}
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
-                  <PinOff className="h-3.5 w-3.5" />
+                  <EyeOff className="h-3.5 w-3.5" />
                 </button>
               </Tooltip.Trigger>
               <Tooltip.Portal>

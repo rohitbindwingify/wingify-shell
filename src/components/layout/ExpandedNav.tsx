@@ -12,9 +12,9 @@ import {
   ChevronDown,
   Crown,
   ExternalLink,
+  Eye,
+  EyeOff,
   MoreHorizontal,
-  Pin,
-  PinOff,
 } from "@/components/icons/protoLucide";
 import {
   leafLandPath,
@@ -51,6 +51,8 @@ const FLYOUT_CLOSE_GRACE_MS = 120;
 const MORE_CLOSE_GRACE_MS = 150;
 const FLYOUT_VIEWPORT_MARGIN = 8;
 const MORE_FLYOUT_WIDTH = 248;
+/** Horizontal gap between rail ↔ flyout and Other ↔ nested. -1 overlaps borders. */
+const FLYOUT_PANEL_GAP_PX = -1;
 /** Rail ↔ expanded morph — keep label/accordion timing in sync. */
 const WIDTH_MS = 280;
 const WIDTH_EASE = "var(--ease-smooth)";
@@ -538,9 +540,9 @@ export default function ExpandedNav({
                 style={{ transition: revealTransition }}
               >
                 {inMore ? (
-                  <Pin className="h-3.5 w-3.5" />
+                  <Eye className="h-3.5 w-3.5" />
                 ) : (
-                  <PinOff className="h-3.5 w-3.5" />
+                  <EyeOff className="h-3.5 w-3.5" />
                 )}
               </button>
             </Tooltip.Trigger>
@@ -614,7 +616,7 @@ export default function ExpandedNav({
                   }}
                   className="flex h-5 w-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
-                  <PinOff className="h-3 w-3" />
+                  <EyeOff className="h-3 w-3" />
                 </button>
               )}
             </HoverCard.Content>
@@ -1126,9 +1128,11 @@ export default function ExpandedNav({
         {flyout && flyoutItem?.sections && (
           <div
             ref={flyoutRef}
-            className="fixed z-40 animate-scale-in pl-1.5 duration-200"
+            className="fixed z-40 animate-scale-in duration-200"
             style={{
-              left: expanded ? EXPANDED_NAV_WIDTH : RAIL_WIDTH,
+              left:
+                (expanded ? EXPANDED_NAV_WIDTH : RAIL_WIDTH) +
+                FLYOUT_PANEL_GAP_PX,
               top: flyout.top,
             }}
             onMouseEnter={cancelClose}
@@ -1154,8 +1158,11 @@ export default function ExpandedNav({
         {!expanded && moreFlyout && unpinned.length > 0 && (
           <div
             ref={moreFlyoutRef}
-            className="fixed z-40 animate-scale-in pl-1.5 duration-200"
-            style={{ left: RAIL_WIDTH, top: moreFlyout.top }}
+            className="fixed z-40 animate-scale-in duration-200"
+            style={{
+              left: RAIL_WIDTH + FLYOUT_PANEL_GAP_PX,
+              top: moreFlyout.top,
+            }}
             onMouseEnter={cancelMoreClose}
             onMouseLeave={scheduleMoreClose}
           >
@@ -1205,7 +1212,7 @@ export default function ExpandedNav({
                           }}
                           className="rounded-sm p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                         >
-                          <Pin className="h-3.5 w-3.5" />
+                          <Eye className="h-3.5 w-3.5" />
                         </button>
                       </Tooltip.Trigger>
                       <Tooltip.Portal>
@@ -1230,8 +1237,11 @@ export default function ExpandedNav({
             ref={moreNestedRef}
             className="fixed z-40 animate-scale-in duration-200"
             style={{
-              // Sit flush against the Other list (no gutter between the two panels).
-              left: RAIL_WIDTH + 6 + MORE_FLYOUT_WIDTH,
+              left:
+                RAIL_WIDTH +
+                FLYOUT_PANEL_GAP_PX +
+                MORE_FLYOUT_WIDTH +
+                FLYOUT_PANEL_GAP_PX,
               top: moreNested.top,
             }}
             onMouseEnter={cancelMoreClose}

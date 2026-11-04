@@ -500,15 +500,11 @@ export const SETTINGS_NAV: DrillInNavItem[] = [
       { label: "Users", path: "/settings/accounts/users", hideCreate: true },
       { label: "Security", path: "/settings/accounts/security", hideCreate: true },
       { label: "Privacy Center", path: "/settings/accounts/privacy-center", hideCreate: true },
-      { label: "Apps", path: "/settings/accounts/apps", hideCreate: true },
       { label: "Activity Timeline", path: "/settings/accounts/activity-timeline", hideCreate: true },
-      { label: "Insights Settings", path: "/settings/accounts/insights-settings", hideCreate: true },
       { label: "Notification Preferences", path: "/settings/accounts/notification-preferences", hideCreate: true },
-      { label: "Attributes List", path: "/settings/accounts/attributes-list", hideCreate: true },
       { label: "Users List", path: "/settings/accounts/users-list", hideCreate: true },
     ],
   },
-  { label: "Campaigns", path: "/settings/campaigns", icon: Layers, hideCreate: true },
   {
     label: "Subscription & Invoices",
     path: "/settings/subscription",
@@ -598,8 +594,10 @@ export const SETTINGS_NAV: DrillInNavItem[] = [
 ];
 
 /**
- * Configuration drill-in — clubs Websites and Apps, Integrations, Pages, Assets Hub.
- * WNA + Assets Hub are accordions; Integrations and Pages are leaf rows like Settings.
+ * Configuration drill-in — product/workspace setup (WNA, campaigns, integrations,
+ * pages, assets, apps, insights, attributes). Account/billing stays in SETTINGS_NAV.
+ * Paths under /settings/* for moved leaves are intentional; findProfileMode resolves
+ * by nav ownership so the Configuration shell still opens.
  */
 const CONFIG = "/configuration";
 const WNA = `${CONFIG}/websites-and-apps`;
@@ -620,6 +618,7 @@ export const CONFIGURATION_NAV: DrillInNavItem[] = [
       { label: "FAQs", path: `${WNA}/faqs`, hideCreate: true },
     ],
   },
+  { label: "Campaigns", path: "/settings/campaigns", icon: Layers, hideCreate: true },
   {
     label: "Integrations",
     path: `${CONFIG}/integrations`,
@@ -648,6 +647,19 @@ export const CONFIGURATION_NAV: DrillInNavItem[] = [
         hideCreate: true,
       },
     ],
+  },
+  { label: "Apps", path: "/settings/accounts/apps", icon: Puzzle, hideCreate: true },
+  {
+    label: "Insights Settings",
+    path: "/settings/accounts/insights-settings",
+    icon: Eye,
+    hideCreate: true,
+  },
+  {
+    label: "Attributes List",
+    path: "/settings/accounts/attributes-list",
+    icon: Crosshair,
+    hideCreate: true,
   },
 ];
 
@@ -950,7 +962,21 @@ export function leafLandPath(leaf: NavLeaf): string {
 }
 
 export function findProfileMode(pathname: string): ProfileMode | undefined {
-  // Longest prefix wins so nested paths resolve correctly.
+  // Prefer the mode whose nav owns this leaf (longest path wins) so items that
+  // still live under /settings/* but belong in Configuration resolve correctly.
+  let owned: { mode: ProfileMode; len: number } | undefined;
+  for (const mode of PROFILE_MODES) {
+    for (const leaf of modeLeaves(mode)) {
+      if (pathname === leaf.path || pathname.startsWith(leaf.path + "/")) {
+        if (!owned || leaf.path.length > owned.len) {
+          owned = { mode, len: leaf.path.length };
+        }
+      }
+    }
+  }
+  if (owned) return owned.mode;
+
+  // Fall back to mode-root prefix for bare /settings, /configuration, /upgrade.
   return PROFILE_MODES.filter(
     (m) => pathname === m.path || pathname.startsWith(m.path + "/")
   ).sort((a, b) => b.path.length - a.path.length)[0];

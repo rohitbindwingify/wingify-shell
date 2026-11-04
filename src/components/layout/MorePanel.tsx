@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { Pin } from "@/components/icons/protoLucide";
+import { Eye } from "@/components/icons/protoLucide";
 import { visibleNav } from "../../config/navigation";
 import { firstChildPath } from "../../lib/nav";
 import { useUIStore } from "../../store/ui";
@@ -53,7 +53,7 @@ export default function MorePanel() {
                         }}
                         className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >
-                        <Pin className="h-3.5 w-3.5" />
+                        <Eye className="h-3.5 w-3.5" />
                       </button>
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
