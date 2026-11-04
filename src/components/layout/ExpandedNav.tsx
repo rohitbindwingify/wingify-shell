@@ -476,7 +476,7 @@ export default function ExpandedNav({
           type="button"
           aria-label={label}
           aria-expanded={expandOnly ? flyout?.path === item.path : undefined}
-          onClick={(e) => {
+          onClick={() => {
             if (navDisabled) return;
             if (tooltipOnly) return;
             if (expandOnly) {
