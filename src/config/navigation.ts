@@ -634,7 +634,12 @@ export const CONFIGURATION_NAV: DrillInNavItem[] = [
       { label: "FAQs", path: `${WNA}/faqs`, hideCreate: true },
     ],
   },
-  { label: "Campaigns", path: "/settings/campaigns", icon: Layers, hideCreate: true },
+  {
+    label: "Campaigns",
+    path: `${CONFIG}/campaigns`,
+    icon: Layers,
+    hideCreate: true,
+  },
   {
     label: "Integrations",
     path: `${CONFIG}/integrations`,
@@ -667,13 +672,13 @@ export const CONFIGURATION_NAV: DrillInNavItem[] = [
   // { label: "Apps", path: "/settings/accounts/apps", icon: Puzzle, hideCreate: true }, // @undo
   {
     label: "Behavioural Analytics",
-    path: "/settings/accounts/insights-settings",
+    path: `${CONFIG}/behavioural-analytics`,
     icon: Eye,
     hideCreate: true,
   },
   {
     label: "Attributes List",
-    path: "/settings/accounts/attributes-list",
+    path: `${CONFIG}/attributes-list`,
     icon: Crosshair,
     hideCreate: true,
   },

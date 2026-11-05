@@ -550,11 +550,33 @@ export const router = createBrowserRouter([
       },
       {
         path: "/assets-hub",
-        element: <Navigate to="/configuration/assets-hub" replace />,
+        element: <Navigate to="/configuration/assets-hub/images" replace />,
       },
       {
         path: "/assets-hub/*",
-        element: <Navigate to="/configuration/assets-hub" replace />,
+        element: (
+          <LegacyPathPrefixRedirect
+            from="/assets-hub"
+            to="/configuration/assets-hub"
+          />
+        ),
+      },
+      {
+        path: "/configuration/assets-hub",
+        element: <Navigate to="/configuration/assets-hub/images" replace />,
+      },
+      // Legacy Settings-prefixed Configuration leaves → Configuration shell.
+      {
+        path: "/settings/campaigns",
+        element: <Navigate to="/configuration/campaigns" replace />,
+      },
+      {
+        path: "/settings/accounts/insights-settings",
+        element: <Navigate to="/configuration/behavioural-analytics" replace />,
+      },
+      {
+        path: "/settings/accounts/attributes-list",
+        element: <Navigate to="/configuration/attributes-list" replace />,
       },
       // Wingz — full-page chat with the same persistent main rail as AppLayout.
       {
