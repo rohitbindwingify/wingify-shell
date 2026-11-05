@@ -144,9 +144,16 @@ function withNavLockTooltip(
   );
 }
 
+type ClampedFlyoutPos = {
+  top: number;
+  left?: number;
+  anchorBottom?: number;
+  placement?: "right" | "above";
+};
+
 function useClampedFlyoutPosition(
   ref: { current: HTMLDivElement | null },
-  state: FlyoutState | { top: number; placement?: undefined } | null
+  state: ClampedFlyoutPos | null
 ) {
   useLayoutEffect(() => {
     const el = ref.current;
@@ -159,7 +166,7 @@ function useClampedFlyoutPosition(
       // Sit above the icon; left edge aligns with icon’s left.
       const gap = 8;
       const anchorBottom =
-        "anchorBottom" in state && typeof state.anchorBottom === "number"
+        typeof state.anchorBottom === "number"
           ? state.anchorBottom
           : state.top;
       let bottom = window.innerHeight - anchorBottom + gap;
