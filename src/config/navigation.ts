@@ -493,9 +493,12 @@ export const NAV: NavItem[] = [
   ]},
 ];
 
+/** Profile menu header target — rendered as the user card, not a list row. */
+export const PROFILE_DETAILS_PATH = "/settings/profile-details";
+export const LOGOUT_PATH = "/logout";
+
 /**
- * Settings sidebar (real). Other Profile modes use dummyNav until you paste
- * their navigation one by one.
+ * Settings drill-in — accounts, subscription/invoices, workspaces, profile.
  */
 export const SETTINGS_NAV: DrillInNavItem[] = [
   {
@@ -597,8 +600,13 @@ export const SETTINGS_NAV: DrillInNavItem[] = [
       },
     ],
   },
-  { label: "Profile details", path: "/settings/profile-details", icon: UserRound, hideCreate: true },
   { label: "Workspaces", path: "/settings/workspaces", icon: Building2, hideCreate: true },
+  {
+    label: "Profile details",
+    path: PROFILE_DETAILS_PATH,
+    icon: UserRound,
+    hideCreate: true,
+  },
 ];
 
 /**
@@ -656,9 +664,9 @@ export const CONFIGURATION_NAV: DrillInNavItem[] = [
       },
     ],
   },
-  { label: "Apps", path: "/settings/accounts/apps", icon: Puzzle, hideCreate: true },
+  // { label: "Apps", path: "/settings/accounts/apps", icon: Puzzle, hideCreate: true }, // @undo
   {
-    label: "Insights Settings",
+    label: "Behavioural Analytics",
     path: "/settings/accounts/insights-settings",
     icon: Eye,
     hideCreate: true,
@@ -727,7 +735,7 @@ export const UPGRADE_NAV: DrillInNavItem[] = [
   },
 ];
 
-/** Drill-in shells reachable from the Profile (JD) flyout. */
+/** Drill-in shells reachable from the Settings gear / Profile flyout. */
 export const PROFILE_MODES: ProfileMode[] = [
   { id: "settings", label: "Settings", path: "/settings", nav: SETTINGS_NAV },
   {
@@ -746,13 +754,9 @@ export const CURRENT_USER = {
   initials: "JD",
 };
 
-/** Profile menu header target — rendered as the user card, not a list row. */
-export const PROFILE_DETAILS_PATH = "/settings/profile-details";
-export const LOGOUT_PATH = "/logout";
-
 const MODE_ICONS: Record<string, LucideIcon> = {
-  configuration: Settings2,
   settings: Settings,
+  configuration: Settings2,
   upgrade: Zap,
 };
 
@@ -760,19 +764,16 @@ const modeLeaf = (id: string): NavLeaf => {
   const mode = PROFILE_MODES.find((m) => m.id === id)!;
   return {
     label: mode.label,
-    path: mode.path,
+    path: firstModePath(mode),
     hideCreate: true,
     icon: MODE_ICONS[id],
   };
 };
 
-/** Settings gear flyout — destinations under the rail gear (avoid repeating “Settings”). */
+/** Settings gear flyout — click destinations under the rail gear. */
 const settingsFlyoutSections: NavSection[] = [
   {
-    items: [
-      { ...modeLeaf("settings"), label: "Account & billing" },
-      modeLeaf("configuration"),
-    ],
+    items: [modeLeaf("settings"), modeLeaf("configuration")],
   },
 ];
 

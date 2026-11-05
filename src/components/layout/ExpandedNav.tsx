@@ -73,11 +73,14 @@ const UTILITY_ORDER_EXPANDED = [
 type FlyoutState = {
   path: string;
   top: number;
-  /** Icon bottom — used when placement is "above" (panel sits above icon). */
+  /** Icon bottom — used when placement is "above" / "right-end". */
   anchorBottom?: number;
   left?: number;
-  /** Expanded utility bar → above icon; collapsed → right of icon. */
-  placement: "right" | "above";
+  /**
+   * above = utility bar expanded; right = product / default utility;
+   * right-end = Settings — to the right, bottom-aligned to the icon.
+   */
+  placement: "right" | "above" | "right-end";
 };
 
 /** Width of the expanded (labeled) navigation sidebar — shared with the app grid. */
@@ -148,7 +151,7 @@ type ClampedFlyoutPos = {
   top: number;
   left?: number;
   anchorBottom?: number;
-  placement?: "right" | "above";
+  placement?: "right" | "above" | "right-end";
 };
 
 function useClampedFlyoutPosition(
@@ -161,10 +164,10 @@ function useClampedFlyoutPosition(
 
     const height = el.offsetHeight;
     const width = el.offsetWidth;
+    const gap = 8;
 
     if (state.placement === "above") {
       // Sit above the icon; left edge aligns with icon’s left.
-      const gap = 8;
       const anchorBottom =
         typeof state.anchorBottom === "number"
           ? state.anchorBottom
@@ -184,6 +187,30 @@ function useClampedFlyoutPosition(
       );
       el.style.top = "auto";
       el.style.bottom = `${bottom}px`;
+      el.style.left = `${left}px`;
+      return;
+    }
+
+    if (state.placement === "right-end") {
+      // Right of icon, bottom edge aligned to icon bottom (bottom-right anchor).
+      const anchorBottom =
+        typeof state.anchorBottom === "number"
+          ? state.anchorBottom
+          : state.top;
+      let top = anchorBottom - height;
+      top = Math.max(
+        FLYOUT_VIEWPORT_MARGIN,
+        Math.min(top, window.innerHeight - height - FLYOUT_VIEWPORT_MARGIN)
+      );
+      const left = Math.max(
+        FLYOUT_VIEWPORT_MARGIN,
+        Math.min(
+          (state.left ?? FLYOUT_VIEWPORT_MARGIN) + gap,
+          window.innerWidth - width - FLYOUT_VIEWPORT_MARGIN
+        )
+      );
+      el.style.bottom = "auto";
+      el.style.top = `${top}px`;
       el.style.left = `${left}px`;
       return;
     }
@@ -358,6 +385,19 @@ export default function ExpandedNav({
     const isUtility = (UTILITY_BAR_PATHS as readonly string[]).includes(
       item.path
     );
+
+    // Settings: always bottom-right of the gear (right of icon, bottom-aligned).
+    if (item.path === "/settings") {
+      setFlyout({
+        path: item.path,
+        top: rect.top,
+        anchorBottom: rect.bottom,
+        left: rect.right,
+        placement: "right-end",
+      });
+      return;
+    }
+
     // Expanded (horizontal icons): open above, left-aligned to the icon.
     // Collapsed (vertical icons): open to the right of the icon.
     if (isUtility && expanded) {
@@ -388,13 +428,8 @@ export default function ExpandedNav({
 
   const scheduleClose = () => {
     if (profileSubmenuOpen) return;
-    // Utility-bar panels open on click — don't dismiss from hover leave.
-    if (
-      flyout &&
-      (UTILITY_BAR_PATHS as readonly string[]).includes(flyout.path)
-    ) {
-      return;
-    }
+    // Utility Settings/Profile stay open until click-out (not hover leave).
+    if (flyout?.path === "/profile" || flyout?.path === "/settings") return;
     window.clearTimeout(closeTimer.current);
     closeTimer.current = window.setTimeout(() => {
       setFlyout(null);
@@ -1078,114 +1113,139 @@ export default function ExpandedNav({
             {!welcomeChrome && separator}
             <div
               className={cn(
-                "flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+                "flex min-h-0 flex-1 flex-col overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
                 "px-2",
                 welcomeChrome && "mt-4"
               )}
             >
-              {!welcomeChrome && group2.map((i) => renderItem(i))}
-              {!welcomeChrome && unpinned.length > 0 && (
-                <>
-                  <div
-                    className="grid"
-                    style={{
-                      gridTemplateRows: expanded ? "1fr" : "0fr",
-                      opacity: expanded ? 1 : 0,
-                      transition: accordionTransition,
-                    }}
-                    aria-hidden={!expanded}
-                  >
-                    <div className="min-h-0 overflow-hidden">
-                      <button
-                        type="button"
-                        aria-expanded={moreOpen}
-                        aria-label={
-                          moreOpen ? "Collapse Other" : "Expand Other"
-                        }
-                        tabIndex={expanded ? undefined : -1}
-                        onClick={() => setMoreOpen((open) => !open)}
-                        className={cn(
-                          "mt-3 flex w-full items-center gap-0.5 rounded-md px-0 py-0 text-left hover:bg-muted",
-                          !!unpinnedActivePath && !moreOpen && "bg-muted"
-                        )}
-                      >
-                        <span
+              <div className="flex shrink-0 flex-col gap-0.5">
+                {!welcomeChrome && group2.map((i) => renderItem(i))}
+                {!welcomeChrome && unpinned.length > 0 && (
+                  <>
+                    <div
+                      className="grid"
+                      style={{
+                        gridTemplateRows: expanded ? "1fr" : "0fr",
+                        opacity: expanded ? 1 : 0,
+                        transition: accordionTransition,
+                      }}
+                      aria-hidden={!expanded}
+                    >
+                      <div className="min-h-0 overflow-hidden">
+                        <button
+                          type="button"
+                          aria-expanded={moreOpen}
+                          aria-label={
+                            moreOpen ? "Collapse Other" : "Expand Other"
+                          }
+                          tabIndex={expanded ? undefined : -1}
+                          onClick={() => setMoreOpen((open) => !open)}
                           className={cn(
-                            "flex h-9 min-w-0 flex-1 items-center gap-2 text-sm",
-                            unpinnedActivePath
-                              ? "font-medium text-foreground"
-                              : "text-muted-foreground"
+                            "mt-3 flex w-full items-center gap-0.5 rounded-md px-0 py-0 text-left hover:bg-muted",
+                            !!unpinnedActivePath && !moreOpen && "bg-muted"
                           )}
                         >
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center">
-                            <MoreHorizontal
-                              className="h-4 w-4"
-                              strokeWidth={1.75}
+                          <span
+                            className={cn(
+                              "flex h-9 min-w-0 flex-1 items-center gap-2 text-sm",
+                              unpinnedActivePath
+                                ? "font-medium text-foreground"
+                                : "text-muted-foreground"
+                            )}
+                          >
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center">
+                              <MoreHorizontal
+                                className="h-4 w-4"
+                                strokeWidth={1.75}
+                              />
+                            </span>
+                            <span className="font-medium">Other</span>
+                          </span>
+                          <span className="flex size-4 shrink-0 items-center justify-center text-muted-foreground">
+                            <ChevronDown
+                              className={cn(
+                                "size-4 transition-transform duration-[280ms]",
+                                moreOpen && "rotate-180"
+                              )}
                             />
                           </span>
-                          <span className="font-medium">Other</span>
-                        </span>
-                        <span className="flex size-4 shrink-0 items-center justify-center text-muted-foreground">
-                          <ChevronDown
-                            className={cn(
-                              "size-4 transition-transform duration-[280ms]",
-                              moreOpen && "rotate-180"
-                            )}
-                          />
-                        </span>
-                      </button>
-                      <div
-                        className="grid"
-                        style={{
-                          gridTemplateRows: moreOpen ? "1fr" : "0fr",
-                          opacity: moreOpen ? 1 : 0,
-                          transition: accordionTransition,
-                        }}
-                        aria-hidden={!moreOpen}
-                      >
-                        <div className="min-h-0 overflow-hidden">
-                          <div className="flex flex-col gap-0.5 pb-1">
-                            {unpinned.map((i) => renderItem(i, true))}
+                        </button>
+                        <div
+                          className="grid"
+                          style={{
+                            gridTemplateRows: moreOpen ? "1fr" : "0fr",
+                            opacity: moreOpen ? 1 : 0,
+                            transition: accordionTransition,
+                          }}
+                          aria-hidden={!moreOpen}
+                        >
+                          <div className="min-h-0 overflow-hidden">
+                            <div className="flex flex-col gap-0.5 pb-1">
+                              {unpinned.map((i) => renderItem(i, true))}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div
-                    className="grid"
-                    style={{
-                      gridTemplateRows: expanded ? "0fr" : "1fr",
-                      opacity: expanded ? 0 : 1,
-                      transition: accordionTransition,
-                    }}
-                    aria-hidden={expanded}
-                  >
-                    <div className="min-h-0 overflow-hidden">
-                      <button
-                        type="button"
-                        aria-label="Other products"
-                        tabIndex={expanded ? -1 : undefined}
-                        onClick={(e) => openMoreFlyout(e.currentTarget)}
-                        onMouseEnter={(e) => openMoreFlyout(e.currentTarget)}
-                        onMouseLeave={scheduleMoreClose}
-                        onFocus={(e) => openMoreFlyout(e.currentTarget)}
-                        onBlur={scheduleMoreClose}
-                        className={cn(
-                          "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted",
-                          unpinnedActivePath &&
-                            "bg-rail-active text-rail-active-foreground hover:bg-rail-active",
-                          !unpinnedActivePath && !!moreFlyout && "bg-muted"
-                        )}
-                      >
-                        <MoreHorizontal
-                          className="h-4 w-4"
-                          strokeWidth={1.75}
-                        />
-                      </button>
+                    <div
+                      className="grid"
+                      style={{
+                        gridTemplateRows: expanded ? "0fr" : "1fr",
+                        opacity: expanded ? 0 : 1,
+                        transition: accordionTransition,
+                      }}
+                      aria-hidden={expanded}
+                    >
+                      <div className="min-h-0 overflow-hidden">
+                        <button
+                          type="button"
+                          aria-label="Other products"
+                          tabIndex={expanded ? -1 : undefined}
+                          onClick={(e) => openMoreFlyout(e.currentTarget)}
+                          onMouseEnter={(e) => openMoreFlyout(e.currentTarget)}
+                          onMouseLeave={scheduleMoreClose}
+                          onFocus={(e) => openMoreFlyout(e.currentTarget)}
+                          onBlur={scheduleMoreClose}
+                          className={cn(
+                            "mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted",
+                            unpinnedActivePath &&
+                              "bg-rail-active text-rail-active-foreground hover:bg-rail-active",
+                            !unpinnedActivePath && !!moreFlyout && "bg-muted"
+                          )}
+                        >
+                          <MoreHorizontal
+                            className="h-4 w-4"
+                            strokeWidth={1.75}
+                          />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
+              {/* Empty rail gutter — click toggles expand/collapse (icons stay interactive). */}
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <button
+                    type="button"
+                    aria-label={
+                      expanded ? "Collapse navigation" : "Expand navigation"
+                    }
+                    aria-pressed={isDocked}
+                    onClick={() => toggleDock()}
+                    className="mt-1 min-h-0 w-full flex-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content
+                    side="right"
+                    sideOffset={8}
+                    className={tooltipContentClass}
+                  >
+                    {expanded ? "Collapse navigation" : "Expand navigation"}
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
             </div>
             <div className="mt-2.5 shrink-0 px-2" aria-hidden="true">
               <div
