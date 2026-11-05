@@ -1,10 +1,17 @@
 /*
  * Change summary: expand/collapse is a dwell-armed full-height seam on the nav
  * edge (click or drag). Overflow products live under "Other". Profile row shows
- * the active workspace name with user initials; Settings + Configuration
- * open from the gear flyout.
+ * Bottom utility bar (Avatar · Help · Settings · Activity from the avatar):
+ * vertical when collapsed, one icon row when expanded; label tooltip on hover,
+ * panels on click.
  */
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactElement,
+} from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import * as Tooltip from "@radix-ui/react-tooltip";
@@ -37,9 +44,41 @@ import ActivityOverviewPopover from "./ActivityOverviewPopover";
 import HelpSupportPopover from "./HelpSupportPopover";
 import WingifyLogoButton from "./WingifyLogoButton";
 import ProfileAvatar from "./ProfileAvatar";
-import { useActiveWorkspace } from "@/store/workspace";
-import { useHasUnreadNotifications } from "@/store/notifications";
 import { useProfileSubmenuStore } from "@/store/profileSubmenu";
+
+/** Bottom rail icons (order remapped for collapsed vs expanded). */
+const UTILITY_BAR_PATHS = [
+  "/activity-timeline",
+  "/settings",
+  "/helpdesk",
+  "/profile",
+] as const;
+
+/** Collapsed (top → bottom): Activity → Settings → Help → Avatar. */
+const UTILITY_ORDER_COLLAPSED = [
+  "/activity-timeline",
+  "/settings",
+  "/helpdesk",
+  "/profile",
+] as const;
+
+/** Expanded (left → right): Avatar → Help → Settings → Activity. */
+const UTILITY_ORDER_EXPANDED = [
+  "/profile",
+  "/helpdesk",
+  "/settings",
+  "/activity-timeline",
+] as const;
+
+type FlyoutState = {
+  path: string;
+  top: number;
+  /** Icon bottom — used when placement is "above" (panel sits above icon). */
+  anchorBottom?: number;
+  left?: number;
+  /** Expanded utility bar → above icon; collapsed → right of icon. */
+  placement: "right" | "above";
+};
 
 /** Width of the expanded (labeled) navigation sidebar — shared with the app grid. */
 export const EXPANDED_NAV_WIDTH = 240;
@@ -84,10 +123,10 @@ const SEAM_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(
 const SEAM_HOVER_DELAY_MS = 50;
 
 function withNavLockTooltip(
-  node: React.ReactElement,
+  node: ReactElement,
   tooltip: string | null,
   enabled: boolean
-): React.ReactElement {
+): ReactElement {
   if (!enabled || !tooltip) return node;
   return (
     <Tooltip.Root>
@@ -105,16 +144,59 @@ function withNavLockTooltip(
   );
 }
 
-function useClampedFlyoutTop(
-  ref: React.RefObject<HTMLDivElement | null>,
-  state: { top: number } | null
+function useClampedFlyoutPosition(
+  ref: { current: HTMLDivElement | null },
+  state: FlyoutState | { top: number; placement?: undefined } | null
 ) {
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el || !state) return;
-    const maxTop =
-      window.innerHeight - el.offsetHeight - FLYOUT_VIEWPORT_MARGIN;
-    el.style.top = `${Math.max(FLYOUT_VIEWPORT_MARGIN, Math.min(state.top, maxTop))}px`;
+
+    const height = el.offsetHeight;
+    const width = el.offsetWidth;
+
+    if (state.placement === "above") {
+      // Sit above the icon; left edge aligns with icon’s left.
+      const gap = 8;
+      const anchorBottom =
+        "anchorBottom" in state && typeof state.anchorBottom === "number"
+          ? state.anchorBottom
+          : state.top;
+      let bottom = window.innerHeight - anchorBottom + gap;
+      // Prefer keeping the panel fully above the icon; clamp into the viewport.
+      const topEdge = window.innerHeight - bottom - height;
+      if (topEdge < FLYOUT_VIEWPORT_MARGIN) {
+        bottom = window.innerHeight - height - FLYOUT_VIEWPORT_MARGIN;
+      }
+      const left = Math.max(
+        FLYOUT_VIEWPORT_MARGIN,
+        Math.min(
+          state.left ?? FLYOUT_VIEWPORT_MARGIN,
+          window.innerWidth - width - FLYOUT_VIEWPORT_MARGIN
+        )
+      );
+      el.style.top = "auto";
+      el.style.bottom = `${bottom}px`;
+      el.style.left = `${left}px`;
+      return;
+    }
+
+    // Right of icon — no top/bottom edge lock; keep top near the icon.
+    el.style.bottom = "auto";
+    const maxTop = window.innerHeight - height - FLYOUT_VIEWPORT_MARGIN;
+    el.style.top = `${Math.max(
+      FLYOUT_VIEWPORT_MARGIN,
+      Math.min(state.top, maxTop)
+    )}px`;
+    if (typeof state.left === "number") {
+      el.style.left = `${Math.max(
+        FLYOUT_VIEWPORT_MARGIN,
+        Math.min(
+          state.left,
+          window.innerWidth - width - FLYOUT_VIEWPORT_MARGIN
+        )
+      )}px`;
+    }
   }, [ref, state]);
 }
 
@@ -145,7 +227,6 @@ export default function ExpandedNav({
   const nav = visibleNav();
   const navLocked = useIsGetStartedLocked();
   const lockTooltip = useGetStartedNavLockTooltip();
-  const hasUnreadNotifications = useHasUnreadNotifications();
   const profileSubmenuOpen = useProfileSubmenuStore((s) => s.openCount > 0);
 
   const expanded = !forceCollapsed && isDocked;
@@ -155,12 +236,9 @@ export default function ExpandedNav({
   );
   const [openSubPath, setOpenSubPath] = useState<string | null>(null);
 
-  // Hover flyouts (collapsed only).
-  const [flyout, setFlyout] = useState<{ path: string; top: number } | null>(
-    null
-  );
+  // Hover flyouts (collapsed products) + click flyouts (utility bar).
+  const [flyout, setFlyout] = useState<FlyoutState | null>(null);
   const [oldNavFeedbackOpen, setOldNavFeedbackOpen] = useState(false);
-  const activeWorkspace = useActiveWorkspace();
   const closeTimer = useRef<number | undefined>(undefined);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const [moreFlyout, setMoreFlyout] = useState<{ top: number } | null>(null);
@@ -266,16 +344,50 @@ export default function ExpandedNav({
     // Settings/Profile float in both modes; product flyouts are collapsed-only.
     if (expanded && !(item.flyoutOnly && item.sections)) return;
     if (navLocked && item.path !== "/home") return;
+    if (!item.sections?.length) return;
     window.clearTimeout(closeTimer.current);
     closeMore();
-    setFlyout(
-      item.sections
-        ? { path: item.path, top: target.getBoundingClientRect().top }
-        : null
+    const rect = target.getBoundingClientRect();
+    const isUtility = (UTILITY_BAR_PATHS as readonly string[]).includes(
+      item.path
     );
+    // Expanded (horizontal icons): open above, left-aligned to the icon.
+    // Collapsed (vertical icons): open to the right of the icon.
+    if (isUtility && expanded) {
+      setFlyout({
+        path: item.path,
+        top: rect.top,
+        anchorBottom: rect.top,
+        left: rect.left,
+        placement: "above",
+      });
+      return;
+    }
+    setFlyout({
+      path: item.path,
+      top: rect.top,
+      left: isUtility ? rect.right + 8 : undefined,
+      placement: "right",
+    });
   };
+
+  const toggleFlyout = (item: NavItem, target: HTMLElement) => {
+    if (flyout?.path === item.path) {
+      setFlyout(null);
+      return;
+    }
+    openFlyout(item, target);
+  };
+
   const scheduleClose = () => {
     if (profileSubmenuOpen) return;
+    // Utility-bar panels open on click — don't dismiss from hover leave.
+    if (
+      flyout &&
+      (UTILITY_BAR_PATHS as readonly string[]).includes(flyout.path)
+    ) {
+      return;
+    }
     window.clearTimeout(closeTimer.current);
     closeTimer.current = window.setTimeout(() => {
       setFlyout(null);
@@ -302,10 +414,9 @@ export default function ExpandedNav({
     };
   }, []);
 
-  // Expanded Settings/Profile flyouts: click-outside dismisses the floating panel.
+  // Settings/Profile flyouts: click-outside dismisses the floating panel.
   useEffect(() => {
     if (
-      !expanded ||
       !flyout ||
       (flyout.path !== "/profile" && flyout.path !== "/settings")
     ) {
@@ -330,9 +441,9 @@ export default function ExpandedNav({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [expanded, flyout]);
 
-  useClampedFlyoutTop(flyoutRef, flyout);
-  useClampedFlyoutTop(moreFlyoutRef, moreFlyout);
-  useClampedFlyoutTop(moreNestedRef, moreNested);
+  useClampedFlyoutPosition(flyoutRef, flyout);
+  useClampedFlyoutPosition(moreFlyoutRef, moreFlyout);
+  useClampedFlyoutPosition(moreNestedRef, moreNested);
 
   const isVisible = (i: NavItem) => !i.pinnable || pinnedPaths.includes(i.path);
   // Welcome preview: real rail chrome, but product links have not appeared yet —
@@ -347,9 +458,74 @@ export default function ExpandedNav({
   const group3 = welcomeChrome
     ? nav.filter(
         (i) =>
-          i.group === 3 && (i.path === "/helpdesk" || i.path === "/profile")
+          i.group === 3 &&
+          (i.path === "/helpdesk" ||
+            i.path === "/profile" ||
+            i.path === "/settings")
       )
     : nav.filter((i) => i.group === 3);
+  const utilityOrder = expanded
+    ? UTILITY_ORDER_EXPANDED
+    : UTILITY_ORDER_COLLAPSED;
+  const utilityItems = utilityOrder
+    .map((path) => group3.find((i) => i.path === path))
+    .filter((i): i is NavItem => Boolean(i));
+
+  /** FLIP: animate utility icons between vertical ↔ horizontal slots. */
+  const utilityFlipRefs = useRef(new Map<string, HTMLElement | null>());
+  const utilityPrevRects = useRef(new Map<string, DOMRect>());
+  const utilityExpandedRef = useRef(expanded);
+
+  useLayoutEffect(() => {
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const nextRects = new Map<string, DOMRect>();
+    for (const [path, el] of utilityFlipRefs.current) {
+      if (el) nextRects.set(path, el.getBoundingClientRect());
+    }
+
+    const orientationChanged = utilityExpandedRef.current !== expanded;
+    utilityExpandedRef.current = expanded;
+
+    if (orientationChanged && !reduceMotion) {
+      for (const [path, el] of utilityFlipRefs.current) {
+        if (!el) continue;
+        const first = utilityPrevRects.current.get(path);
+        const last = nextRects.get(path);
+        if (!first || !last) continue;
+        const dx = first.left - last.left;
+        const dy = first.top - last.top;
+        if (dx === 0 && dy === 0) continue;
+        el.style.transition = "none";
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+      }
+
+      // Force layout so the browser commits the inverted positions.
+      void document.body.offsetHeight;
+
+      for (const [, el] of utilityFlipRefs.current) {
+        if (!el?.style.transform) continue;
+        el.style.transition = `transform ${WIDTH_MS}ms ${WIDTH_EASE}`;
+        el.style.transform = "translate(0, 0)";
+      }
+
+      const clearId = window.setTimeout(() => {
+        for (const [, el] of utilityFlipRefs.current) {
+          if (!el) continue;
+          el.style.transition = "";
+          el.style.transform = "";
+        }
+      }, WIDTH_MS + 50);
+
+      utilityPrevRects.current = nextRects;
+      return () => window.clearTimeout(clearId);
+    }
+
+    utilityPrevRects.current = nextRects;
+  }, [expanded, utilityItems]);
+
   const unpinned = welcomeChrome
     ? []
     : nav.filter((i) => i.pinnable && !pinnedPaths.includes(i.path));
@@ -415,14 +591,12 @@ export default function ExpandedNav({
         strokeWidth={1.75}
       />
     );
-    const isProfile = item.path === "/profile";
-    const label = isProfile ? activeWorkspace.label : item.label;
     const leadingIcon = item.initials ? (
       <ProfileAvatar
         initials={item.initials}
         size="sm"
         onDark={isActive && !expanded}
-        showUnreadDot={isProfile ? hasUnreadNotifications : false}
+        showUnreadDot={false}
       />
     ) : isActive && ActiveIcon ? (
       <ActiveIcon className={cn("h-4 w-4 shrink-0", iconTone)} />
@@ -454,33 +628,40 @@ export default function ExpandedNav({
         )}
         onMouseEnter={(e) => {
           if (navDisabled) return;
-          // Collapsed product flyouts + Settings/Profile in either rail state.
-          if ((!expanded && !tooltipOnly) || expandOnly) {
+          // Product flyouts: hover when collapsed. Settings/Profile: click only.
+          if (expandOnly) return;
+          if (!expanded && !tooltipOnly) {
             openFlyout(item, e.currentTarget);
           }
         }}
         onMouseLeave={() => {
-          if ((!expanded && !tooltipOnly) || expandOnly) scheduleClose();
+          if (expandOnly) return;
+          if (!expanded && !tooltipOnly) scheduleClose();
         }}
         onFocus={(e) => {
           if (navDisabled) return;
-          if ((!expanded && !tooltipOnly) || expandOnly) {
+          if (expandOnly) return;
+          if (!expanded && !tooltipOnly) {
             openFlyout(item, e.currentTarget);
           }
         }}
         onBlur={() => {
-          if ((!expanded && !tooltipOnly) || expandOnly) scheduleClose();
+          if (expandOnly) return;
+          if (!expanded && !tooltipOnly) scheduleClose();
         }}
       >
         <button
           type="button"
-          aria-label={label}
+          aria-label={item.label}
           aria-expanded={expandOnly ? flyout?.path === item.path : undefined}
-          onClick={() => {
+          onClick={(e) => {
             if (navDisabled) return;
             if (tooltipOnly) return;
             if (expandOnly) {
-              // Hover opens Settings/Profile; click is a no-op.
+              const rowEl = (e.currentTarget as HTMLElement).closest(
+                "[data-nav-item]"
+              ) as HTMLElement | null;
+              if (rowEl) toggleFlyout(item, rowEl);
               return;
             }
             if (navLocked && item.path === "/home") {
@@ -511,7 +692,7 @@ export default function ExpandedNav({
             {leadingIcon}
           </span>
           <span className={labelClass} style={{ transition: revealTransition }}>
-            {label}
+            {item.label}
           </span>
         </button>
 
@@ -638,20 +819,9 @@ export default function ExpandedNav({
       );
     }
 
-    if (item.path === "/activity-timeline") {
-      return (
-        <ActivityOverviewPopover key={item.path} side="right" align="end">
-          {row}
-        </ActivityOverviewPopover>
-      );
-    }
-
-    if (item.path === "/helpdesk") {
-      return (
-        <HelpSupportPopover key={item.path} side="right" align="end">
-          {row}
-        </HelpSupportPopover>
-      );
+    // Bottom utility bar renders Activity / Settings / Help / Profile.
+    if ((UTILITY_BAR_PATHS as readonly string[]).includes(item.path)) {
+      return null;
     }
 
     return (
@@ -877,7 +1047,7 @@ export default function ExpandedNav({
         <div className="h-full overflow-hidden">
         <nav
           data-slot="app-nav"
-          className="flex h-full flex-col overflow-hidden border-r border-panel-border bg-panel pb-4 text-panel-foreground"
+          className="flex h-full flex-col overflow-hidden border-r border-panel-border bg-panel text-panel-foreground"
           style={{ width: EXPANDED_NAV_WIDTH }}
         >
           {/* Inner stays full expanded width so icons never shift while the outer clips. */}
@@ -1010,7 +1180,7 @@ export default function ExpandedNav({
                 </>
               )}
             </div>
-            <div className="my-2.5 shrink-0 px-2" aria-hidden="true">
+            <div className="mt-2.5 shrink-0 px-2" aria-hidden="true">
               <div
                 className="h-px bg-panel-border"
                 style={{
@@ -1021,11 +1191,94 @@ export default function ExpandedNav({
             </div>
             <div
               className={cn(
-                "flex shrink-0 flex-col gap-0.5",
-                "px-2"
+                "flex shrink-0 px-2 py-2",
+                expanded
+                  ? "flex-row items-center gap-0.5"
+                  : "flex-col gap-1"
               )}
             >
-              {group3.map((i) => renderItem(i))}
+              {utilityItems.map((item) => {
+                const Icon = item.icon;
+                const flyoutOpen = flyout?.path === item.path;
+                const iconButton = (
+                  <button
+                    type="button"
+                    data-nav-item={item.path}
+                    aria-label={item.label}
+                    aria-expanded={
+                      item.path === "/settings" || item.path === "/profile"
+                        ? flyoutOpen
+                        : undefined
+                    }
+                    onClick={(e) => {
+                      if (
+                        item.path === "/settings" ||
+                        item.path === "/profile"
+                      ) {
+                        toggleFlyout(item, e.currentTarget);
+                      }
+                    }}
+                    className={cn(
+                      "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted",
+                      flyoutOpen && "bg-muted hover:bg-muted"
+                    )}
+                  >
+                    {item.initials ? (
+                      <ProfileAvatar initials={item.initials} size="sm" />
+                    ) : (
+                      <Icon className="h-4 w-4" strokeWidth={1.75} />
+                    )}
+                  </button>
+                );
+
+                let control: ReactElement = iconButton;
+                if (item.path === "/activity-timeline") {
+                  control = (
+                    <ActivityOverviewPopover
+                      side={expanded ? "top" : "right"}
+                      align="start"
+                      openMode="click"
+                    >
+                      {iconButton}
+                    </ActivityOverviewPopover>
+                  );
+                } else if (item.path === "/helpdesk") {
+                  control = (
+                    <HelpSupportPopover
+                      side={expanded ? "top" : "right"}
+                      align="start"
+                      openMode="click"
+                    >
+                      {iconButton}
+                    </HelpSupportPopover>
+                  );
+                }
+
+                return (
+                  <div
+                    key={item.path}
+                    ref={(el) => {
+                      utilityFlipRefs.current.set(item.path, el);
+                    }}
+                    className="inline-flex will-change-transform"
+                  >
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        <span className="inline-flex">{control}</span>
+                      </Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        <Tooltip.Content
+                          side={expanded ? "top" : "right"}
+                          sideOffset={8}
+                          className={tooltipContentClass}
+                        >
+                          {item.label}
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </nav>
@@ -1129,12 +1382,22 @@ export default function ExpandedNav({
           <div
             ref={flyoutRef}
             className="fixed z-40 animate-scale-in duration-200"
-            style={{
-              left:
-                (expanded ? EXPANDED_NAV_WIDTH : RAIL_WIDTH) +
-                FLYOUT_PANEL_GAP_PX,
-              top: flyout.top,
-            }}
+            style={
+              flyout.placement === "above"
+                ? {
+                    // Final left/bottom applied in useClampedFlyoutPosition.
+                    left: flyout.left,
+                    bottom: 0,
+                  }
+                : {
+                    left:
+                      typeof flyout.left === "number"
+                        ? flyout.left
+                        : (expanded ? EXPANDED_NAV_WIDTH : RAIL_WIDTH) +
+                          FLYOUT_PANEL_GAP_PX,
+                    top: flyout.top,
+                  }
+            }
             onMouseEnter={cancelClose}
             onMouseLeave={scheduleClose}
           >

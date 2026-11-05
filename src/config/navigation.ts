@@ -466,9 +466,9 @@ export const NAV: NavItem[] = [
       },
     ],
   },
+  // Bottom utility bar: Activity · Settings · Help · Avatar.
+  // Vertical when collapsed; single icon row (no labels) when expanded.
   { label: "Activity", path: "/activity-timeline", icon: Activity, group: 3, flyoutOnly: true, hideCreate: true },
-  { label: "Need Help?", path: "/helpdesk", icon: Headphones, group: 3, flyoutOnly: true, hideCreate: true },
-  // Settings gear — flyout with Settings + Configuration. Filled after PROFILE_MODES.
   {
     label: "Settings",
     path: "/settings",
@@ -477,6 +477,14 @@ export const NAV: NavItem[] = [
     flyoutOnly: true,
     hideCreate: true,
     sections: [{ items: [] }],
+  },
+  {
+    label: "Need Help?",
+    path: "/helpdesk",
+    icon: Headphones,
+    group: 3,
+    flyoutOnly: true,
+    hideCreate: true,
   },
   // Avatar expands account options; does not navigate.
   { label: "John Doe", path: "/profile", icon: UserCircle, group: 3, initials: "JD", flyoutOnly: true, sections: [
@@ -758,10 +766,13 @@ const modeLeaf = (id: string): NavLeaf => {
   };
 };
 
-/** Settings gear flyout — Settings + Configuration at the bottom of the rail. */
+/** Settings gear flyout — destinations under the rail gear (avoid repeating “Settings”). */
 const settingsFlyoutSections: NavSection[] = [
   {
-    items: [modeLeaf("settings"), modeLeaf("configuration")],
+    items: [
+      { ...modeLeaf("settings"), label: "Account settings" },
+      modeLeaf("configuration"),
+    ],
   },
 ];
 

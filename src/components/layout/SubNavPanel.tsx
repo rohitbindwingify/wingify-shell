@@ -276,6 +276,12 @@ export default function SubNavPanel({
 
   if (!item.sections) return null;
 
+  // Gear flyout: rail already says “Settings” — skip the duplicate panel title.
+  const showTitle =
+    !(variant === "flyout" && item.path === "/settings" && item.flyoutOnly);
+  const showUnpin =
+    item.pinnable && pinnedPaths.includes(item.path) && canUnpin(item.path);
+
   return (
     <nav
       className={cn(
@@ -286,39 +292,45 @@ export default function SubNavPanel({
           "max-h-[calc(100vh-2rem)] rounded-lg border border-border bg-popover text-popover-foreground shadow-lg"
       )}
     >
-      <div className="flex items-center justify-between gap-2 px-5 pb-1.5">
-        <div className="truncate text-sm font-normal text-muted-foreground">
-          {toSentenceCase(item.label)}
+      {(showTitle || showUnpin) && (
+        <div className="flex items-center justify-between gap-2 px-5 pb-1.5">
+          {showTitle ? (
+            <div className="truncate text-sm font-normal text-muted-foreground">
+              {toSentenceCase(item.label)}
+            </div>
+          ) : (
+            <span />
+          )}
+          {showUnpin && (
+            <Tooltip.Provider delayDuration={300}>
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Hide from sidebar"
+                    onClick={() => {
+                      unpin(item.path);
+                      onRequestClose?.();
+                    }}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <EyeOff className="h-3.5 w-3.5" />
+                  </button>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content
+                    side="bottom"
+                    sideOffset={4}
+                    className="z-50 rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md"
+                  >
+                    Hide from sidebar
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          )}
         </div>
-        {item.pinnable && pinnedPaths.includes(item.path) && canUnpin(item.path) && (
-          <Tooltip.Provider delayDuration={300}>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <button
-                  type="button"
-                  aria-label="Hide from sidebar"
-                  onClick={() => {
-                    unpin(item.path);
-                    onRequestClose?.();
-                  }}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                >
-                  <EyeOff className="h-3.5 w-3.5" />
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content
-                  side="bottom"
-                  sideOffset={4}
-                  className="z-50 rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md"
-                >
-                  Hide from sidebar
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        )}
-      </div>
+      )}
       <Tooltip.Provider delayDuration={300}>
         <div className="flex flex-col px-3">
           {item.sections.map((section, i) => (
