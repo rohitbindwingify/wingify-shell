@@ -1,7 +1,7 @@
 /*
  * Change summary: expand/collapse is a dwell-armed full-height seam on the nav
  * edge (click or drag). Overflow products live under "Other". Profile row shows
- * Bottom utility bar (Avatar · Help · Settings · Activity from the avatar):
+ * Bottom utility bar (Avatar · Settings · Help · Activity from the avatar):
  * vertical when collapsed, one icon row when expanded; label tooltip on hover,
  * panels on click.
  */
@@ -54,19 +54,19 @@ const UTILITY_BAR_PATHS = [
   "/profile",
 ] as const;
 
-/** Collapsed (top → bottom): Activity → Settings → Help → Avatar. */
+/** Collapsed (top → bottom): Activity → Help → Settings → Avatar. */
 const UTILITY_ORDER_COLLAPSED = [
   "/activity-timeline",
-  "/settings",
   "/helpdesk",
+  "/settings",
   "/profile",
 ] as const;
 
-/** Expanded (left → right): Avatar → Help → Settings → Activity. */
+/** Expanded (left → right): Avatar → Settings → Help → Activity. */
 const UTILITY_ORDER_EXPANDED = [
   "/profile",
-  "/helpdesk",
   "/settings",
+  "/helpdesk",
   "/activity-timeline",
 ] as const;
 
