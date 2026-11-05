@@ -770,7 +770,7 @@ const modeLeaf = (id: string): NavLeaf => {
 const settingsFlyoutSections: NavSection[] = [
   {
     items: [
-      { ...modeLeaf("settings"), label: "Account settings" },
+      { ...modeLeaf("settings"), label: "Account & billing" },
       modeLeaf("configuration"),
     ],
   },
