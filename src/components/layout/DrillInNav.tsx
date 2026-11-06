@@ -1,10 +1,12 @@
 /** Linear-style drill-in sidebar for Profile modes (Settings, Configuration, …).
- * @summary Logo bird lives in the left rail (same 56px slot as ExpandedNav); Back to app below.
+ * @summary The always-visible main rail (DrillInShell) carries the logo; this nav's top slot
+ * shows the mode name. "Back to app" removed (@undo).
  * Section icons use Phosphor fill when a leaf under them is active (same as Experimentation rail).
  */
 import { useEffect, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown, Search } from "@/components/icons/protoLucide";
+import { ChevronDown, Search } from "@/components/icons/protoLucide";
+// @undo — "Back to app" arrow: import { ArrowLeft } from "@/components/icons/protoLucide";
 import { IconVariantOverride } from "../icons/IconLibraryProvider";
 import {
   findProfileMode,
@@ -16,7 +18,7 @@ import {
 import { SETTINGS_NAV_WIDTH } from "../../lib/nav";
 import { cn } from "../../lib/utils";
 import { Input } from "../ui/input";
-import WingifyLogoButton from "./WingifyLogoButton";
+// @undo — logo moved to the main rail: import WingifyLogoButton from "./WingifyLogoButton";
 
 function isUnder(pathname: string, path: string) {
   return pathname === path || pathname.startsWith(path + "/");
@@ -165,9 +167,7 @@ export default function DrillInNav({ mode }: { mode: ProfileMode }) {
     setQuery("");
   }, [mode.id]);
 
-  const goBack = () => {
-    navigate("/home/dashboard");
-  };
+  // @undo — "Back to app": const goBack = () => { navigate("/home/dashboard"); };
 
   const q = query.trim().toLowerCase();
 
@@ -296,7 +296,13 @@ export default function DrillInNav({ mode }: { mode: ProfileMode }) {
       className="flex h-full flex-col overflow-hidden border-r border-panel-border bg-background pb-4 text-foreground"
       style={{ width: SETTINGS_NAV_WIDTH }}
     >
-      {/* Same 56px logo slot as ExpandedNav — bird + wordmark when open. */}
+      {/* Same 56px top slot as ExpandedNav — the main rail beside it carries the logo. */}
+      <div className="flex h-[56px] shrink-0 items-center px-5">
+        <span className="truncate text-sm font-semibold text-foreground">
+          {mode.label}
+        </span>
+      </div>
+      {/* @undo — logo + "Back to app" (main rail is now always visible beside this nav):
       <div className="flex h-[56px] shrink-0 items-center px-3">
         <span className="flex h-9 min-w-0 shrink-0 items-center">
           <WingifyLogoButton showWordmark />
@@ -314,6 +320,7 @@ export default function DrillInNav({ mode }: { mode: ProfileMode }) {
           <span className="truncate text-sm font-semibold">Back to app</span>
         </button>
       </div>
+      */}
 
       {mode.searchPlaceholder && (
         <div className="shrink-0 px-3 pb-2">

@@ -1,6 +1,8 @@
+/* Change summary: PageTabs (page tab strip) is commented out — Analytics pages each have their own nav row again. */
 import { Outlet, useLocation } from "react-router-dom";
 import ExpandedNav from "./ExpandedNav";
 import GlobalWingzDock from "./GlobalWingzDock";
+// import PageTabs from "./PageTabs"; // @undo — re-enable with <PageTabs /> below
 import TopBar from "./TopBar";
 
 export default function AppLayout() {
@@ -23,6 +25,7 @@ export default function AppLayout() {
           data-welcome-chrome={welcomeChrome ? "" : undefined}
           className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-canvas"
         >
+          {/* @undo — page tab strip, off while every suite page has its own nav row: <PageTabs /> */}
           <Outlet />
         </main>
         <GlobalWingzDock />

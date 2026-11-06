@@ -1,5 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+/*
+ * Change summary: the main nav (existing ExpandedNav, locked collapsed via `forceCollapsed`) is
+ * always shown on the left of Settings / Configuration / Upgrade; it cannot be expanded. The
+ * left-edge slide-out overlay and the "[" shortcut are commented out (@undo) as redundant.
+ * A hairline (existing border-panel-border token) separates the rail from the sub-nav.
+ */
+// @undo — edge slide-out state: import { useEffect, useRef, useState } from "react";
+// @undo — edge slide-out portal: import { createPortal } from "react-dom";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -31,7 +37,7 @@ import {
   MTU_HISTORY_PATH,
 } from "@/data/webExperimentationSubscription";
 import { findProfileMode } from "../../config/navigation";
-import { cn } from "../../lib/utils";
+// @undo — only used by the edge slide-out: import { cn } from "../../lib/utils";
 import { useIntegrationRequestStore } from "@/store/integrationRequest";
 import DrillInBreadcrumb from "./DrillInBreadcrumb";
 import DrillInNav from "./DrillInNav";
@@ -41,8 +47,9 @@ import UpgradeNav from "./UpgradeNav";
 // import WingifyLogoButton from "./WingifyLogoButton";
 import WorkspaceSwitcher from "./WorkspaceSwitcher";
 
-const EDGE_OPEN_DELAY_MS = 240;
-const OVERLAY_CLOSE_GRACE_MS = 250;
+// @undo — edge slide-out timings:
+// const EDGE_OPEN_DELAY_MS = 240;
+// const OVERLAY_CLOSE_GRACE_MS = 250;
 
 const WNA_SITES_PATH = "/configuration/websites-and-apps/sites";
 const INTEGRATIONS_PATH = "/configuration/integrations";
@@ -63,7 +70,7 @@ const ASSETS_HUB_HEADER_CTAS: Record<string, string> = {
 
 /**
  * Linear-style drill-in surface for every Profile flyout destination (Settings,
- * Configuration, …). Sidebar + back control + left-edge main-rail reveal.
+ * Configuration, …). Collapsed main rail (not expandable) + drill-in sidebar.
  * Header CTAs: Add new (WNA sites), Request new integration (list) /
  * Create connection (integration detail).
  * Workspace status banners live in RootChrome (above header).
@@ -91,6 +98,7 @@ export default function DrillInShell() {
     pathname !== "/settings/subscription/visitor-allocation" &&
     SUBSCRIPTION_CTA_PREFIXES.some((prefix) => pathname.startsWith(prefix));
   const assetsHubCtaLabel = ASSETS_HUB_HEADER_CTAS[pathname];
+  /* @undo — left-edge slide-out of the main nav (replaced by the always-visible rail):
   const [navOpen, setNavOpen] = useState(false);
   const [navRendered, setNavRendered] = useState(false);
   const [navShown, setNavShown] = useState(false);
@@ -146,6 +154,7 @@ export default function DrillInShell() {
     const unmountTimer = window.setTimeout(() => setNavRendered(false), 280);
     return () => window.clearTimeout(unmountTimer);
   }, [navOpen]);
+  */
 
   if (!mode) {
     return <Navigate to="/home/dashboard" replace />;
@@ -153,7 +162,15 @@ export default function DrillInShell() {
 
   return (
     <div className="flex h-full bg-background text-foreground">
-      {mode.id === "upgrade" ? <UpgradeNav /> : <DrillInNav mode={mode} />}
+      {/* Hairline separates the main rail from the drill-in sub-nav (same token as the sub-nav's right edge). */}
+      <div className="flex h-full shrink-0 border-r border-panel-border">
+        <ExpandedNav forceCollapsed />
+      </div>
+      {mode.id === "upgrade" ? (
+        <UpgradeNav title={mode.label} />
+      ) : (
+        <DrillInNav mode={mode} />
+      )}
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="flex h-[56px] shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4">
@@ -334,6 +351,7 @@ export default function DrillInShell() {
         </main>
       </div>
 
+      {/* @undo — left-edge hover zone + slide-out overlay of the main nav:
       <div
         className="fixed inset-y-0 left-0 z-40 w-3"
         onMouseEnter={scheduleEdgeOpen}
@@ -374,6 +392,7 @@ export default function DrillInShell() {
           </div>,
           document.body
         )}
+      */}
     </div>
   );
 }

@@ -1,15 +1,17 @@
 // Upgrade left rail — flat product list (badges kept). Other modes use DrillInNav.
-// Logo sits in the same 56px rail slot as ExpandedNav / DrillInNav.
+// Change summary: the always-visible main rail (DrillInShell) carries the logo; the top 56px slot
+// shows the page name (`title`). "Back to app" removed (@undo). Same treatment as DrillInNav.
 
-import { NavLink, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "@/components/icons/protoLucide";
+import { NavLink } from "react-router-dom";
+// @undo — "Back to app": import { NavLink, useNavigate } from "react-router-dom";
+// @undo — "Back to app": import { ArrowLeft } from "@/components/icons/protoLucide";
 import {
   UPGRADE_SECTIONS,
   type UpgradeBadgeTone,
 } from "../../config/upgradeNav";
 import { SETTINGS_NAV_WIDTH } from "../../lib/nav";
 import { cn } from "../../lib/utils";
-import WingifyLogoButton from "./WingifyLogoButton";
+// @undo — logo moved to the main rail: import WingifyLogoButton from "./WingifyLogoButton";
 
 function Badge({
   label,
@@ -32,14 +34,21 @@ function Badge({
   );
 }
 
-export default function UpgradeNav() {
-  const navigate = useNavigate();
+export default function UpgradeNav({ title }: { title: string }) {
+  // @undo — "Back to app": const navigate = useNavigate();
 
   return (
     <nav
       className="flex h-full flex-col overflow-hidden border-r border-panel-border bg-background text-foreground"
       style={{ width: SETTINGS_NAV_WIDTH }}
     >
+      {/* Same 56px top slot as DrillInNav — the main rail beside it carries the logo. */}
+      <div className="flex h-[56px] shrink-0 items-center px-5">
+        <span className="truncate text-sm font-semibold text-foreground">
+          {title}
+        </span>
+      </div>
+      {/* @undo — logo + "Back to app" (main rail is now always visible beside this nav):
       <div className="flex h-[56px] shrink-0 items-center px-3">
         <span className="flex h-9 min-w-0 shrink-0 items-center">
           <WingifyLogoButton showWordmark />
@@ -57,6 +66,7 @@ export default function UpgradeNav() {
           <span className="truncate text-sm font-semibold">Back to app</span>
         </button>
       </div>
+      */}
 
       <div className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-3">
         {UPGRADE_SECTIONS.map((section, i) => {

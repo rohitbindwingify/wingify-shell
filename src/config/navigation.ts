@@ -1,3 +1,12 @@
+/*
+ * Change summary: Commerce is hidden from the rail via HIDDEN_NAV_PATHS (used by visibleNav and
+ * PINNABLE_PATHS); its routes and pages are unchanged.
+ * Journey analytics, Behaviour analytics and User feedback are products inside one "Analytics"
+ * suite item, shown as always-visible nested accordion rows (existing NavLeaf `items` pattern).
+ * NavItem `suite` makes the hover flyout two-panel (products left, hovered product's pages right).
+ * NavSection `product` (product switcher) and NavLeaf `tabs` (page tabs) are kept but currently
+ * unused. All page URLs unchanged.
+ */
 import type { LucideIcon } from "@/components/icons/protoLucide";
 import {
   Home,
@@ -56,10 +65,8 @@ import {
   ShellHardDrivesFillIcon,
   ShellHardDrivesIcon,
 } from "@/components/icons/shell/HardDrivesIcons";
-import {
-  ShellInsightsFillIcon,
-  ShellInsightsIcon,
-} from "@/components/icons/shell/InsightsIcons";
+// @undo — Behaviour analytics product icon, used only by the product-switcher version:
+// import { ShellInsightsIcon } from "@/components/icons/shell/InsightsIcons";
 import {
   ShellMegaphoneFillIcon,
   ShellMegaphoneIcon,
@@ -76,10 +83,8 @@ import {
   ShellUserFocusFillIcon,
   ShellUserFocusIcon,
 } from "@/components/icons/shell/UserFocusIcons";
-import {
-  ShellUserSoundFillIcon,
-  ShellUserSoundIcon,
-} from "@/components/icons/shell/UserSoundIcons";
+// @undo — User feedback product icon, used only by the product-switcher version:
+// import { ShellUserSoundIcon } from "@/components/icons/shell/UserSoundIcons";
 import { UPGRADE_ADDONS_PATH, UPGRADE_SECTIONS } from "./upgradeNav";
 
 /** Page-orientation helpers shown after the last breadcrumb (replaces title-adjacent chrome). */
@@ -115,8 +120,24 @@ export type NavLeaf = {
   /** Show external-link affordance; still routes in-app unless opened via the icon. */
   external?: boolean;
   pageGuide?: PageGuide;
+  /**
+   * Sibling pages shown as page tabs instead of nav rows; this leaf is the first tab.
+   * Tab pages keep their own URLs and still get routes (see flattenNavLeaves).
+   */
+  tabs?: NavLeaf[];
+  /** Short label when this page is shown as a tab (defaults to `label`). */
+  tabLabel?: string;
 };
-export type NavSection = { heading?: string; items: NavLeaf[] };
+export type NavSection = {
+  heading?: string;
+  items: NavLeaf[];
+  /**
+   * Marks the section as a product inside a suite (e.g. Analytics). When every section of an
+   * item has this, the sub-nav shows a product switcher (`heading` = product name) and only
+   * the chosen product's pages.
+   */
+  product?: { description: string; icon: LucideIcon };
+};
 export type NavItem = {
   label: string;
   path: string;
@@ -132,6 +153,11 @@ export type NavItem = {
   hideCreate?: boolean;
   sections?: NavSection[];
   pageGuide?: PageGuide;
+  /**
+   * Suite of products (each a leaf with `items`): the hover flyout shows products on the left
+   * and the hovered product's pages on the right, so any page is one click away.
+   */
+  suite?: boolean;
 };
 
 /** Sidebar row inside a Profile-mode drill-in (Settings, Profile, …). */
@@ -335,6 +361,265 @@ export const NAV: NavItem[] = [
       { label: "Settings", path: "/commerce/settings", icon: Settings, hideCreate: true },
     ]},
   ]},
+  // Analytics suite — Journey analytics, Behaviour analytics and User feedback are always-visible
+  // product rows (existing nested accordion leaves); the product you're in opens automatically.
+  // Parent paths are accordion keys only (not routed). Every page keeps its original
+  // /analytics/*, /insights/* or /pulse/* URL so routes, detail pages and bookmarks still work.
+  {
+    label: "Analytics",
+    path: "/analytics",
+    icon: ShellAnalyticsCustomIcon as LucideIcon,
+    activeIcon: ShellAnalyticsCustomFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+    suite: true,
+    sections: [
+      { items: [
+        {
+          label: "Journey analytics",
+          path: "/analytics/journey",
+          items: [
+            { label: "Overview", path: "/analytics/overview" },
+            { label: "Browse", path: "/analytics/browse" },
+          ],
+        },
+        {
+          label: "Behaviour analytics",
+          path: "/insights",
+          items: [
+            { label: "Dashboard", path: "/insights/dashboard", hideCreate: true },
+            { label: "Heatmaps", path: "/insights/heatmaps", hideCreate: true },
+            {
+              label: "Session Recordings",
+              path: "/insights/session-recordings",
+              hideCreate: true,
+              pageGuide: {
+                tutorial: { label: "Play tutorial" },
+                help: {
+                  title: "Insight | Recordings",
+                  body: "View the recordings of your visitors' interactions on your webpage, such as scrolls, clicks, and mouse movements.",
+                  href: "#",
+                  video: {
+                    title: "Session Recordings | Dashboard",
+                    duration: "4 mins",
+                    poster: "/editor-preview/images/hero.jpg",
+                  },
+                },
+                info: {
+                  body: "Record and playback visitor sessions on your website.",
+                  href: "#",
+                },
+              },
+            },
+            { label: "Mobile Recordings", path: "/insights/mobile-recordings", hideCreate: true },
+            { label: "Form Analytics", path: "/insights/forms" },
+            { label: "Metric Reports", path: "/insights/metric-reports" },
+            { label: "Funnel Reports", path: "/insights/funnel-reports" },
+          ],
+        },
+        {
+          label: "User feedback",
+          path: "/pulse",
+          items: [
+            { label: "Surveys", path: "/pulse/surveys" },
+            { label: "Concept Test", path: "/pulse/concept-test" },
+            { label: "Templates", path: "/pulse/templates", hideCreate: true },
+            { label: "Settings", path: "/pulse/settings", hideCreate: true },
+          ],
+        },
+      ]},
+    ],
+  },
+  /* @undo — product-switcher version (one product's pages visible at a time):
+  {
+    label: "Analytics",
+    path: "/analytics",
+    icon: ShellAnalyticsCustomIcon as LucideIcon,
+    activeIcon: ShellAnalyticsCustomFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+    sections: [
+      {
+        heading: "Journey analytics",
+        product: {
+          description: "Customer journeys",
+          icon: ShellAnalyticsCustomIcon as LucideIcon,
+        },
+        items: [
+          { label: "Overview", path: "/analytics/overview" },
+          { label: "Browse", path: "/analytics/browse" },
+        ],
+      },
+      {
+        heading: "Behaviour analytics",
+        product: {
+          description: "Heatmaps and recordings",
+          icon: ShellInsightsIcon as LucideIcon,
+        },
+        items: [
+          { label: "Dashboard", path: "/insights/dashboard", hideCreate: true },
+          { label: "Heatmaps", path: "/insights/heatmaps", hideCreate: true },
+          {
+            label: "Session Recordings",
+            path: "/insights/session-recordings",
+            hideCreate: true,
+            pageGuide: {
+              tutorial: { label: "Play tutorial" },
+              help: {
+                title: "Insight | Recordings",
+                body: "View the recordings of your visitors' interactions on your webpage, such as scrolls, clicks, and mouse movements.",
+                href: "#",
+                video: {
+                  title: "Session Recordings | Dashboard",
+                  duration: "4 mins",
+                  poster: "/editor-preview/images/hero.jpg",
+                },
+              },
+              info: {
+                body: "Record and playback visitor sessions on your website.",
+                href: "#",
+              },
+            },
+          },
+          { label: "Mobile Recordings", path: "/insights/mobile-recordings", hideCreate: true },
+          { label: "Form Analytics", path: "/insights/forms" },
+          { label: "Metric Reports", path: "/insights/metric-reports" },
+          { label: "Funnel Reports", path: "/insights/funnel-reports" },
+        ],
+      },
+      {
+        heading: "User feedback",
+        product: {
+          description: "Surveys and concept tests",
+          icon: ShellUserSoundIcon as LucideIcon,
+        },
+        items: [
+          { label: "Surveys", path: "/pulse/surveys" },
+          { label: "Concept Test", path: "/pulse/concept-test" },
+          { label: "Templates", path: "/pulse/templates", hideCreate: true },
+          { label: "Settings", path: "/pulse/settings", hideCreate: true },
+        ],
+      },
+    ],
+  },
+  */
+  /* @undo — task-based 8-row suite with page tabs (replaced by the product switcher):
+  {
+    label: "Analytics",
+    path: "/analytics",
+    icon: ShellAnalyticsCustomIcon as LucideIcon,
+    activeIcon: ShellAnalyticsCustomFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+    sections: [
+      { items: [
+        {
+          label: "Overview",
+          path: "/analytics/overview",
+          tabLabel: "Journey analytics",
+          tabs: [
+            { label: "Behavior Dashboard", tabLabel: "Behavior analytics", path: "/insights/dashboard", hideCreate: true },
+          ],
+        },
+        { label: "Journeys", path: "/analytics/browse" },
+        { label: "Heatmaps", path: "/insights/heatmaps", hideCreate: true },
+        {
+          label: "Recordings",
+          tabLabel: "Web",
+          path: "/insights/session-recordings",
+          hideCreate: true,
+          pageGuide: {
+            tutorial: { label: "Play tutorial" },
+            help: {
+              title: "Insight | Recordings",
+              body: "View the recordings of your visitors' interactions on your webpage, such as scrolls, clicks, and mouse movements.",
+              href: "#",
+              video: {
+                title: "Session Recordings | Dashboard",
+                duration: "4 mins",
+                poster: "/editor-preview/images/hero.jpg",
+              },
+            },
+            info: {
+              body: "Record and playback visitor sessions on your website.",
+              href: "#",
+            },
+          },
+          tabs: [
+            { label: "Mobile Recordings", tabLabel: "Mobile", path: "/insights/mobile-recordings", hideCreate: true },
+          ],
+        },
+        { label: "Forms", path: "/insights/forms" },
+        {
+          label: "Surveys",
+          path: "/pulse/surveys",
+          tabs: [
+            { label: "Concept Tests", tabLabel: "Concept tests", path: "/pulse/concept-test" },
+            { label: "Templates", path: "/pulse/templates", hideCreate: true },
+          ],
+        },
+        {
+          label: "Reports",
+          tabLabel: "Metric",
+          path: "/insights/metric-reports",
+          tabs: [
+            { label: "Funnel Reports", tabLabel: "Funnel", path: "/insights/funnel-reports" },
+          ],
+        },
+        { label: "Settings", path: "/pulse/settings", hideCreate: true },
+      ]},
+    ],
+  },
+  */
+  /* @undo — earlier suite version with Journeys / Behavior / Reports group labels (no User Feedback):
+  {
+    label: "Analytics",
+    path: "/analytics",
+    icon: ShellAnalyticsCustomIcon as LucideIcon,
+    activeIcon: ShellAnalyticsCustomFillIcon as LucideIcon,
+    group: 2,
+    pinnable: true,
+    sections: [
+      { heading: "Journeys", items: [
+        { label: "Overview", path: "/analytics/overview" },
+        { label: "Browse", path: "/analytics/browse" },
+      ]},
+      { heading: "Behavior", items: [
+        { label: "Dashboard", path: "/insights/dashboard", hideCreate: true },
+        { label: "Heatmaps", path: "/insights/heatmaps", hideCreate: true },
+        {
+          label: "Session Recordings",
+          path: "/insights/session-recordings",
+          hideCreate: true,
+          pageGuide: {
+            tutorial: { label: "Play tutorial" },
+            help: {
+              title: "Insight | Recordings",
+              body: "View the recordings of your visitors' interactions on your webpage, such as scrolls, clicks, and mouse movements.",
+              href: "#",
+              video: {
+                title: "Session Recordings | Dashboard",
+                duration: "4 mins",
+                poster: "/editor-preview/images/hero.jpg",
+              },
+            },
+            info: {
+              body: "Record and playback visitor sessions on your website.",
+              href: "#",
+            },
+          },
+        },
+        { label: "Mobile Recordings", path: "/insights/mobile-recordings", hideCreate: true },
+        { label: "Form Analytics", path: "/insights/forms" },
+      ]},
+      { heading: "Reports", items: [
+        { label: "Metric Reports", path: "/insights/metric-reports" },
+        { label: "Funnel Reports", path: "/insights/funnel-reports" },
+      ]},
+    ],
+  },
+  */
+  /* @undo — separate Journey Analytics + Behavior Analytics rail items before the suite merge:
   {
     label: "Journey Analytics",
     path: "/analytics",
@@ -345,16 +630,8 @@ export const NAV: NavItem[] = [
     sections: [
       {
         items: [
-          {
-            label: "Overview",
-            path: "/analytics/overview",
-            icon: LayoutGrid,
-          },
-          {
-            label: "Browse",
-            path: "/analytics/browse",
-            icon: Search,
-          },
+          { label: "Overview", path: "/analytics/overview", icon: LayoutGrid },
+          { label: "Browse", path: "/analytics/browse", icon: Search },
         ],
       },
     ],
@@ -400,6 +677,8 @@ export const NAV: NavItem[] = [
       { label: "Funnel Reports", path: "/insights/funnel-reports" },
     ]},
   ]},
+  */
+  /* @undo — User Feedback rail item, merged into the Analytics suite:
   {
     label: "User Feedback",
     path: "/pulse",
@@ -415,6 +694,7 @@ export const NAV: NavItem[] = [
     { items: [{ label: "Templates", path: "/pulse/templates", hideCreate: true }]},
     { items: [{ label: "Settings", path: "/pulse/settings", hideCreate: true }]},
   ]},
+  */
   {
     label: "Push notification",
     path: "/engage",
@@ -853,7 +1133,13 @@ export function resolveJdSwitcherItem(pathname: string): JdSwitcherItem | undefi
   return items.find((item) => item.id === mode.path);
 }
 
-export const PINNABLE_PATHS = NAV.filter((i) => i.pinnable).map((i) => i.path);
+/** Products kept in NAV (routes, breadcrumbs) but hidden from the rail and never pinnable. */
+export const HIDDEN_NAV_PATHS: string[] = ["/commerce"];
+
+export const PINNABLE_PATHS = NAV.filter(
+  (i) => i.pinnable && !HIDDEN_NAV_PATHS.includes(i.path)
+).map((i) => i.path);
+// @undo — was: NAV.filter((i) => i.pinnable).map((i) => i.path);
 
 /**
  * Default sidebar products (rest start in Other). Keep this short so "Hide from sidebar"
@@ -863,7 +1149,7 @@ export const DEFAULT_PINNED_PATHS = [
   "/experimentation",
   "/personalize",
   "/feature-management",
-  "/insights",
+  "/analytics", // @undo — was "/insights" (Behavior Analytics) before the Analytics suite
   "/plan",
 ].filter((path) => PINNABLE_PATHS.includes(path));
 
@@ -879,8 +1165,8 @@ export const PRODUCT_SWITCHER_PATHS = [
   "/feature-management",
   "/commerce",
   "/analytics",
-  "/insights",
-  "/pulse",
+  // "/insights", // @undo — merged into the "/analytics" suite
+  // "/pulse", // @undo — User Feedback merged into the "/analytics" suite
   "/engage",
   "/data-360",
   "/plan",
@@ -895,18 +1181,28 @@ export function productSwitcherItems(): NavItem[] {
 /** Theme-QA campaign flow — hidden from the rail; open via design controller. */
 export const WEB_EXPERIMENT_OLD_PATH = "/web-experiment-old";
 
-/** NAV without prototype-only items (e.g. Web experimentation Old). */
+/** NAV without prototype-only items (e.g. Web experimentation Old) or hidden products. */
 export function visibleNav(): NavItem[] {
-  return NAV.filter((item) => item.path !== WEB_EXPERIMENT_OLD_PATH);
+  return NAV.filter(
+    (item) =>
+      item.path !== WEB_EXPERIMENT_OLD_PATH &&
+      !HIDDEN_NAV_PATHS.includes(item.path)
+  );
 }
 
 /** End leaves only (skip accordion parents that have children). */
-export function flattenNavLeaves(sections: NavSection[]): NavLeaf[] {
+export function flattenNavLeaves(
+  sections: NavSection[],
+  { includeTabs = true }: { includeTabs?: boolean } = {}
+): NavLeaf[] {
   const out: NavLeaf[] = [];
   const walk = (leaves: NavLeaf[]) => {
     for (const leaf of leaves) {
       if (leaf.items?.length) walk(leaf.items);
-      else out.push(leaf);
+      else {
+        out.push(leaf);
+        if (includeTabs && leaf.tabs) out.push(...leaf.tabs);
+      }
     }
   };
   for (const section of sections) walk(section.items);

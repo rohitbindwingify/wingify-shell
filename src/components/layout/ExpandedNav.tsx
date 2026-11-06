@@ -4,6 +4,9 @@
  * Bottom utility bar (Avatar · Settings · Help · Activity from the avatar):
  * vertical when collapsed, one icon row when expanded; label tooltip on hover,
  * panels on click.
+ * Sub-nav rows also highlight on their page-tab pages (leafOwnsPath from lib/nav).
+ * Suites (Analytics): SuiteProductSwitcher above the accordion, showing only the active product's pages.
+ * Locked rail (`forceCollapsed`, e.g. Settings / Configuration / Upgrade): empty gutter is inert.
  */
 import {
   useEffect,
@@ -11,6 +14,7 @@ import {
   useRef,
   useState,
   type ReactElement,
+  type ReactNode,
 } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import * as HoverCard from "@radix-ui/react-hover-card";
@@ -27,8 +31,17 @@ import {
   leafLandPath,
   visibleNav,
   type NavItem,
+  type NavSection,
 } from "../../config/navigation";
-import { findItemByPath, firstChildPath, RAIL_WIDTH } from "../../lib/nav";
+import {
+  activeProductIndex,
+  findItemByPath,
+  firstChildPath,
+  leafOwnsPath,
+  RAIL_WIDTH,
+  suiteProducts,
+} from "../../lib/nav";
+import SuiteProductSwitcher from "./SuiteProductSwitcher";
 import { GET_STARTED_PATH, isGetStartedHomeLeaf } from "@/lib/getStartedGate";
 import {
   useGetStartedNavLockTooltip,
@@ -37,7 +50,7 @@ import {
 import { canUnpinPath, useUIStore } from "../../store/ui";
 import { cn } from "../../lib/utils";
 import { IconVariantOverride } from "../icons/IconLibraryProvider";
-import SubNavPanel from "./SubNavPanel";
+import SubNavPanel, { toSentenceCase } from "./SubNavPanel";
 import ProfileMenuPanel from "./ProfileMenuPanel";
 import OldNavFeedbackDialog from "./OldNavFeedbackDialog";
 import ActivityOverviewPopover from "./ActivityOverviewPopover";
@@ -82,6 +95,33 @@ type FlyoutState = {
    */
   placement: "right" | "above" | "right-end";
 };
+
+/** Suite items (Analytics) get the product switcher above their pages; other items render as-is. */
+function SuiteSections({
+  products,
+  activeIndex,
+  tabIndex,
+  children,
+}: {
+  products: NavSection[] | null;
+  activeIndex: number;
+  tabIndex?: number;
+  children: ReactNode;
+}) {
+  if (!products) return <>{children}</>;
+  return (
+    <SuiteProductSwitcher
+      products={products}
+      activeIndex={activeIndex}
+      tabIndex={tabIndex}
+    >
+      {/* Pages keep the accordion's indent + guide line under the full-width switcher. */}
+      <div className="ml-[14px] flex flex-col border-l border-panel-border pl-3">
+        {children}
+      </div>
+    </SuiteProductSwitcher>
+  );
+}
 
 /** Width of the expanded (labeled) navigation sidebar — shared with the app grid. */
 export const EXPANDED_NAV_WIDTH = 240;
@@ -866,6 +906,12 @@ export default function ExpandedNav({
       return null;
     }
 
+    const products = suiteProducts(item);
+    const activeProduct = products ? activeProductIndex(products, pathname) : 0;
+    const visibleSections = products
+      ? [products[activeProduct]]
+      : item.sections ?? [];
+
     return (
       <div key={item.path}>
         {hoverRow}
@@ -881,8 +927,20 @@ export default function ExpandedNav({
             aria-hidden={!open}
           >
             <div className="min-h-0 overflow-hidden">
-              <div className="ml-[22px] mt-1.5 flex flex-col border-l border-panel-border pb-2 pl-3">
-                {item.sections.map((section, i) => {
+              <div
+                className={cn(
+                  "mt-1.5 flex flex-col pb-2",
+                  products
+                    ? "pl-2"
+                    : "ml-[22px] border-l border-panel-border pl-3"
+                )}
+              >
+                <SuiteSections
+                  products={products}
+                  activeIndex={activeProduct}
+                  tabIndex={open ? undefined : -1}
+                >
+                {visibleSections.map((section, i) => {
                   return (
                     <div
                       key={section.heading ?? i}
@@ -894,6 +952,12 @@ export default function ExpandedNav({
                           aria-hidden="true"
                         />
                       )}
+                      {/* Same label treatment as the flyout (SubNavPanel) so both states match. */}
+                      {!products && section.heading ? (
+                        <div className="px-2.5 pb-0.5 pt-0.5 text-sm font-normal text-muted-foreground">
+                          {toSentenceCase(section.heading)}
+                        </div>
+                      ) : null}
                       {section.items.map((leaf) => {
                         const hasChildren = !!leaf.items?.length;
                         const subOpen = openSubPath === leaf.path;
@@ -1039,7 +1103,7 @@ export default function ExpandedNav({
                                 className={({ isActive: leafActive }) =>
                                   cn(
                                     "flex items-center gap-3 rounded-md px-2.5 py-2 text-sm text-foreground transition-colors hover:bg-muted",
-                                    leafActive &&
+                                    (leafActive || leafOwnsPath(leaf, pathname)) &&
                                       "bg-accent font-medium text-accent-foreground hover:bg-accent"
                                   )
                                 }
@@ -1053,6 +1117,7 @@ export default function ExpandedNav({
                     </div>
                   );
                 })}
+                </SuiteSections>
               </div>
             </div>
           </div>
@@ -1223,29 +1288,31 @@ export default function ExpandedNav({
                   </>
                 )}
               </div>
-              {/* Empty rail gutter — click toggles expand/collapse (icons stay interactive). */}
+              {/* Empty rail gutter — click toggles expand/collapse (icons stay interactive). No hover tooltip.
+                  Locked rails (forceCollapsed) get an inert spacer so the docked preference can't flip. */}
+              {forceCollapsed ? (
+                <div className="mt-1 min-h-0 w-full flex-1" aria-hidden="true" />
+              ) : (
+                <button
+                  type="button"
+                  aria-label={
+                    expanded ? "Collapse navigation" : "Expand navigation"
+                  }
+                  aria-pressed={isDocked}
+                  onClick={() => toggleDock()}
+                  className="mt-1 min-h-0 w-full flex-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              )}
+              {/* @undo — tooltip that wrapped the gutter button:
               <Tooltip.Root>
-                <Tooltip.Trigger asChild>
-                  <button
-                    type="button"
-                    aria-label={
-                      expanded ? "Collapse navigation" : "Expand navigation"
-                    }
-                    aria-pressed={isDocked}
-                    onClick={() => toggleDock()}
-                    className="mt-1 min-h-0 w-full flex-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  />
-                </Tooltip.Trigger>
+                <Tooltip.Trigger asChild>{gutter button}</Tooltip.Trigger>
                 <Tooltip.Portal>
-                  <Tooltip.Content
-                    side="right"
-                    sideOffset={8}
-                    className={tooltipContentClass}
-                  >
+                  <Tooltip.Content side="right" sideOffset={8} className={tooltipContentClass}>
                     {expanded ? "Collapse navigation" : "Expand navigation"}
                   </Tooltip.Content>
                 </Tooltip.Portal>
               </Tooltip.Root>
+              */}
             </div>
             <div className="mt-2.5 shrink-0 px-2" aria-hidden="true">
               <div

@@ -1,4 +1,7 @@
-/* Change summary: Settings/Configuration drill-ins highlight the rail gear; profile details highlight the avatar. */
+/* Change summary: Settings/Configuration drill-ins highlight the rail gear; profile details highlight the avatar.
+ * Page tabs: added leafOwnsPath (row stays highlighted on its tab pages) and findTabbedLeaf (used by
+ * PageTabs); breadcrumb siblings list nav rows only. Reuses the existing flattenNavLeaves helper.
+ * Suites: suiteProducts / activeProductIndex drive the product switcher (SuiteProductSwitcher). */
 import type { LucideIcon } from "lucide-react";
 import {
   NAV,
@@ -12,6 +15,7 @@ import {
   leafLandPath,
   type NavItem,
   type NavLeaf,
+  type NavSection,
 } from "../config/navigation";
 
 /** Width of the primary rail in px — shared by the rail, its flyout, and the app grid. */
@@ -95,13 +99,58 @@ export type Breadcrumb = {
 export function resolveBreadcrumb(pathname: string): Breadcrumb {
   const item = findItemByPath(pathname);
   if (!item || !item.sections) return { item, siblings: [] };
-  const siblings = flattenNavLeaves(item.sections);
-  const leaf = [...siblings]
+  // Siblings are the nav rows only; tab pages are reached from the page's tab strip.
+  // In a suite, siblings are the current product's pages only.
+  const products = suiteProducts(item);
+  const siblings = flattenNavLeaves(
+    products ? [products[activeProductIndex(products, pathname)]] : item.sections,
+    { includeTabs: false }
+  );
+  const leaf = [...flattenNavLeaves(item.sections)]
     .sort((a, b) => b.path.length - a.path.length)
     .find(
       (l) => pathname === l.path || pathname.startsWith(l.path + "/")
     );
   return { item, leaf, siblings };
+}
+
+/** True when `pathname` is on this nav row's page or one of its tab pages (or their detail pages). */
+export function leafOwnsPath(leaf: NavLeaf, pathname: string): boolean {
+  return [leaf, ...(leaf.tabs ?? [])].some(
+    (l) => pathname === l.path || pathname.startsWith(`${l.path}/`)
+  );
+}
+
+/** Nav row with page tabs whose own page or a tab page is exactly `pathname` (detail pages show no tabs). */
+export function findTabbedLeaf(pathname: string): NavLeaf | undefined {
+  for (const item of NAV) {
+    if (!item.sections) continue;
+    for (const leaf of flattenNavLeaves(item.sections, { includeTabs: false })) {
+      if (!leaf.tabs?.length) continue;
+      if ([leaf, ...leaf.tabs].some((l) => l.path === pathname)) return leaf;
+    }
+  }
+  return undefined;
+}
+
+/** Product sections of a suite item (every section has `product`), else null. */
+export function suiteProducts(item: NavItem): NavSection[] | null {
+  const sections = item.sections;
+  if (!sections?.length || !sections.every((s) => s.product)) return null;
+  return sections;
+}
+
+/** Index of the product that owns `pathname`; the first product when none does. */
+export function activeProductIndex(
+  products: NavSection[],
+  pathname: string
+): number {
+  const index = products.findIndex((product) =>
+    flattenNavLeaves([product]).some(
+      (l) => pathname === l.path || pathname.startsWith(`${l.path}/`)
+    )
+  );
+  return index === -1 ? 0 : index;
 }
 
 /** Href for the main-nav breadcrumb segment: the current leaf's path, falling back to the section's first child. */

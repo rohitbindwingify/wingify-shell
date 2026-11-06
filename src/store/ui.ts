@@ -1,3 +1,4 @@
+/* Change summary: saved "/insights" (Behavior Analytics) and "/pulse" (User Feedback) pins now map to the merged "/analytics" suite. */
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { DEFAULT_PINNED_PATHS, PINNABLE_PATHS } from "../config/navigation";
@@ -69,6 +70,10 @@ export const useUIStore = create<UIState>()(
               (path) => {
                 if (path === "/web-experiment") return "/experimentation";
                 if (path === "/wandz") return "/wingz";
+                // Behavior Analytics pin carries over to the merged Analytics suite.
+                if (path === "/insights") return "/analytics";
+                // User Feedback pin also carries over to the Analytics suite.
+                if (path === "/pulse") return "/analytics";
                 return path;
               }
             )
