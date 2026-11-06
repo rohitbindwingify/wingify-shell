@@ -7,6 +7,10 @@
  * Sub-nav rows also highlight on their page-tab pages (leafOwnsPath from lib/nav).
  * Suites (Analytics): SuiteProductSwitcher above the accordion, showing only the active product's pages.
  * Locked rail (`forceCollapsed`, e.g. Settings / Configuration / Upgrade): empty gutter is inert.
+ * Settings gear + Profile avatar open their menus on hover (close on leave, like products) and
+ * show no name tooltip; click still opens. Previous click-to-toggle kept as @undo.
+ * Activity / Help tooltips hide immediately on click and stay hidden until the pointer leaves.
+ * Expanded nav: the Settings menu opens above the gear (not to the right over the other icons).
  */
 import {
   useEffect,
@@ -309,6 +313,9 @@ export default function ExpandedNav({
     activeItem?.sections ? activeItem.path : null
   );
   const [openSubPath, setOpenSubPath] = useState<string | null>(null);
+  // Utility-bar tooltips (Activity / Help): hidden on click until the pointer leaves the icon.
+  const [utilityTooltipPath, setUtilityTooltipPath] = useState<string | null>(null);
+  const [utilityTooltipMuted, setUtilityTooltipMuted] = useState<string | null>(null);
 
   // Hover flyouts (collapsed products) + click flyouts (utility bar).
   const [flyout, setFlyout] = useState<FlyoutState | null>(null);
@@ -426,8 +433,9 @@ export default function ExpandedNav({
       item.path
     );
 
-    // Settings: always bottom-right of the gear (right of icon, bottom-aligned).
-    if (item.path === "/settings") {
+    // Settings (collapsed rail): bottom-right of the gear (right of icon, bottom-aligned).
+    // Expanded (horizontal icons) falls through to "above" so it never covers neighbouring icons.
+    if (item.path === "/settings" && !expanded) {
       setFlyout({
         path: item.path,
         top: rect.top,
@@ -468,8 +476,8 @@ export default function ExpandedNav({
 
   const scheduleClose = () => {
     if (profileSubmenuOpen) return;
-    // Utility Settings/Profile stay open until click-out (not hover leave).
-    if (flyout?.path === "/profile" || flyout?.path === "/settings") return;
+    // @undo — Settings/Profile used to stay open until click-out (now hover menus like products):
+    // if (flyout?.path === "/profile" || flyout?.path === "/settings") return;
     window.clearTimeout(closeTimer.current);
     closeTimer.current = window.setTimeout(() => {
       setFlyout(null);
@@ -1334,6 +1342,8 @@ export default function ExpandedNav({
               {utilityItems.map((item) => {
                 const Icon = item.icon;
                 const flyoutOpen = flyout?.path === item.path;
+                const isHoverMenu =
+                  item.path === "/settings" || item.path === "/profile";
                 const iconButton = (
                   <button
                     type="button"
@@ -1344,6 +1354,17 @@ export default function ExpandedNav({
                         ? flyoutOpen
                         : undefined
                     }
+                    // Settings / Profile are menus: open on hover (click still opens for keyboard / touch).
+                    onMouseEnter={(e) => {
+                      if (isHoverMenu) openFlyout(item, e.currentTarget);
+                    }}
+                    onMouseLeave={() => {
+                      if (isHoverMenu) scheduleClose();
+                    }}
+                    onClick={(e) => {
+                      if (isHoverMenu) openFlyout(item, e.currentTarget);
+                    }}
+                    /* @undo — click-to-toggle:
                     onClick={(e) => {
                       if (
                         item.path === "/settings" ||
@@ -1352,6 +1373,7 @@ export default function ExpandedNav({
                         toggleFlyout(item, e.currentTarget);
                       }
                     }}
+                    */
                     className={cn(
                       "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted",
                       flyoutOpen && "bg-muted hover:bg-muted"
@@ -1396,9 +1418,35 @@ export default function ExpandedNav({
                     }}
                     className="inline-flex will-change-transform"
                   >
-                    <Tooltip.Root>
+                    {/* Hover menus (Settings / Profile) open their panel on hover — no name tooltip. */}
+                    {isHoverMenu ? (
+                      <span className="inline-flex">{control}</span>
+                    ) : (
+                    <Tooltip.Root
+                      open={utilityTooltipPath === item.path}
+                      onOpenChange={(next) =>
+                        setUtilityTooltipPath(
+                          next && utilityTooltipMuted !== item.path
+                            ? item.path
+                            : null
+                        )
+                      }
+                    >
                       <Tooltip.Trigger asChild>
-                        <span className="inline-flex">{control}</span>
+                        <span
+                          className="inline-flex"
+                          onPointerDownCapture={() => {
+                            setUtilityTooltipPath(null);
+                            setUtilityTooltipMuted(item.path);
+                          }}
+                          onPointerLeave={() =>
+                            setUtilityTooltipMuted((muted) =>
+                              muted === item.path ? null : muted
+                            )
+                          }
+                        >
+                          {control}
+                        </span>
                       </Tooltip.Trigger>
                       <Tooltip.Portal>
                         <Tooltip.Content
@@ -1410,6 +1458,7 @@ export default function ExpandedNav({
                         </Tooltip.Content>
                       </Tooltip.Portal>
                     </Tooltip.Root>
+                    )}
                   </div>
                 );
               })}
