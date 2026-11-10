@@ -66,7 +66,6 @@ import {
   resolveBreadcrumb,
 } from "../../lib/nav";
 import { useIsGetStartedLocked } from "@/store/getStartedOnboarding";
-import { LeafCrumb, ProductCrumb } from "./CrumbSwitchers";
 import { cn } from "../../lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -1540,26 +1539,23 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
 
               <div className="flex min-w-0 items-center gap-1.5 text-sm">
                 <DetailCrumbOverflow
-                  earlier={
-                    isAnalyticsBoardContext
-                      ? [{ label: analyticsListCrumb, to: basePath }]
-                      : undefined
-                  }
+                  product={item}
+                  leaf={leaf}
+                  siblings={siblings}
+                  earlier={[
+                    {
+                      label: analyticsListCrumb,
+                      to: basePath,
+                      icon: LayoutGrid,
+                    },
+                  ]}
                 />
-                <span className="shrink-0 text-muted-foreground" aria-hidden>
-                  /
-                </span>
-                {/* Last two: list (or board when in board context) + entity. */}
-                {!(isAnalyticsBoardContext && contextBoard) && (
-                  <Link
-                    to={basePath}
-                    className="shrink-0 rounded-md px-1.5 py-1 font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:bg-muted"
-                  >
-                    {analyticsListCrumb}
-                  </Link>
-                )}
+                {/* Board stays visible when in board context; list lives in middle overflow/icons. */}
                 {isAnalyticsBoardContext && contextBoard ? (
                   <>
+                    <span className="shrink-0 text-muted-foreground" aria-hidden>
+                      /
+                    </span>
                     <Popover.Root
                       open={boardMenuOpen}
                       onOpenChange={(o) => {
@@ -1741,7 +1737,7 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
                               e.stopPropagation();
                               startRename();
                             }}
-                            className="flex min-w-0 max-w-full items-center gap-2 rounded-md px-1.5 py-1 text-left outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
+                            className="flex min-w-0 max-w-[9rem] items-center gap-2 rounded-md px-1.5 py-1 text-left outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none sm:max-w-[14rem] md:max-w-[20rem]"
                           >
                             <span
                               className={cn(
@@ -1962,32 +1958,15 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
             </TooltipProvider>
 
             <div className="flex min-w-0 items-center gap-1 text-sm">
-              <DetailCrumbOverflow product={leaf && item ? item : undefined} />
+              <DetailCrumbOverflow
+                product={item}
+                leaf={leaf}
+                siblings={siblings}
+              />
               <span className="shrink-0 text-muted-foreground" aria-hidden>
                 /
               </span>
-              {/* Last two: section/list crumb + entity. Each node opens its level switcher. */}
-              {leaf ? (
-                <LeafCrumb
-                  leaf={leaf}
-                  siblings={siblings}
-                  locked={navLocked}
-                  tone="muted"
-                />
-              ) : item ? (
-                <ProductCrumb item={item} locked={navLocked} tone="muted" />
-              ) : (
-                <Link
-                  to={mainNavCrumbPath(basePath)}
-                  title={basePath}
-                  className="max-w-[10rem] shrink-0 truncate rounded-md px-1 py-0.5 font-normal text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted"
-                >
-                  {basePath}
-                </Link>
-              )}
-              <span className="shrink-0 text-muted-foreground" aria-hidden>
-                /
-              </span>
+              {/* Last: entity only — product/section live in middle … or icons. */}
             <Popover.Root
               open={entityOpen}
               onOpenChange={(o) => {
@@ -2038,7 +2017,7 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
                           e.stopPropagation();
                           startRename();
                         }}
-                        className="flex min-w-0 max-w-full items-center gap-1.5 rounded-md px-1.5 py-1 text-left outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
+                        className="flex min-w-0 max-w-[9rem] items-center gap-1.5 rounded-md px-1.5 py-1 text-left outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none sm:max-w-[14rem] md:max-w-[22rem]"
                       >
                         <span className="min-w-0 truncate text-sm font-semibold text-foreground">
                           {selected?.name ?? "Untitled"}

@@ -53,38 +53,60 @@ import {
   ShellAnalyticsCustomFillIcon,
   ShellAnalyticsCustomIcon,
 } from "@/components/icons/shell/AnalyticsCustomIcons";
-import {
-  ShellCalendarBlankFillIcon,
-  ShellCalendarBlankIcon,
-} from "@/components/icons/shell/CalendarBlankIcons";
-import {
-  ShellFlaskFillIcon,
-  ShellFlaskIcon,
-} from "@/components/icons/shell/FlaskIcons";
-import {
-  ShellHardDrivesFillIcon,
-  ShellHardDrivesIcon,
-} from "@/components/icons/shell/HardDrivesIcons";
 // @undo — Behaviour analytics product icon, used only by the product-switcher version:
 // import { ShellInsightsIcon } from "@/components/icons/shell/InsightsIcons";
-import {
-  ShellMegaphoneFillIcon,
-  ShellMegaphoneIcon,
-} from "@/components/icons/shell/MegaphoneIcons";
-import {
-  ShellRocketLaunchFillIcon,
-  ShellRocketLaunchIcon,
-} from "@/components/icons/shell/RocketLaunchIcons";
-import {
-  ShellSparkleFillIcon,
-  ShellSparkleIcon,
-} from "@/components/icons/shell/SparkleIcons";
-import {
-  ShellUserFocusFillIcon,
-  ShellUserFocusIcon,
-} from "@/components/icons/shell/UserFocusIcons";
 // @undo — User feedback product icon, used only by the product-switcher version:
 // import { ShellUserSoundIcon } from "@/components/icons/shell/UserSoundIcons";
+import {
+  NavABIcon,
+  NavAgentsIcon,
+  NavAttributesIcon,
+  NavAuditIcon,
+  NavBehaviorAnalyticsIcon,
+  NavChatIcon,
+  NavConceptTestIcon,
+  NavConfigurationsIcon,
+  NavDashboardIcon,
+  NavDataPlatformIcon,
+  NavEventsIcon,
+  NavExperimentationIcon,
+  NavFeatureRolloutsIcon,
+  NavFeatureTestsIcon,
+  NavFeaturesIcon,
+  NavFormAnalyticsIcon,
+  NavFullStackIcon,
+  NavFunnelReportsIcon,
+  NavFunnelsIcon,
+  NavHeatmapsIcon,
+  NavHypothesesIcon,
+  NavIdeasIcon,
+  NavIntegrationsIcon,
+  NavIntroductionIcon,
+  NavMetricReportsIcon,
+  NavMetricsIcon,
+  NavMobileAppABIcon,
+  NavMobileRecordingsIcon,
+  NavObservationsIcon,
+  NavPagesIcon,
+  NavPlanIcon,
+  NavProfilesIcon,
+  NavPushNotificationIcon,
+  NavSegmentsIcon,
+  NavSessionRecordingsIcon,
+  NavSettingsIcon,
+  NavSettingsUserFeedbackIcon,
+  NavSurveysIcon,
+  NavSyntheticABIcon,
+  NavTemplatesIcon,
+  NavTriggersIcon,
+  NavUpgradeIcon,
+  NavUserFeedbackIcon,
+  NavWebExperimentationIcon,
+  NavWebPersonalizationIcon,
+  NavWebRolloutIcon,
+  NavWingzIcon,
+  NavWorkflowsIcon,
+} from "@/components/icons/sidebarNavIcons";
 import { UPGRADE_ADDONS_PATH, UPGRADE_SECTIONS } from "./upgradeNav";
 
 /** Page-orientation helpers shown after the last breadcrumb (replaces title-adjacent chrome). */
@@ -230,9 +252,9 @@ function dummyNav(
 
 
 export const NAV: NavItem[] = [
-  { label: "Home", path: "/home", icon: Home, group: 1, sections: [
+  { label: "Home", path: "/home", icon: NavDashboardIcon as LucideIcon, group: 1, sections: [
     { items: [
-      { label: "Dashboard", path: "/home/dashboard", hideCreate: true },
+      { label: "Dashboard", path: "/home/dashboard", icon: NavDashboardIcon as LucideIcon, hideCreate: true },
       { label: "Get Started", path: "/home/get-started", hideCreate: true },
       { label: "Campaigns Overview", path: "/home/roi-dashboard", hideCreate: true },
       { label: "Impact Dashboard", path: "/home/account-overview", hideCreate: true },
@@ -241,16 +263,15 @@ export const NAV: NavItem[] = [
   {
     label: "Wingz",
     path: "/wingz",
-    icon: ShellSparkleIcon as LucideIcon,
-    activeIcon: ShellSparkleFillIcon as LucideIcon,
+    icon: NavWingzIcon as LucideIcon,
     group: 1,
     hideCreate: true,
     sections: [
-    { heading: "Assistant", items: [{ label: "Chat", path: "/wingz/chat", hideCreate: true }]},
+    { heading: "Assistant", items: [{ label: "Chat", path: "/wingz/chat", icon: NavChatIcon as LucideIcon, hideCreate: true }]},
     { heading: "Automation", items: [
-      { label: "Agents", path: "/wingz/agents" },
-      { label: "Workflows", path: "/wingz/workflows" },
-      { label: "Synthetic A/B", path: "/wingz/synthetic-ab" },
+      { label: "Agents", path: "/wingz/agents", icon: NavAgentsIcon as LucideIcon },
+      { label: "Workflows", path: "/wingz/workflows", icon: NavWorkflowsIcon as LucideIcon },
+      { label: "Synthetic A/B", path: "/wingz/synthetic-ab", icon: NavSyntheticABIcon as LucideIcon },
     ]},
     // @undo — What's New removed from Wingz leaf nav
     // { heading: "Discover", items: [{ label: "What's New", path: "/wingz/whats-new", hideCreate: true }]},
@@ -258,48 +279,44 @@ export const NAV: NavItem[] = [
   {
     label: "Experimentation",
     path: "/experimentation",
-    icon: ShellFlaskIcon as LucideIcon,
-    activeIcon: ShellFlaskFillIcon as LucideIcon,
+    icon: NavExperimentationIcon as LucideIcon,
     group: 2,
     pinnable: true,
     sections: [
     { items: [
-      { label: "Web Experimentation", path: "/web-experiment" },
-      { label: "Web Rollout", path: "/web-rollouts", hideCreate: true },
-      { label: "Mobile App A/B", path: "/mobile-app-ab", hideCreate: true },
+      { label: "Web Experimentation", path: "/web-experiment", icon: NavWebExperimentationIcon as LucideIcon },
+      { label: "Web Rollout", path: "/web-rollouts", icon: NavWebRolloutIcon as LucideIcon, hideCreate: true },
+      { label: "Mobile App A/B", path: "/mobile-app-ab", icon: NavMobileAppABIcon as LucideIcon, hideCreate: true },
     ]},
   ]},
   {
     label: "Web experimentation (Old)",
     path: "/web-experiment-old",
-    icon: ShellFlaskIcon as LucideIcon,
-    activeIcon: ShellFlaskFillIcon as LucideIcon,
+    icon: NavWebExperimentationIcon as LucideIcon,
     group: 2,
   },
   {
     label: "Web Personalization",
     path: "/personalize",
-    icon: ShellUserFocusIcon as LucideIcon,
-    activeIcon: ShellUserFocusFillIcon as LucideIcon,
+    icon: NavWebPersonalizationIcon as LucideIcon,
     group: 2,
     pinnable: true,
   },
   {
     label: "Feature Management",
     path: "/feature-management",
-    icon: ShellRocketLaunchIcon as LucideIcon,
-    activeIcon: ShellRocketLaunchFillIcon as LucideIcon,
+    icon: NavFullStackIcon as LucideIcon,
     group: 2,
     pinnable: true,
     sections: [
     { items: [
-      { label: "Feature Flags", path: "/feature-management/feature-flags" },
+      { label: "Feature Flags", path: "/feature-management/feature-flags", icon: NavFeaturesIcon as LucideIcon },
     ]},
     { items: [
-      { label: "Feature Rollout", path: "/feature-management/flag-rollout" },
-      { label: "Feature Experimentation", path: "/feature-management/flag-testing" },
-      { label: "Feature Multivariate", path: "/feature-management/flag-multivariate" },
-      { label: "Feature Personalization", path: "/feature-management/flag-personalize" },
+      { label: "Feature Rollout", path: "/feature-management/flag-rollout", icon: NavFeatureRolloutsIcon as LucideIcon },
+      { label: "Feature Experimentation", path: "/feature-management/flag-testing", icon: NavFeatureTestsIcon as LucideIcon },
+      { label: "Feature Multivariate", path: "/feature-management/flag-multivariate", icon: NavABIcon as LucideIcon },
+      { label: "Feature Personalization", path: "/feature-management/flag-personalize", icon: NavWebPersonalizationIcon as LucideIcon },
     ]},
     { items: [
       { label: "Holdouts", path: "/feature-management/holdout", hideCreate: true },
@@ -349,7 +366,7 @@ export const NAV: NavItem[] = [
           {
             label: "Templates",
             path: "/commerce/visuals/templates",
-            icon: LayoutGrid,
+            icon: NavTemplatesIcon as LucideIcon,
             hideCreate: true,
           },
         ],
@@ -358,7 +375,7 @@ export const NAV: NavItem[] = [
     { items: [
       { label: "Usage dashboard", path: "/commerce/usage-dashboard", icon: BarChart3, hideCreate: true },
       { label: "Health monitor", path: "/commerce/health-monitor", icon: Activity, hideCreate: true },
-      { label: "Settings", path: "/commerce/settings", icon: Settings, hideCreate: true },
+      { label: "Settings", path: "/commerce/settings", icon: NavSettingsIcon as LucideIcon, hideCreate: true },
     ]},
   ]},
   // Analytics suite — Journey analytics, Behaviour analytics and User feedback are always-visible
@@ -698,8 +715,7 @@ export const NAV: NavItem[] = [
   {
     label: "Push notification",
     path: "/engage",
-    icon: ShellMegaphoneIcon as LucideIcon,
-    activeIcon: ShellMegaphoneFillIcon as LucideIcon,
+    icon: NavPushNotificationIcon as LucideIcon,
     group: 2,
     pinnable: true,
   },
@@ -707,41 +723,39 @@ export const NAV: NavItem[] = [
   {
     label: "Data Platform",
     path: "/data-360",
-    icon: ShellHardDrivesIcon as LucideIcon,
-    activeIcon: ShellHardDrivesFillIcon as LucideIcon,
+    icon: NavDataPlatformIcon as LucideIcon,
     group: 2,
     pinnable: true,
     sections: [
     { items: [
-      { label: "Introduction", path: "/data-360/introduction", hideCreate: true },
-      { label: "Profiles", path: "/data-360/profiles" },
-      { label: "Attributes", path: "/data-360/attributes" },
-      { label: "Events", path: "/data-360/events" },
-      { label: "Segments", path: "/data-360/segments" },
+      { label: "Introduction", path: "/data-360/introduction", icon: NavIntroductionIcon as LucideIcon, hideCreate: true },
+      { label: "Profiles", path: "/data-360/profiles", icon: NavProfilesIcon as LucideIcon },
+      { label: "Attributes", path: "/data-360/attributes", icon: NavAttributesIcon as LucideIcon },
+      { label: "Events", path: "/data-360/events", icon: NavEventsIcon as LucideIcon },
+      { label: "Segments", path: "/data-360/segments", icon: NavSegmentsIcon as LucideIcon },
     ]},
     { items: [
-      { label: "Triggers", path: "/data-360/triggers" },
+      { label: "Triggers", path: "/data-360/triggers", icon: NavTriggersIcon as LucideIcon },
       { label: "Audiences", path: "/data-360/audiences" },
-      { label: "Metrics", path: "/data-360/metrics" },
-      { label: "Funnels", path: "/data-360/funnels" },
+      { label: "Metrics", path: "/data-360/metrics", icon: NavMetricsIcon as LucideIcon },
+      { label: "Funnels", path: "/data-360/funnels", icon: NavFunnelsIcon as LucideIcon },
     ]},
     { items: [
-      { label: "Audit", path: "/data-360/audit", hideCreate: true },
+      { label: "Audit", path: "/data-360/audit", icon: NavAuditIcon as LucideIcon, hideCreate: true },
     ]},
   ]},
   {
     label: "Plan",
     path: "/plan",
-    icon: ShellCalendarBlankIcon as LucideIcon,
-    activeIcon: ShellCalendarBlankFillIcon as LucideIcon,
+    icon: NavPlanIcon as LucideIcon,
     group: 2,
     pinnable: true,
     sections: [
       {
         items: [
-          { label: "Observations", path: "/plan/observations", icon: Eye },
-          { label: "Hypotheses", path: "/plan/hypotheses", icon: Lightbulb },
-          { label: "Ideas", path: "/plan/ideas", icon: Sparkles },
+          { label: "Observations", path: "/plan/observations", icon: NavObservationsIcon as LucideIcon },
+          { label: "Hypotheses", path: "/plan/hypotheses", icon: NavHypothesesIcon as LucideIcon },
+          { label: "Ideas", path: "/plan/ideas", icon: NavIdeasIcon as LucideIcon },
         ],
       },
     ],
@@ -752,7 +766,7 @@ export const NAV: NavItem[] = [
   {
     label: "Settings",
     path: "/settings",
-    icon: Settings,
+    icon: NavSettingsIcon as LucideIcon,
     group: 3,
     flyoutOnly: true,
     hideCreate: true,
@@ -923,13 +937,13 @@ export const CONFIGURATION_NAV: DrillInNavItem[] = [
   {
     label: "Integrations",
     path: `${CONFIG}/integrations`,
-    icon: Blocks,
+    icon: NavIntegrationsIcon as LucideIcon,
     hideCreate: true,
   },
   {
     label: "Pages",
     path: `${CONFIG}/pages`,
-    icon: FileText,
+    icon: NavPagesIcon as LucideIcon,
     hideCreate: true,
   },
   {
@@ -953,7 +967,7 @@ export const CONFIGURATION_NAV: DrillInNavItem[] = [
   {
     label: "Behavioural Analytics",
     path: `${CONFIG}/behavioural-analytics`,
-    icon: Eye,
+    icon: NavBehaviorAnalyticsIcon as LucideIcon,
     hideCreate: true,
   },
   {
@@ -1040,9 +1054,9 @@ export const CURRENT_USER = {
 };
 
 const MODE_ICONS: Record<string, LucideIcon> = {
-  settings: Settings,
-  configuration: Settings2,
-  upgrade: Zap,
+  settings: NavSettingsIcon as LucideIcon,
+  configuration: NavConfigurationsIcon as LucideIcon,
+  upgrade: NavUpgradeIcon as LucideIcon,
 };
 
 const modeLeaf = (id: string): NavLeaf => {

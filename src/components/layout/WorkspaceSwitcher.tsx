@@ -129,16 +129,30 @@ export default function WorkspaceSwitcher({
   onOpenChange,
   /** Match product/leaf crumb chrome (detail overflow trail). */
   compact = false,
+  /**
+   * Detail crumb trail: show a short name (max `nameMaxChars` letters) + #id.
+   * Full name stays on title / aria-label / menu rows.
+   */
+  shortName = false,
+  nameMaxChars = 5,
   tone = "normal",
 }: {
   /** Notify parents (e.g. overflow popover) when the menu opens/closes. */
   onOpenChange?: (open: boolean) => void;
   compact?: boolean;
+  shortName?: boolean;
+  nameMaxChars?: number;
   tone?: CrumbTone;
 } = {}) {
   const navigate = useNavigate();
   const active = useActiveWorkspace();
   const setWorkspaceId = useWorkspaceStore((s) => s.setWorkspaceId);
+  const shortLabel =
+    shortName && active.triggerLabel.length > nameMaxChars
+      ? `${active.triggerLabel.slice(0, nameMaxChars)}…`
+      : shortName
+        ? active.triggerLabel
+        : active.triggerLabel;
 
   return (
     <DropdownMenu.Root modal={false} onOpenChange={onOpenChange}>
@@ -146,19 +160,32 @@ export default function WorkspaceSwitcher({
         <button
           type="button"
           title={active.triggerLabel}
+          aria-label={active.triggerLabel}
           className={cn(
-            compact
+            compact || shortName
               ? cn(
                   crumbTriggerClass,
-                  "max-w-[16rem] gap-1.5",
+                  shortName ? "max-w-none gap-1" : "max-w-[16rem] gap-1.5",
                   crumbToneClass(tone)
                 )
               : "flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-foreground outline-none transition-colors hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
           )}
         >
-          <WorkspaceKindIcon workspace={active} />
-          <span className={cn("truncate", compact ? "max-w-[8rem]" : "max-w-[12rem]")}>
-            {active.triggerLabel}
+          <WorkspaceKindIcon
+            workspace={active}
+            className={shortName ? "h-3.5 w-3.5" : undefined}
+          />
+          <span
+            className={cn(
+              "truncate",
+              shortName
+                ? "max-w-[4.5rem]"
+                : compact
+                  ? "max-w-[8rem]"
+                  : "max-w-[12rem]"
+            )}
+          >
+            {shortName ? shortLabel : active.triggerLabel}
           </span>
           <WorkspaceIdBadge accountId={active.accountId} />
           <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />

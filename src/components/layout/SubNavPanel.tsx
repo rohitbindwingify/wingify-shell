@@ -1,5 +1,5 @@
 // Product sub-nav (docked / flyout) — nested accordion leaves, premium
-// crown badge, section separators. Sub-leaf leading icons omitted.
+// crown badge, section separators, optional leaf leading icons.
 // Change summary: `toSentenceCase` is exported so the open nav (ExpandedNav) reuses it for group labels.
 // A row also highlights on its page-tab pages (leafOwnsPath from lib/nav); existing NavLink styling reused.
 // Suites (Analytics): SuiteProductSwitcher on top, then only the active product's pages (section
@@ -113,8 +113,16 @@ function LeafRow({
   lockTooltip?: string | null;
 }) {
   const { pathname } = useLocation();
+  const LeafIcon = leaf.icon;
   const content = (
     <>
+      {LeafIcon ? (
+        <LeafIcon
+          className="h-4 w-4 shrink-0 text-foreground"
+          strokeWidth={1.75}
+          aria-hidden
+        />
+      ) : null}
       <span className="min-w-0 flex-1 truncate">
         {toSentenceCase(leaf.label)}
       </span>
@@ -208,6 +216,7 @@ function AccordionLeaf({
 }) {
   const { pathname } = useLocation();
   const sectionActive = leafActive(pathname, leaf);
+  const LeafIcon = leaf.icon;
 
   return (
     <div>
@@ -223,6 +232,13 @@ function AccordionLeaf({
             sectionActive && "text-accent-foreground"
           )}
         >
+          {LeafIcon ? (
+            <LeafIcon
+              className="h-4 w-4 shrink-0 text-foreground"
+              strokeWidth={1.75}
+              aria-hidden
+            />
+          ) : null}
           <span className="min-w-0 flex-1 truncate">
             {toSentenceCase(leaf.label)}
           </span>

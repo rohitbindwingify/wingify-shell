@@ -143,19 +143,29 @@ export function LeafCrumb({
           sideOffset={4}
           className="z-50 min-w-[220px] rounded-md border border-border bg-popover p-1.5 text-sm text-popover-foreground shadow-lg"
         >
-          {siblings.map((sibling) => (
-            <DropdownMenu.Item key={sibling.path} asChild>
-              <NavLink
-                to={sibling.path}
-                className={cn(
-                  "block cursor-pointer rounded-sm px-3 py-2 outline-none data-[highlighted]:bg-accent",
-                  sibling.path === leaf.path && "bg-accent font-medium"
-                )}
-              >
-                {sibling.label}
-              </NavLink>
-            </DropdownMenu.Item>
-          ))}
+          {siblings.map((sibling) => {
+            const SiblingIcon = sibling.icon;
+            return (
+              <DropdownMenu.Item key={sibling.path} asChild>
+                <NavLink
+                  to={sibling.path}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-2.5 rounded-sm px-3 py-2 outline-none data-[highlighted]:bg-accent",
+                    sibling.path === leaf.path && "bg-accent font-medium"
+                  )}
+                >
+                  {SiblingIcon ? (
+                    <SiblingIcon
+                      className="h-4 w-4 shrink-0 text-muted-foreground"
+                      strokeWidth={1.75}
+                      aria-hidden
+                    />
+                  ) : null}
+                  <span className="truncate">{sibling.label}</span>
+                </NavLink>
+              </DropdownMenu.Item>
+            );
+          })}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
