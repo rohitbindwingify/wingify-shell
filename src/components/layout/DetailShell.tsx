@@ -65,7 +65,6 @@ import {
   UTILITY_RAIL_WIDTH,
   resolveBreadcrumb,
 } from "../../lib/nav";
-import { useIsGetStartedLocked } from "@/store/getStartedOnboarding";
 import { cn } from "../../lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -1036,7 +1035,6 @@ export default function DetailShell({ basePath: basePathProp, children }: Detail
 
   // Breadcrumb trail: main-nav label, plus the sub-nav label when basePath is a leaf.
   const { item, leaf, siblings } = resolveBreadcrumb(basePath);
-  const navLocked = useIsGetStartedLocked();
 
   // Real-data paths: Web Exp, Personalize, or Commerce Recommendation.
   const realData = isRealDataPath(basePath);

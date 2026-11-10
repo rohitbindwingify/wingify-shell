@@ -9,16 +9,13 @@
  */
 import type { LucideIcon } from "@/components/icons/protoLucide";
 import {
-  Home,
   ShoppingCart,
   BarChart3,
   Activity,
   Headphones,
   UserCircle,
   Settings,
-  Settings2,
   Layers,
-  FileText,
   Contact,
   UserRound,
   Invoice,
@@ -35,9 +32,7 @@ import {
   // Component, // @undo — Assets Hub leaf icons removed
   // Palette, // @undo — Assets Hub leaf icons removed
   // CodeXml, // @undo — Assets Hub leaf icons removed
-  Blocks,
   LogOut,
-  Zap,
   BookOpen,
   Shirt,
   Crosshair,
@@ -45,9 +40,6 @@ import {
   Award,
   Search,
   Puzzle,
-  Eye,
-  Lightbulb,
-  Sparkles,
 } from "@/components/icons/protoLucide";
 import {
   ShellAnalyticsCustomFillIcon,
@@ -403,12 +395,24 @@ export const NAV: NavItem[] = [
         {
           label: "Behaviour analytics",
           path: "/insights",
+          icon: NavBehaviorAnalyticsIcon as LucideIcon,
           items: [
-            { label: "Dashboard", path: "/insights/dashboard", hideCreate: true },
-            { label: "Heatmaps", path: "/insights/heatmaps", hideCreate: true },
+            {
+              label: "Dashboard",
+              path: "/insights/dashboard",
+              icon: NavDashboardIcon as LucideIcon,
+              hideCreate: true,
+            },
+            {
+              label: "Heatmaps",
+              path: "/insights/heatmaps",
+              icon: NavHeatmapsIcon as LucideIcon,
+              hideCreate: true,
+            },
             {
               label: "Session Recordings",
               path: "/insights/session-recordings",
+              icon: NavSessionRecordingsIcon as LucideIcon,
               hideCreate: true,
               pageGuide: {
                 tutorial: { label: "Play tutorial" },
@@ -428,20 +432,56 @@ export const NAV: NavItem[] = [
                 },
               },
             },
-            { label: "Mobile Recordings", path: "/insights/mobile-recordings", hideCreate: true },
-            { label: "Form Analytics", path: "/insights/forms" },
-            { label: "Metric Reports", path: "/insights/metric-reports" },
-            { label: "Funnel Reports", path: "/insights/funnel-reports" },
+            {
+              label: "Mobile Recordings",
+              path: "/insights/mobile-recordings",
+              icon: NavMobileRecordingsIcon as LucideIcon,
+              hideCreate: true,
+            },
+            {
+              label: "Form Analytics",
+              path: "/insights/forms",
+              icon: NavFormAnalyticsIcon as LucideIcon,
+            },
+            {
+              label: "Metric Reports",
+              path: "/insights/metric-reports",
+              icon: NavMetricReportsIcon as LucideIcon,
+            },
+            {
+              label: "Funnel Reports",
+              path: "/insights/funnel-reports",
+              icon: NavFunnelReportsIcon as LucideIcon,
+            },
           ],
         },
         {
           label: "User feedback",
           path: "/pulse",
+          icon: NavUserFeedbackIcon as LucideIcon,
           items: [
-            { label: "Surveys", path: "/pulse/surveys" },
-            { label: "Concept Test", path: "/pulse/concept-test" },
-            { label: "Templates", path: "/pulse/templates", hideCreate: true },
-            { label: "Settings", path: "/pulse/settings", hideCreate: true },
+            {
+              label: "Surveys",
+              path: "/pulse/surveys",
+              icon: NavSurveysIcon as LucideIcon,
+            },
+            {
+              label: "Concept Test",
+              path: "/pulse/concept-test",
+              icon: NavConceptTestIcon as LucideIcon,
+            },
+            {
+              label: "Templates",
+              path: "/pulse/templates",
+              icon: NavTemplatesIcon as LucideIcon,
+              hideCreate: true,
+            },
+            {
+              label: "Settings",
+              path: "/pulse/settings",
+              icon: NavSettingsUserFeedbackIcon as LucideIcon,
+              hideCreate: true,
+            },
           ],
         },
       ]},
