@@ -320,6 +320,7 @@ function SuitePanels({
       <div className="flex w-[200px] shrink-0 flex-col gap-0.5">
         {products.map((product) => {
           const isShown = product.path === shown.path;
+          const ProductIcon = product.icon;
           return (
             <button
               key={product.path}
@@ -337,6 +338,13 @@ function SuitePanels({
                 isShown && "bg-muted"
               )}
             >
+              {ProductIcon ? (
+                <ProductIcon
+                  className="h-4 w-4 shrink-0 text-foreground"
+                  strokeWidth={1.75}
+                  aria-hidden
+                />
+              ) : null}
               <span className="min-w-0 flex-1 truncate">
                 {toSentenceCase(product.label)}
               </span>
