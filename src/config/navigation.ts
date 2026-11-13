@@ -18,7 +18,6 @@
 import type { LucideIcon } from "@/components/icons/protoLucide";
 import {
   Home,
-  ShoppingCart,
   BarChart3,
   Activity,
   Headphones,
@@ -94,6 +93,10 @@ import {
   ShellCalendarBlankFillIcon,
   ShellCalendarBlankIcon,
 } from "@/components/icons/shell/CalendarBlankIcons";
+import {
+  ShellCommerceFillIcon,
+  ShellCommerceIcon,
+} from "@/components/icons/shell/CommerceIcons";
 import {
   ShellFlaskFillIcon,
   ShellFlaskIcon,
@@ -343,7 +346,7 @@ export const NAV: NavItem[] = [
       { label: "Tech Debt", path: "/feature-management/tech-debt", icon: Wrench, hideCreate: true },
     ]},
   ]},
-  { label: "Commerce", path: "/commerce", icon: ShoppingCart, group: 2, pinnable: true, sections: [
+  { label: "Commerce", path: "/commerce", icon: ShellCommerceIcon as LucideIcon, activeIcon: ShellCommerceFillIcon as LucideIcon, group: 2, pinnable: true, sections: [
     { items: [
       { label: "Catalog", path: "/commerce/catalog", icon: BookOpen, hideCreate: true },
     ]},

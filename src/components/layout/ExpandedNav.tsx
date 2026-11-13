@@ -761,10 +761,15 @@ export default function ExpandedNav({
               if (expanded) setOpenPath(open ? null : item.path);
               return;
             }
+            // Expanded + sections: only toggle the accordion — do not land the first leaf.
+            if (expanded && hasSections) {
+              setOpenPath(open ? null : item.path);
+              return;
+            }
             navigate(firstChildPath(item));
             if (expanded) {
-              // Direct items collapse any open accordion; section items toggle.
-              setOpenPath(hasSections ? (open ? null : item.path) : null);
+              // Direct items collapse any open accordion.
+              setOpenPath(null);
             }
           }}
           className={cn(
