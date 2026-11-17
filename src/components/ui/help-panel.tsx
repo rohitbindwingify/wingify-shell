@@ -1,6 +1,6 @@
 /** Help panel — reader order, with a designed surface for each step. */
 
-import { useEffect, useState, type ComponentType, type SVGProps } from "react";
+import { useEffect, useState, type ComponentType, type ReactElement, type SVGProps } from "react";
 import {
   BookOpen,
   Check,
@@ -100,7 +100,7 @@ function CopyIconButton({
       variant="shadow"
       size="icon"
       className={cn(
-        "h-7 w-7 shrink-0 text-muted-foreground hover:bg-foreground/10",
+        "h-7 w-7 shrink-0 text-muted-foreground",
         className
       )}
       aria-label={copied ? "Copied" : label}
@@ -158,7 +158,7 @@ function ContactFact({
   return (
     <div
       className={cn(
-        "flex min-w-0 items-center gap-1 px-3 py-2.5 transition-colors hover:bg-foreground/5",
+        "flex min-w-0 items-center gap-1 px-3 py-2.5 transition-colors hover:bg-muted",
         fit && "w-max max-w-full"
       )}
     >
@@ -180,49 +180,67 @@ function ContactFact({
   );
 }
 
+function ScopeTip({
+  scope,
+  children,
+}: {
+  scope: string;
+  children: ReactElement;
+}) {
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent side="top" className="z-[60] max-w-60 text-left leading-snug">
+          {scope}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 function ManagerDisclosure({ contact }: { contact: HelpContact }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <article className="overflow-hidden rounded-xl border border-dashed border-border bg-background">
-      <button
-        type="button"
-        className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-muted/50"
-        aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
-      >
-        <Avatar className="size-10">
-          <AvatarImage
-            src={contact.photo}
-            alt=""
-            className="object-cover object-[center_20%]"
-          />
-          <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
-            {contact.initials}
-          </AvatarFallback>
-        </Avatar>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-[15px] font-medium tracking-tight text-foreground">
-            {contact.name}
+    <article className="overflow-hidden rounded-xl border border-border bg-background">
+      <ScopeTip scope={contact.scope}>
+        <button
+          type="button"
+          className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-muted/50"
+          aria-expanded={open}
+          onClick={() => setOpen((value) => !value)}
+        >
+          <Avatar className="size-10">
+            <AvatarImage
+              src={contact.photo}
+              alt=""
+              className="object-cover object-[center_20%]"
+            />
+            <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
+              {contact.initials}
+            </AvatarFallback>
+          </Avatar>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[15px] font-medium tracking-tight text-foreground">
+              {contact.name}
+            </span>
+            <span className="block truncate text-xs text-muted-foreground">
+              {contact.roleLabel}
+            </span>
           </span>
-          <span className="block truncate text-xs text-muted-foreground">
-            {contact.roleLabel}
+          <span className="inline-flex shrink-0 items-center gap-0.5 text-xs text-muted-foreground">
+            {open ? "Hide" : "Escalate"}
+            <ChevronRight
+              className={cn("size-3.5 transition-transform", open && "rotate-90")}
+              strokeWidth={1.75}
+              aria-hidden
+            />
           </span>
-        </span>
-        <span className="inline-flex shrink-0 items-center gap-0.5 text-xs text-muted-foreground">
-          {open ? "Hide" : "Escalate"}
-          <ChevronRight
-            className={cn("size-3.5 transition-transform", open && "rotate-90")}
-            strokeWidth={1.75}
-            aria-hidden
-          />
-        </span>
-      </button>
+        </button>
+      </ScopeTip>
       {open ? (
         <>
-          <p className="px-3.5 pb-3 pl-[4.25rem] text-xs leading-snug text-muted-foreground">
-            {contact.scope}
-          </p>
           <div className={contactFactsClass(Boolean(contact.phone))}>
             {contact.phone ? (
               <ContactFact
@@ -263,40 +281,41 @@ function ContactBody({
     <article
       className={cn(
         "overflow-hidden rounded-xl border bg-background",
-        quiet ? "border-dashed border-border" : "border-border"
+        "border-border"
       )}
     >
-      <div className="flex items-start gap-3 px-3.5 py-3">
-        <Avatar className="size-10">
-          <AvatarImage
-            src={contact.photo}
-            alt=""
-            className="object-cover object-[center_20%]"
-          />
-          <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
-            {contact.initials}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <p className="truncate text-[15px] font-medium tracking-tight text-foreground">
-              {contact.name}
-            </p>
-            {quiet ? (
-              <span className="shrink-0 pt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                Escalate
-              </span>
+      <ScopeTip scope={contact.scope}>
+        <div className="flex items-center gap-3 px-3.5 py-3">
+          <Avatar className="size-10">
+            <AvatarImage
+              src={contact.photo}
+              alt=""
+              className="object-cover object-[center_20%]"
+            />
+            <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
+              {contact.initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <p className="truncate text-[15px] font-medium tracking-tight text-foreground">
+                {contact.name}
+              </p>
+              {quiet ? (
+                <span className="shrink-0 pt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                  Escalate
+                </span>
+              ) : null}
+            </div>
+            <p className="truncate text-xs text-muted-foreground">{contact.roleLabel}</p>
+            {contact.escalationHint ? (
+              <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                {contact.escalationHint}
+              </p>
             ) : null}
           </div>
-          <p className="truncate text-xs text-muted-foreground">{contact.roleLabel}</p>
-          <p className="mt-1 text-xs leading-snug text-muted-foreground">{contact.scope}</p>
-          {contact.escalationHint ? (
-            <p className="mt-1 text-xs leading-snug text-muted-foreground">
-              {contact.escalationHint}
-            </p>
-          ) : null}
         </div>
-      </div>
+      </ScopeTip>
       <div className={contactFactsClass(Boolean(contact.phone))}>
         {contact.phone ? (
           <ContactFact
