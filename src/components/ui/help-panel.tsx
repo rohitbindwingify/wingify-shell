@@ -485,12 +485,12 @@ export function HelpPanel({
           stepped && "grid grid-cols-2 items-stretch"
         )}
       >
-        <div className={cn("px-4 py-4", stepped && "border-r border-border")}>
+        <div className="px-4 py-4">
           {team}
         </div>
         <div
           className={cn(
-            "flex flex-col gap-5 px-4 py-4",
+            "flex flex-col gap-5 bg-muted px-4 py-4",
             stepped && "min-h-full"
           )}
         >
