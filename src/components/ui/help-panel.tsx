@@ -3,6 +3,7 @@
 import { useEffect, useState, type ComponentType, type ReactElement, type SVGProps } from "react";
 import {
   BookOpen,
+  Calendar,
   Check,
   ChevronDown,
   ChevronRight,
@@ -199,6 +200,28 @@ function ScopeTip({
   );
 }
 
+function SetupMeetingButton({ className }: { className?: string }) {
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className={cn("size-7 shrink-0", className)}
+            aria-label="Setup a meeting"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <Calendar className="size-3.5" strokeWidth={1.75} aria-hidden />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent className="z-[60]">Setup a meeting</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 function ManagerDisclosure({ contact }: { contact: HelpContact }) {
   const [open, setOpen] = useState(false);
 
@@ -284,38 +307,41 @@ function ContactBody({
         "border-border"
       )}
     >
-      <ScopeTip scope={contact.scope}>
-        <div className="flex items-center gap-3 px-3.5 py-3">
-          <Avatar className="size-10">
-            <AvatarImage
-              src={contact.photo}
-              alt=""
-              className="object-cover object-[center_20%]"
-            />
-            <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
-              {contact.initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-2">
-              <p className="truncate text-[15px] font-medium tracking-tight text-foreground">
-                {contact.name}
-              </p>
-              {quiet ? (
-                <span className="shrink-0 pt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                  Escalate
-                </span>
+      <div className="flex items-center gap-2 px-3.5 py-3">
+        <ScopeTip scope={contact.scope}>
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <Avatar className="size-10">
+              <AvatarImage
+                src={contact.photo}
+                alt=""
+                className="object-cover object-[center_20%]"
+              />
+              <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
+                {contact.initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <p className="truncate text-[15px] font-medium tracking-tight text-foreground">
+                  {contact.name}
+                </p>
+                {quiet ? (
+                  <span className="shrink-0 pt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                    Escalate
+                  </span>
+                ) : null}
+              </div>
+              <p className="truncate text-xs text-muted-foreground">{contact.roleLabel}</p>
+              {contact.escalationHint ? (
+                <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                  {contact.escalationHint}
+                </p>
               ) : null}
             </div>
-            <p className="truncate text-xs text-muted-foreground">{contact.roleLabel}</p>
-            {contact.escalationHint ? (
-              <p className="mt-1 text-xs leading-snug text-muted-foreground">
-                {contact.escalationHint}
-              </p>
-            ) : null}
           </div>
-        </div>
-      </ScopeTip>
+        </ScopeTip>
+        {contact.role === "csm" ? <SetupMeetingButton /> : null}
+      </div>
       <div className={contactFactsClass(Boolean(contact.phone))}>
         {contact.phone ? (
           <ContactFact
