@@ -40,8 +40,10 @@ export default function HelpSupportPopover({
   }, []);
 
   const cancelClose = () => window.clearTimeout(closeTimer.current);
-  const scheduleClose = () => {
+  const scheduleClose = (event?: { relatedTarget: EventTarget | null }) => {
     if (clickMode) return;
+    const next = event?.relatedTarget;
+    if (next instanceof Element && next.closest("[role='menu']")) return;
     window.clearTimeout(closeTimer.current);
     closeTimer.current = window.setTimeout(() => setOpen(false), HOVER_CLOSE_MS);
   };
@@ -69,7 +71,7 @@ export default function HelpSupportPopover({
               setOpen(true);
             }
       }
-      onMouseLeave={clickMode ? undefined : scheduleClose}
+      onMouseLeave={clickMode ? undefined : (event) => scheduleClose(event)}
     >
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>{trigger}</PopoverTrigger>
@@ -79,7 +81,13 @@ export default function HelpSupportPopover({
           sideOffset={10}
           collisionPadding={12}
           onMouseEnter={clickMode ? undefined : cancelClose}
-          onMouseLeave={clickMode ? undefined : scheduleClose}
+          onMouseLeave={clickMode ? undefined : (event) => scheduleClose(event)}
+          onInteractOutside={(event) => {
+            const target = event.target;
+            if (target instanceof Element && target.closest("[role='menu']")) {
+              event.preventDefault();
+            }
+          }}
           className="z-50 w-auto max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-lg"
         >
           <HelpPanel

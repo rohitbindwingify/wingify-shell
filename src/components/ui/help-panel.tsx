@@ -4,6 +4,7 @@ import { useEffect, useState, type ComponentType, type SVGProps } from "react";
 import {
   BookOpen,
   Check,
+  ChevronDown,
   ChevronRight,
   Copy,
   LifeBuoy,
@@ -12,6 +13,13 @@ import {
 } from "@/components/icons/protoLucide";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -312,8 +320,8 @@ function ContactBody({
 }
 
 const PREVIEW_TIERS: { tier: HelpMrrTier; label: string }[] = [
-  { tier: "enterprise", label: "> $500" },
-  { tier: "standard", label: "< $500" },
+  { tier: "enterprise", label: ">500 MRR" },
+  { tier: "standard", label: "<500 MRR" },
 ];
 
 export function HelpPanel({
@@ -421,20 +429,34 @@ export function HelpPanel({
           Get help
         </h2>
         {onPreviewTier ? (
-          <div className="flex items-center gap-1.5" role="group" aria-label="Preview MRR">
-            {PREVIEW_TIERS.map(({ tier, label }) => (
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
               <Button
-                key={tier}
                 type="button"
+                variant="ghost"
                 size="sm"
-                variant={profile.tier === tier ? "default" : "outline"}
-                aria-pressed={profile.tier === tier}
-                onClick={() => onPreviewTier(tier)}
+                className="h-7 gap-1.5 px-2 text-xs font-normal text-muted-foreground"
               >
-                {label}
+                usecase
+                <span className="text-foreground">
+                  {PREVIEW_TIERS.find((item) => item.tier === profile.tier)?.label}
+                </span>
+                <ChevronDown className="size-3.5" strokeWidth={1.75} aria-hidden />
               </Button>
-            ))}
-          </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="z-[60] min-w-36">
+              <DropdownMenuRadioGroup
+                value={profile.tier}
+                onValueChange={(value) => onPreviewTier(value as HelpMrrTier)}
+              >
+                {PREVIEW_TIERS.map(({ tier, label }) => (
+                  <DropdownMenuRadioItem key={tier} value={tier}>
+                    {label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : null}
       </header>
 
