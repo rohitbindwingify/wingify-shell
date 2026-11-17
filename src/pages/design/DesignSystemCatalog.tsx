@@ -36,6 +36,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { HelpPanel } from "@/components/ui/help-panel";
+import { HELP_SUPPORT } from "@/data/helpSupport";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -390,6 +392,20 @@ export default function DesignSystemCatalog() {
             </Button>
           </CardFooter>
         </Card>
+      </Block>
+
+      <Block
+        title="Help panel"
+        description="Read top to bottom: your team, then self-serve, then Support."
+      >
+        <div className="flex flex-wrap items-start gap-4">
+          <div className="overflow-hidden rounded-lg border border-border">
+            <HelpPanel profile={HELP_SUPPORT.enterprise} />
+          </div>
+          <div className="overflow-hidden rounded-lg border border-border">
+            <HelpPanel profile={HELP_SUPPORT.standard} />
+          </div>
+        </div>
       </Block>
     </div>
   );

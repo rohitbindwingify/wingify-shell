@@ -54,6 +54,7 @@ import FormGalleryPage from "../pages/design/FormGalleryPage";
 import DesignSystemPage from "../pages/design/DesignSystemPage";
 import WelcomeStartPreviewPage from "../pages/design/WelcomeStartPreviewPage";
 import BreadcrumbWorkspaceOptionsPage from "../pages/design/BreadcrumbWorkspaceOptionsPage";
+import AgentFirstDocsPage from "../pages/design/AgentFirstDocsPage";
 import SessionRecordingsPage from "../pages/insights/SessionRecordingsPage";
 import HeatmapsPage from "../pages/insights/HeatmapsPage";
 import HeatmapViewerPage from "../pages/insights/HeatmapViewerPage";
@@ -598,6 +599,11 @@ export const router = createBrowserRouter([
       // Legacy Wandz URLs → Wingz.
       { path: "/wandz", element: <Navigate to="/wingz/chat" replace /> },
       { path: "/wandz/*", element: <Navigate to="/wingz/chat" replace /> },
+      // Agent-first docs prototype — own nav, no product header or sidebar.
+      {
+        path: "/design/agent-first",
+        element: <AgentFirstDocsPage />,
+      },
       {
         element: <AppLayout />,
         children: [

@@ -2,6 +2,7 @@
 // NAV_INTRO_VERSION after the boot splash clears, and again via openNavIntro().
 // Esc / X / Skip / Got it all count as seen.
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { ChevronRight } from "@/components/icons/protoLucide";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +47,8 @@ function StepDots({
 }
 
 export default function NavIntroModal() {
+  const { pathname } = useLocation();
+  const hideOnAgentDocs = pathname.startsWith("/design/agent-first");
   const seenVersion = useNavIntroStore((s) => s.seenVersion);
   const replayRequested = useNavIntroStore((s) => s.replayRequested);
   const hasHydrated = useNavIntroStore((s) => s._hasHydrated);
@@ -67,6 +70,11 @@ export default function NavIntroModal() {
       : 0;
 
   useEffect(() => {
+    // Agent docs has its own nav — don't cover it with the product tour.
+    if (hideOnAgentDocs) {
+      setOpen(false);
+      return;
+    }
     // Wait for persist rehydrate so a previously dismissed tour does not flash open.
     if (!hasHydrated) return;
     if (open) return;
@@ -101,7 +109,14 @@ export default function NavIntroModal() {
       window.clearInterval(interval);
       window.clearTimeout(timeout);
     };
-  }, [open, hasHydrated, replayRequested, seenVersion, rebrandingOpen]);
+  }, [
+    open,
+    hasHydrated,
+    replayRequested,
+    seenVersion,
+    rebrandingOpen,
+    hideOnAgentDocs,
+  ]);
 
   const finish = useCallback(() => {
     markSeen();

@@ -1,5 +1,9 @@
 // @summary Dummy Need Help contacts — MRR ≥ 500 gets full team; below gets one contact + Support.
 
+import elenaRossi from "@/assets/help/elena-rossi.jpg";
+import marcusChen from "@/assets/help/marcus-chen.jpg";
+import priyaSharma from "@/assets/help/priya-sharma.jpg";
+
 export type HelpMrrTier = "enterprise" | "standard";
 
 export type HelpContactRole =
@@ -12,6 +16,7 @@ export type HelpContact = {
   id: string;
   name: string;
   initials: string;
+  photo: string;
   role: HelpContactRole;
   roleLabel: string;
   email: string;
@@ -50,33 +55,36 @@ export const HELP_SUPPORT: Record<HelpMrrTier, HelpSupportProfile> = {
         id: "csm",
         name: "Priya Sharma",
         initials: "PS",
+        photo: priyaSharma,
         role: "csm",
         roleLabel: "Customer Success Manager",
         email: "priya.sharma@wingify.com",
         phone: "+1-415-555-0142",
-        scope: "Setup, experiments, and everyday product questions",
+        scope: "Setup, experiments, and product questions",
         emphasis: "primary",
       },
       {
         id: "kam",
         name: "Marcus Chen",
         initials: "MC",
+        photo: marcusChen,
         role: "key-account",
         roleLabel: "Key Account Manager",
         email: "marcus.chen@wingify.com",
         phone: "+1-415-555-0198",
-        scope: "Billing, contracts, and account paperwork",
+        scope: "Billing and contracts",
         emphasis: "default",
       },
       {
         id: "csm-manager",
         name: "Elena Rossi",
         initials: "ER",
+        photo: elenaRossi,
         role: "csm-manager",
         roleLabel: "CSM Manager",
         email: "elena.rossi@wingify.com",
+        phone: "+1-415-555-0164",
         scope: "Unresolved issues that need a manager",
-        escalationHint: "Reach out to your CSM first, then escalate here",
         emphasis: "muted",
       },
     ],
@@ -93,11 +101,12 @@ export const HELP_SUPPORT: Record<HelpMrrTier, HelpSupportProfile> = {
         id: "account-contact",
         name: "Priya Sharma",
         initials: "PS",
+        photo: priyaSharma,
         role: "account-contact",
         roleLabel: "Customer Success Manager",
         email: "priya.sharma@wingify.com",
         phone: "+1-415-555-0142",
-        scope: "Product help, account questions, and billing",
+        scope: "Product, account, and billing help",
         emphasis: "primary",
       },
     ],
