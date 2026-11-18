@@ -307,9 +307,8 @@ function ContactBody({
 }
 
 const PREVIEW_TIERS: { tier: HelpMrrTier; label: string }[] = [
-  { tier: "enterprise", label: ">500 MRR" },
-  { tier: "duo", label: "2 contacts" },
-  { tier: "standard", label: "<500 MRR" },
+  { tier: "standard", label: "1 contact (<500 MRR)" },
+  { tier: "enterprise", label: "More than 1 contact (>500 MRR)" },
   { tier: "initials", label: "No photo" },
 ];
 
@@ -455,18 +454,21 @@ export function HelpPanel({
           stepped && "grid grid-cols-2 items-stretch"
         )}
       >
-        <div className="bg-muted px-4 py-5">
-          {team}
-        </div>
-        <div
-          className={cn(
-            "flex flex-col gap-3 bg-secondary px-4 py-5",
-            stepped && "min-h-full"
-          )}
-        >
-          {selfServe}
-          {support}
-        </div>
+        {stepped ? (
+          <>
+            <div className="bg-muted px-4 py-5">{team}</div>
+            <div className="flex min-h-full flex-col gap-6 bg-secondary px-4 py-5">
+              {selfServe}
+              {support}
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col gap-6 bg-muted px-4 py-5">
+            {team}
+            {selfServe}
+            {support}
+          </div>
+        )}
       </div>
     </div>
   );
