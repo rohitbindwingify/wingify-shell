@@ -88,7 +88,7 @@ export default function HelpSupportPopover({
               event.preventDefault();
             }
           }}
-          className="z-50 w-auto max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-lg"
+          className="z-50 w-auto max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-border bg-popover p-0 text-popover-foreground shadow-foundation-float"
         >
           <HelpPanel
             profile={HELP_SUPPORT[tier]}

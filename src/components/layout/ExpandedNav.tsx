@@ -1435,6 +1435,8 @@ export default function ExpandedNav({
                     ) : (
                     <Tooltip.Root
                       open={utilityTooltipPath === item.path}
+                      delayDuration={300}
+                      disableHoverableContent
                       onOpenChange={(next) =>
                         setUtilityTooltipPath(
                           next && utilityTooltipMuted !== item.path
@@ -1450,11 +1452,14 @@ export default function ExpandedNav({
                             setUtilityTooltipPath(null);
                             setUtilityTooltipMuted(item.path);
                           }}
-                          onPointerLeave={() =>
+                          onPointerLeave={() => {
+                            setUtilityTooltipPath((path) =>
+                              path === item.path ? null : path
+                            );
                             setUtilityTooltipMuted((muted) =>
                               muted === item.path ? null : muted
-                            )
-                          }
+                            );
+                          }}
                         >
                           {control}
                         </span>

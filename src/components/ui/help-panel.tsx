@@ -14,6 +14,7 @@ import {
 } from "@/components/icons/protoLucide";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -121,62 +122,30 @@ function CopyIconButton({
   );
 }
 
-function contactFactsClass(hasPhone: boolean) {
-  return cn(
-    "grid border-t border-border",
-    hasPhone
-      ? "grid-cols-[auto_minmax(0,1fr)] divide-x divide-border"
-      : "grid-cols-1"
-  );
-}
-
-function ContactFact({
-  href,
-  label,
-  value,
-  copyLabel,
-  fit = false,
-  tooltip = false,
-}: {
-  href: string;
-  label: string;
-  value: string;
-  copyLabel: string;
-  /** Hug the value so a neighboring column can take the leftover width. */
-  fit?: boolean;
-  /** Show the full value when the line is truncated. */
-  tooltip?: boolean;
-}) {
+function ContactEmail({ email }: { email: string }) {
   const link = (
     <a
-      href={href}
-      className="mt-px block truncate text-xs leading-none text-foreground underline-offset-4 hover:underline"
+      href={`mailto:${email}`}
+      className="min-w-0 truncate text-xs font-medium text-foreground underline-offset-4 hover:underline"
     >
-      {value}
+      {email}
     </a>
   );
 
   return (
-    <div
-      className={cn(
-        "flex min-w-0 items-center gap-1 px-3 py-2.5 transition-colors hover:bg-muted",
-        fit && "w-max max-w-full"
-      )}
-    >
-      <span className={cn("min-w-0", fit ? "shrink-0" : "flex-1")}>
-        <span className="block text-[11px] leading-none text-muted-foreground">{label}</span>
-        {tooltip ? (
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              <TooltipTrigger asChild>{link}</TooltipTrigger>
-              <TooltipContent className="z-[60]">{value}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ) : (
-          link
-        )}
-      </span>
-      <CopyIconButton value={value} label={copyLabel} />
+    <div className="flex min-w-0 items-center gap-1.5">
+      <Mail className="size-3.5 shrink-0 text-muted-foreground" strokeWidth={1.75} aria-hidden />
+      <TooltipProvider delayDuration={200}>
+        <Tooltip>
+          <TooltipTrigger asChild>{link}</TooltipTrigger>
+          <TooltipContent className="z-[60]">{email}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <CopyIconButton
+        value={email}
+        label="Copy email address"
+        className="ml-auto size-6"
+      />
     </div>
   );
 }
@@ -202,23 +171,31 @@ function ScopeTip({
 
 function SetupMeetingButton({ className }: { className?: string }) {
   return (
-    <TooltipProvider delayDuration={200}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className={cn("size-7 shrink-0", className)}
-            aria-label="Setup a meeting"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <Calendar className="size-3.5" strokeWidth={1.75} aria-hidden />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent className="z-[60]">Setup a meeting</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Button
+      type="button"
+      variant="default"
+      size="sm"
+      className={cn("h-8 shrink-0 gap-1.5 px-2.5", className)}
+      onClick={(event) => event.stopPropagation()}
+    >
+      <Calendar className="size-3.5" strokeWidth={1.75} aria-hidden />
+      Meet
+    </Button>
+  );
+}
+
+function ContactAvatar({ contact }: { contact: HelpContact }) {
+  return (
+    <Avatar className="size-14 shrink-0 ring-2 ring-muted">
+      <AvatarImage
+        src={contact.photo}
+        alt=""
+        className="object-cover object-[center_20%]"
+      />
+      <AvatarFallback className="bg-muted text-xs font-medium text-muted-foreground">
+        {contact.initials}
+      </AvatarFallback>
+    </Avatar>
   );
 }
 
@@ -226,25 +203,16 @@ function ManagerDisclosure({ contact }: { contact: HelpContact }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <article className="overflow-hidden rounded-xl border border-border bg-background">
+    <Card className="group/contact overflow-hidden p-4 shadow-none">
       <ScopeTip scope={contact.scope}>
         <button
           type="button"
-          className="flex w-full items-center gap-3 px-3.5 py-3 text-left transition-colors hover:bg-muted/50"
+          className="flex w-full items-center gap-3.5 text-left"
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
         >
-          <Avatar className="size-10">
-            <AvatarImage
-              src={contact.photo}
-              alt=""
-              className="object-cover object-[center_20%]"
-            />
-            <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
-              {contact.initials}
-            </AvatarFallback>
-          </Avatar>
-          <span className="min-w-0 flex-1">
+          <ContactAvatar contact={contact} />
+          <span className="min-w-0 flex-1 space-y-0.5">
             <span className="block truncate text-[15px] font-medium tracking-tight text-foreground">
               {contact.name}
             </span>
@@ -263,33 +231,16 @@ function ManagerDisclosure({ contact }: { contact: HelpContact }) {
         </button>
       </ScopeTip>
       {open ? (
-        <>
-          <div className={contactFactsClass(Boolean(contact.phone))}>
-            {contact.phone ? (
-              <ContactFact
-                href={`tel:${contact.phone.replace(/\s+/g, "")}`}
-                label="Phone"
-                value={contact.phone}
-                copyLabel="Copy phone number"
-                fit
-              />
-            ) : null}
-            <ContactFact
-              href={`mailto:${contact.email}`}
-              label="Email"
-              value={contact.email}
-              copyLabel="Copy email address"
-              tooltip
-            />
-          </div>
+        <div className="-mx-4 mt-3 space-y-2 border-t border-border px-4 pt-3">
+          <ContactEmail email={contact.email} />
           {contact.escalationHint ? (
-            <p className="border-t border-border px-3.5 py-2.5 text-xs leading-snug text-muted-foreground">
+            <p className="text-xs leading-snug text-muted-foreground">
               {contact.escalationHint}
             </p>
           ) : null}
-        </>
+        </div>
       ) : null}
-    </article>
+    </Card>
   );
 }
 
@@ -301,28 +252,14 @@ function ContactBody({
   quiet?: boolean;
 }) {
   return (
-    <article
-      className={cn(
-        "overflow-hidden rounded-xl border bg-background",
-        "border-border"
-      )}
-    >
-      <div className="flex items-center gap-2 px-3.5 py-3">
+    <Card className="group/contact overflow-hidden p-4 shadow-none">
+      <div className="flex items-start gap-3.5">
         <ScopeTip scope={contact.scope}>
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <Avatar className="size-10">
-              <AvatarImage
-                src={contact.photo}
-                alt=""
-                className="object-cover object-[center_20%]"
-              />
-              <AvatarFallback className="bg-muted text-[11px] font-medium text-muted-foreground">
-                {contact.initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-2">
-                <p className="truncate text-[15px] font-medium tracking-tight text-foreground">
+          <div className="flex min-w-0 flex-1 items-start gap-3.5">
+            <ContactAvatar contact={contact} />
+            <div className="min-w-0 flex-1 space-y-0.5 pt-0.5">
+              <div className="flex items-start gap-2">
+                <p className="min-w-0 flex-1 truncate text-[15px] font-medium tracking-tight text-foreground">
                   {contact.name}
                 </p>
                 {quiet ? (
@@ -333,7 +270,7 @@ function ContactBody({
               </div>
               <p className="truncate text-xs text-muted-foreground">{contact.roleLabel}</p>
               {contact.escalationHint ? (
-                <p className="mt-1 text-xs leading-snug text-muted-foreground">
+                <p className="pt-1 text-xs leading-snug text-muted-foreground">
                   {contact.escalationHint}
                 </p>
               ) : null}
@@ -342,25 +279,10 @@ function ContactBody({
         </ScopeTip>
         {contact.role === "csm" ? <SetupMeetingButton /> : null}
       </div>
-      <div className={contactFactsClass(Boolean(contact.phone))}>
-        {contact.phone ? (
-          <ContactFact
-            href={`tel:${contact.phone.replace(/\s+/g, "")}`}
-            label="Phone"
-            value={contact.phone}
-            copyLabel="Copy phone number"
-            fit
-          />
-        ) : null}
-        <ContactFact
-          href={`mailto:${contact.email}`}
-          label="Email"
-          value={contact.email}
-          copyLabel="Copy email address"
-          tooltip
-        />
+      <div className="-mx-4 mt-3 border-t border-border px-4 pt-2.5">
+        <ContactEmail email={contact.email} />
       </div>
-    </article>
+    </Card>
   );
 }
 
@@ -385,7 +307,7 @@ export function HelpPanel({
   const team = (
     <section className="flex flex-col gap-3">
       <SectionLabel>{profile.teamHeading}</SectionLabel>
-      <ol className="flex flex-col gap-2">
+      <ol className="flex flex-col gap-2.5">
         {leads.map((contact) => (
           <li key={contact.id}>
             <ContactBody contact={contact} />
@@ -403,7 +325,7 @@ export function HelpPanel({
   const selfServe = (
     <section className="flex flex-col gap-3">
       <SectionLabel>Self-serve</SectionLabel>
-      <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background">
+      <Card className="divide-y divide-border overflow-hidden p-0 shadow-none">
         <HelpActionRow
           icon={BookOpen}
           label="Knowledge Base"
@@ -414,15 +336,15 @@ export function HelpPanel({
           label="Submit a ticket"
           hint="We will follow it with you"
         />
-      </div>
+      </Card>
     </section>
   );
 
   const support = (
     <section className="flex flex-col gap-3">
       <SectionLabel>Support</SectionLabel>
-      <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-background">
-        <div className="flex items-center gap-3 px-3.5 py-3 transition-colors hover:bg-muted/50">
+      <Card className="divide-y divide-border overflow-hidden p-0 shadow-none">
+        <div className="flex items-center gap-3 px-3.5 py-3 transition-colors hover:bg-muted/40">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
             <Phone className="size-4" strokeWidth={1.75} aria-hidden />
           </span>
@@ -439,7 +361,7 @@ export function HelpPanel({
             <CopyIconButton value={phone} label="Copy phone number" />
           </span>
         </div>
-        <div className="flex items-center gap-3 px-3.5 py-3 transition-colors hover:bg-muted/50">
+        <div className="flex items-center gap-3 px-3.5 py-3 transition-colors hover:bg-muted/40">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
             <Mail className="size-4" strokeWidth={1.75} aria-hidden />
           </span>
@@ -456,7 +378,7 @@ export function HelpPanel({
             <CopyIconButton value={email} label="Copy email address" />
           </span>
         </div>
-      </div>
+      </Card>
     </section>
   );
 
@@ -511,12 +433,12 @@ export function HelpPanel({
           stepped && "grid grid-cols-2 items-stretch"
         )}
       >
-        <div className="px-4 py-4">
+        <div className="bg-muted px-4 py-5">
           {team}
         </div>
         <div
           className={cn(
-            "flex flex-col gap-5 bg-muted px-4 py-4",
+            "flex flex-col gap-5 bg-secondary px-4 py-5",
             stepped && "min-h-full"
           )}
         >

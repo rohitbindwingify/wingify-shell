@@ -341,6 +341,7 @@ export default {
         "foundation-sm": "var(--shadow-sm)",
         "foundation-md": "var(--shadow-md)",
         "foundation-lg": "var(--shadow-lg)",
+        "foundation-float": "var(--shadow-float)",
       },
       transitionTimingFunction: {
         DEFAULT: "var(--ease-smooth)",
