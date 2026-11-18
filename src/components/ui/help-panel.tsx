@@ -123,28 +123,32 @@ function CopyIconButton({
 }
 
 function ContactEmail({ email }: { email: string }) {
-  const link = (
-    <a
-      href={`mailto:${email}`}
-      className="min-w-0 truncate text-xs font-medium text-foreground underline-offset-4 hover:underline"
-    >
-      {email}
-    </a>
-  );
-
   return (
     <div className="flex min-w-0 items-center gap-1.5">
-      <Mail className="size-3.5 shrink-0 text-muted-foreground" strokeWidth={1.75} aria-hidden />
-      <TooltipProvider delayDuration={200}>
-        <Tooltip>
-          <TooltipTrigger asChild>{link}</TooltipTrigger>
-          <TooltipContent className="z-[60]">{email}</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <span className="inline-flex min-w-0 flex-1 items-center gap-1.5">
+        <Mail
+          className="size-3.5 shrink-0 text-muted-foreground"
+          strokeWidth={1.75}
+          aria-hidden
+        />
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={`mailto:${email}`}
+                className="min-w-0 truncate text-sm font-medium leading-none text-foreground underline-offset-4 hover:underline"
+              >
+                {email}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent className="z-[60]">{email}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </span>
       <CopyIconButton
         value={email}
         label="Copy email address"
-        className="ml-auto size-6"
+        className="size-6 shrink-0"
       />
     </div>
   );
@@ -227,7 +231,7 @@ function ManagerDisclosure({ contact }: { contact: HelpContact }) {
         >
           <ContactAvatar contact={contact} />
           <span className="min-w-0 flex-1 space-y-0.5">
-            <span className="block truncate text-[15px] font-medium tracking-tight text-foreground">
+            <span className="block truncate text-sm font-medium tracking-tight text-foreground">
               {contact.name}
             </span>
             <span className="block truncate text-xs text-muted-foreground">
@@ -273,7 +277,7 @@ function ContactBody({
             <ContactAvatar contact={contact} />
             <div className="min-w-0 flex-1 space-y-0.5">
               <div className="flex items-center gap-2">
-                <p className="min-w-0 flex-1 truncate text-[15px] font-medium tracking-tight text-foreground">
+                <p className="min-w-0 flex-1 truncate text-sm font-medium tracking-tight text-foreground">
                   {contact.name}
                 </p>
                 {quiet ? (
@@ -365,12 +369,12 @@ export function HelpPanel({
           <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
             <Phone className="size-4" strokeWidth={1.75} aria-hidden />
           </span>
-          <span className="flex min-w-0 items-center gap-1">
-            <span className="min-w-0">
+          <span className="flex min-w-0 flex-1 items-center gap-2">
+            <span className="min-w-0 flex-1 space-y-1.5">
               <span className="block text-xs leading-none text-muted-foreground">Phone</span>
               <a
                 href={`tel:${phone.replace(/\s+/g, "")}`}
-                className="mt-px block text-sm font-medium leading-none text-foreground"
+                className="block text-sm font-medium leading-none text-foreground"
               >
                 {phone}
               </a>
@@ -382,12 +386,12 @@ export function HelpPanel({
           <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground">
             <Mail className="size-4" strokeWidth={1.75} aria-hidden />
           </span>
-          <span className="flex min-w-0 items-center gap-1">
-            <span className="min-w-0">
+          <span className="flex min-w-0 flex-1 items-center gap-2">
+            <span className="min-w-0 flex-1 space-y-1.5">
               <span className="block text-xs leading-none text-muted-foreground">Email</span>
               <a
                 href={`mailto:${email}`}
-                className="mt-px block text-sm font-medium leading-none text-foreground"
+                className="block text-sm font-medium leading-none text-foreground"
               >
                 {email}
               </a>
