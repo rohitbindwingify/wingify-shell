@@ -169,17 +169,29 @@ function ScopeTip({
   );
 }
 
-function SetupMeetingButton({ className }: { className?: string }) {
+function SetupMeetingButton({
+  href,
+  className,
+}: {
+  href: string;
+  className?: string;
+}) {
   return (
     <Button
-      type="button"
+      asChild
       variant="default"
       size="sm"
       className={cn("h-8 shrink-0 gap-1.5 px-2.5", className)}
-      onClick={(event) => event.stopPropagation()}
     >
-      <Calendar className="size-3.5" strokeWidth={1.75} aria-hidden />
-      Meet
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <Calendar className="size-3.5" strokeWidth={1.75} aria-hidden />
+        Meet
+      </a>
     </Button>
   );
 }
@@ -187,12 +199,14 @@ function SetupMeetingButton({ className }: { className?: string }) {
 function ContactAvatar({ contact }: { contact: HelpContact }) {
   return (
     <Avatar className="size-14 shrink-0 ring-2 ring-muted">
-      <AvatarImage
-        src={contact.photo}
-        alt=""
-        className="object-cover object-[center_20%]"
-      />
-      <AvatarFallback className="bg-muted text-xs font-medium text-muted-foreground">
+      {contact.photo ? (
+        <AvatarImage
+          src={contact.photo}
+          alt=""
+          className="object-cover object-[center_20%]"
+        />
+      ) : null}
+      <AvatarFallback className="bg-muted text-sm font-medium text-foreground">
         {contact.initials}
       </AvatarFallback>
     </Avatar>
@@ -253,17 +267,17 @@ function ContactBody({
 }) {
   return (
     <Card className="group/contact overflow-hidden p-4 shadow-none">
-      <div className="flex items-start gap-3.5">
+      <div className="flex items-center gap-3.5">
         <ScopeTip scope={contact.scope}>
-          <div className="flex min-w-0 flex-1 items-start gap-3.5">
+          <div className="flex min-w-0 flex-1 items-center gap-3.5">
             <ContactAvatar contact={contact} />
-            <div className="min-w-0 flex-1 space-y-0.5 pt-0.5">
-              <div className="flex items-start gap-2">
+            <div className="min-w-0 flex-1 space-y-0.5">
+              <div className="flex items-center gap-2">
                 <p className="min-w-0 flex-1 truncate text-[15px] font-medium tracking-tight text-foreground">
                   {contact.name}
                 </p>
                 {quiet ? (
-                  <span className="shrink-0 pt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                  <span className="shrink-0 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                     Escalate
                   </span>
                 ) : null}
@@ -277,7 +291,9 @@ function ContactBody({
             </div>
           </div>
         </ScopeTip>
-        {contact.role === "csm" ? <SetupMeetingButton /> : null}
+        {contact.role === "csm" && contact.meetingUrl ? (
+          <SetupMeetingButton href={contact.meetingUrl} />
+        ) : null}
       </div>
       <div className="-mx-4 mt-3 border-t border-border px-4 pt-2.5">
         <ContactEmail email={contact.email} />
@@ -289,6 +305,7 @@ function ContactBody({
 const PREVIEW_TIERS: { tier: HelpMrrTier; label: string }[] = [
   { tier: "enterprise", label: ">500 MRR" },
   { tier: "standard", label: "<500 MRR" },
+  { tier: "initials", label: "No photo" },
 ];
 
 export function HelpPanel({
@@ -298,7 +315,7 @@ export function HelpPanel({
   profile: HelpSupportProfile;
   onPreviewTier?: (tier: HelpMrrTier) => void;
 }) {
-  const stepped = profile.tier === "enterprise" && profile.contacts.length > 1;
+  const stepped = profile.contacts.length > 1;
   const { phone, email } = profile.support;
 
   const leads = profile.contacts.filter((contact) => contact.emphasis !== "muted");

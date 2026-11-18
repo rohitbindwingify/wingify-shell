@@ -810,7 +810,11 @@ table > thead > tr:has(> th) > th [class*="text-foreground"] {
   --shadow-sm: 0 1px 2px rgb(27 25 19 / 0.1);
   --shadow-md: 0 4px 12px rgb(27 25 19 / 0.13), 0 1px 3px rgb(27 25 19 / 0.07);
   --shadow-lg: 0 14px 34px rgb(27 25 19 / 0.16), 0 2px 8px rgb(27 25 19 / 0.09);
-  --shadow-float: 0 28px 64px -8px rgb(27 25 19 / 0.3), 0 12px 28px -6px rgb(27 25 19 / 0.2), 0 4px 10px rgb(27 25 19 / 0.12);
+  --shadow-float:
+    48px 8px 100px -4px rgb(27 25 19 / 0.55),
+    28px 4px 56px -2px rgb(27 25 19 / 0.38),
+    14px 2px 28px rgb(27 25 19 / 0.28),
+    4px 0 0 1px rgb(27 25 19 / 0.06);
   --veil: #000000;
   --veil-hover: 8%;
   --veil-press: 14%;
@@ -851,7 +855,11 @@ table > thead > tr:has(> th) > th [class*="text-foreground"] {
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.45);
   --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5), 0 1px 3px rgb(0 0 0 / 0.35);
   --shadow-lg: 0 14px 34px rgb(0 0 0 / 0.58), 0 2px 8px rgb(0 0 0 / 0.4);
-  --shadow-float: 0 28px 64px -8px rgb(0 0 0 / 0.72), 0 12px 28px -6px rgb(0 0 0 / 0.5), 0 4px 10px rgb(0 0 0 / 0.35);
+  --shadow-float:
+    48px 8px 100px -4px rgb(0 0 0 / 0.9),
+    28px 4px 56px -2px rgb(0 0 0 / 0.75),
+    14px 2px 28px rgb(0 0 0 / 0.6),
+    4px 0 0 1px rgb(0 0 0 / 0.2);
   --veil: #FFFFFF;
   --veil-hover: 10%;
   --veil-press: 16%;
