@@ -1,0 +1,53 @@
+---
+description: Hard ban — never ship Cursor/AI Co-authored-by on commits
+alwaysApply: true
+---
+
+# Git authorship — humans only (hard ban)
+
+## Hard rule
+Commits and pushes must be authored **only** as the human owner:
+
+- **Name:** Rohit Bind (Rohit / Bind OK if that matches `user.name`)
+- **Email:** whatever is already in local git (`rohitbind`, `rohitbindwingify`, etc.)
+
+Do **not** change `git config` user.name / user.email unless the user explicitly asks.
+
+## Absolute ban — Cursor / agents
+**Never** add, keep, or push any AI/agent co-author, especially Cursor:
+
+- Forbidden: `Co-authored-by: Cursor <cursoragent@cursor.com>`
+- Forbidden: any `Co-authored-by:` for Cursor, Claude, Copilot, ChatGPT, Gemini, Composer, Auto, or other agents
+- Forbidden: `--trailer "Co-authored-by: …"` for any AI
+- Forbidden: commit body lines that credit an AI as co-author
+
+This ban is non-negotiable. Cursor often injects the trailer automatically — treat that as a defect to strip, not as allowed authorship.
+
+## After every `git commit`
+1. Run `git log -1 --format='%an %ae%n%s%n%b'`
+2. If the body contains `Co-authored-by:` (Cursor or any agent), **immediately** rewrite before any push:
+
+```bash
+TREE=$(git rev-parse 'HEAD^{tree}')
+PARENT=$(git rev-parse 'HEAD^')
+NEW=$(git commit-tree "$TREE" -p "$PARENT" -m "$(cat <<'EOF'
+Same commit message here.
+
+EOF
+)")
+git reset --soft "$NEW"
+```
+
+3. Re-check `git log -1` — body must have **no** `Co-authored-by:`
+4. Only then push
+
+Do not amend unless the user’s amend rules allow it; prefer the `commit-tree` + `reset --soft` rewrite above for trailer stripping.
+
+## Commit message style
+```bash
+git commit -m "$(cat <<'EOF'
+Commit message here.
+
+EOF
+)"
+```
