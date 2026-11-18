@@ -149,7 +149,7 @@ const revealTransition = `opacity ${WIDTH_MS}ms ${WIDTH_EASE}, transform ${WIDTH
 const accordionTransition = `grid-template-rows ${WIDTH_MS}ms ${WIDTH_EASE}, opacity ${WIDTH_MS}ms ${WIDTH_EASE}`;
 
 const tooltipContentClass =
-  "z-50 rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md";
+  "pointer-events-none z-50 rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md";
 
 /** Seam cursor: vertical line with left + right arrows. Hotspot at center. */
 const SEAM_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(
@@ -315,9 +315,10 @@ export default function ExpandedNav({
     activeItem?.sections ? activeItem.path : null
   );
   const [openSubPath, setOpenSubPath] = useState<string | null>(null);
-  // Utility-bar tooltips (Activity / Help): hidden on click until the pointer leaves the icon.
+  // Utility-bar tooltips (Activity / Help): hidden on click / while popover is open.
   const [utilityTooltipPath, setUtilityTooltipPath] = useState<string | null>(null);
   const [utilityTooltipMuted, setUtilityTooltipMuted] = useState<string | null>(null);
+  const [utilityPopoverPath, setUtilityPopoverPath] = useState<string | null>(null);
 
   // Hover flyouts (collapsed products) + click flyouts (utility bar).
   const [flyout, setFlyout] = useState<FlyoutState | null>(null);
@@ -1415,11 +1416,22 @@ export default function ExpandedNav({
                       side={expanded ? "top" : "right"}
                       align="start"
                       openMode="click"
+                      onOpenChange={(next) => {
+                        setUtilityPopoverPath(next ? item.path : null);
+                        setUtilityTooltipPath(null);
+                        setUtilityTooltipMuted(next ? item.path : null);
+                      }}
                     >
                       {iconButton}
                     </HelpSupportPopover>
                   );
                 }
+
+                const panelOpen = utilityPopoverPath === item.path;
+                const tooltipOpen =
+                  !panelOpen &&
+                  utilityTooltipPath === item.path &&
+                  utilityTooltipMuted !== item.path;
 
                 return (
                   <div
@@ -1428,22 +1440,42 @@ export default function ExpandedNav({
                       utilityFlipRefs.current.set(item.path, el);
                     }}
                     className="inline-flex will-change-transform"
+                    onPointerLeave={() => {
+                      setUtilityTooltipPath((path) =>
+                        path === item.path ? null : path
+                      );
+                      // Keep muted while the panel is open so "Need Help?" can't
+                      // come back when the pointer leaves the icon for the popup.
+                      if (utilityPopoverPath === item.path) return;
+                      setUtilityTooltipMuted((muted) =>
+                        muted === item.path ? null : muted
+                      );
+                    }}
                   >
-                    {/* Hover menus (Settings / Profile) open their panel on hover — no name tooltip. */}
+                    {/* Hover menus (Settings / Profile) open their panel on hover — no name tooltip.
+                        Keep Help/Activity mounted under a stable Tooltip tree so the first
+                        click can open the panel (swapping trees remounts and needs a 2nd click). */}
                     {isHoverMenu ? (
                       <span className="inline-flex">{control}</span>
                     ) : (
                     <Tooltip.Root
-                      open={utilityTooltipPath === item.path}
-                      delayDuration={300}
+                      open={tooltipOpen}
+                      delayDuration={200}
                       disableHoverableContent
-                      onOpenChange={(next) =>
-                        setUtilityTooltipPath(
-                          next && utilityTooltipMuted !== item.path
-                            ? item.path
-                            : null
-                        )
-                      }
+                      onOpenChange={(next) => {
+                        if (!next) {
+                          setUtilityTooltipPath(null);
+                          return;
+                        }
+                        if (
+                          utilityTooltipMuted === item.path ||
+                          utilityPopoverPath === item.path
+                        ) {
+                          setUtilityTooltipPath(null);
+                          return;
+                        }
+                        setUtilityTooltipPath(item.path);
+                      }}
                     >
                       <Tooltip.Trigger asChild>
                         <span
@@ -1451,14 +1483,6 @@ export default function ExpandedNav({
                           onPointerDownCapture={() => {
                             setUtilityTooltipPath(null);
                             setUtilityTooltipMuted(item.path);
-                          }}
-                          onPointerLeave={() => {
-                            setUtilityTooltipPath((path) =>
-                              path === item.path ? null : path
-                            );
-                            setUtilityTooltipMuted((muted) =>
-                              muted === item.path ? null : muted
-                            );
                           }}
                         >
                           {control}

@@ -23,12 +23,14 @@ export default function HelpSupportPopover({
   side = "right",
   align = "end",
   openMode = "hover",
+  onOpenChange,
 }: {
   children: ReactElement;
   side?: "top" | "right" | "bottom" | "left";
   align?: "start" | "center" | "end";
   /** hover = open on mouse enter; click = open only from the trigger. */
   openMode?: "hover" | "click";
+  onOpenChange?: (open: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [tier, setTier] = useState<HelpMrrTier>("enterprise");
@@ -39,13 +41,18 @@ export default function HelpSupportPopover({
     return () => window.clearTimeout(closeTimer.current);
   }, []);
 
+  const setOpenBoth = (next: boolean) => {
+    setOpen(next);
+    onOpenChange?.(next);
+  };
+
   const cancelClose = () => window.clearTimeout(closeTimer.current);
   const scheduleClose = (event?: { relatedTarget: EventTarget | null }) => {
     if (clickMode) return;
     const next = event?.relatedTarget;
     if (next instanceof Element && next.closest("[role='menu']")) return;
     window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setOpen(false), HOVER_CLOSE_MS);
+    closeTimer.current = window.setTimeout(() => setOpenBoth(false), HOVER_CLOSE_MS);
   };
 
   const trigger = cloneElement(children, {
@@ -68,12 +75,12 @@ export default function HelpSupportPopover({
           ? undefined
           : () => {
               cancelClose();
-              setOpen(true);
+              setOpenBoth(true);
             }
       }
       onMouseLeave={clickMode ? undefined : (event) => scheduleClose(event)}
     >
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={setOpenBoth}>
         <PopoverTrigger asChild>{trigger}</PopoverTrigger>
         <PopoverContent
           side={side}
@@ -88,12 +95,15 @@ export default function HelpSupportPopover({
               event.preventDefault();
             }
           }}
-          className="z-50 w-auto max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-xl border border-border bg-popover p-0 text-popover-foreground shadow-foundation-float"
+          className="z-50 w-auto max-w-[calc(100vw-1.5rem)] overflow-visible rounded-xl border border-border bg-popover p-0 text-popover-foreground shadow-none"
+          style={{ boxShadow: "var(--shadow-float)" }}
         >
-          <HelpPanel
-            profile={HELP_SUPPORT[tier]}
-            onPreviewTier={setTier}
-          />
+          <div className="overflow-hidden rounded-xl">
+            <HelpPanel
+              profile={HELP_SUPPORT[tier]}
+              onPreviewTier={setTier}
+            />
+          </div>
         </PopoverContent>
       </Popover>
     </div>
