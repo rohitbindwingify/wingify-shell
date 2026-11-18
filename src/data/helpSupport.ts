@@ -4,7 +4,7 @@ import elenaRossi from "@/assets/help/elena-rossi.jpg";
 import marcusChen from "@/assets/help/marcus-chen.jpg";
 import priyaSharma from "@/assets/help/priya-sharma.jpg";
 
-export type HelpMrrTier = "enterprise" | "standard" | "initials";
+export type HelpMrrTier = "enterprise" | "standard" | "duo" | "initials";
 
 export type HelpContactRole =
   | "csm"
@@ -114,6 +114,14 @@ export const HELP_SUPPORT: Record<HelpMrrTier, HelpSupportProfile> = {
         emphasis: "primary",
       },
     ],
+  },
+  duo: {
+    tier: "duo",
+    teamHeading: "Your Wingify team",
+    support: SUPPORT,
+    contacts: ENTERPRISE_CONTACTS.filter(
+      (contact) => contact.emphasis !== "muted"
+    ),
   },
   initials: {
     tier: "initials",

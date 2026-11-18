@@ -308,6 +308,7 @@ function ContactBody({
 
 const PREVIEW_TIERS: { tier: HelpMrrTier; label: string }[] = [
   { tier: "enterprise", label: ">500 MRR" },
+  { tier: "duo", label: "2 contacts" },
   { tier: "standard", label: "<500 MRR" },
   { tier: "initials", label: "No photo" },
 ];
@@ -459,12 +460,12 @@ export function HelpPanel({
         </div>
         <div
           className={cn(
-            "flex flex-col gap-5 bg-secondary px-4 py-5",
+            "flex flex-col gap-3 bg-secondary px-4 py-5",
             stepped && "min-h-full"
           )}
         >
           {selfServe}
-          <div className={cn(stepped && "mt-auto")}>{support}</div>
+          {support}
         </div>
       </div>
     </div>
