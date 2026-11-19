@@ -375,7 +375,9 @@ export default function ExpandedNav({
     // Accordion: open the active product's sub-nav; close when on a direct item.
     // Profile is flyout-only — never pin it open as an inline accordion.
     const accordionItem =
-      activeItem?.sections && !activeItem.flyoutOnly ? activeItem : null;
+      activeItem?.sections && !activeItem.flyoutOnly && !activeItem.external
+        ? activeItem
+        : null;
     setOpenPath(accordionItem ? accordionItem.path : null);
     if (accordionItem?.sections) {
       let match: string | null = null;
@@ -428,6 +430,7 @@ export default function ExpandedNav({
     // Settings/Profile float in both modes; product flyouts are collapsed-only.
     if (expanded && !(item.flyoutOnly && item.sections)) return;
     if (navLocked && item.path !== "/home") return;
+    if (item.external) return;
     if (!item.sections?.length) return;
     window.clearTimeout(closeTimer.current);
     closeMore();
@@ -666,7 +669,8 @@ export default function ExpandedNav({
   const renderItem = (item: NavItem, inMore = false) => {
     const Icon = item.icon;
     const isActive = findItemByPath(pathname)?.path === item.path;
-    const hasSections = !!item.sections;
+    // External rail rows keep sections in config for routes, but render like a leaf.
+    const hasSections = !!item.sections && !item.external;
     const open = openPath === item.path;
     const tooltipOnly = !!item.flyoutOnly && !hasSections;
     const expandOnly = !!item.flyoutOnly && hasSections;
@@ -699,6 +703,30 @@ export default function ExpandedNav({
       </IconVariantOverride>
     ) : (
       iconEl
+    );
+
+    const labelInner = (
+      <>
+        {/* Same 36px slot in both states so glyphs don't resize or slide. */}
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center">
+          {leadingIcon}
+        </span>
+        <span className={labelClass} style={{ transition: revealTransition }}>
+          {item.label}
+        </span>
+      </>
+    );
+
+    const labelClassName = cn(
+      "flex h-9 shrink-0 items-center gap-2 text-sm outline-none",
+      // Collapsed: the label + gap overflow the icon box, so centering
+      // would pull the icon left. Start-align and let it spill right.
+      // No left padding when expanded: the icon slot must sit at the same
+      // x in both states so nothing shifts while the width animates.
+      expanded
+        ? "min-w-0 flex-1 text-left text-foreground"
+        : "w-9 justify-start overflow-hidden",
+      isActive && expanded && "font-medium"
     );
 
     const row = (
@@ -743,56 +771,52 @@ export default function ExpandedNav({
           if (!expanded && !tooltipOnly) scheduleClose();
         }}
       >
-        <button
-          type="button"
-          aria-label={item.label}
-          aria-expanded={expandOnly ? flyout?.path === item.path : undefined}
-          onClick={(e) => {
-            if (navDisabled) return;
-            if (tooltipOnly) return;
-            if (expandOnly) {
-              const rowEl = (e.currentTarget as HTMLElement).closest(
-                "[data-nav-item]"
-              ) as HTMLElement | null;
-              if (rowEl) toggleFlyout(item, rowEl);
-              return;
-            }
-            if (navLocked && item.path === "/home") {
-              navigate(GET_STARTED_PATH);
-              if (expanded) setOpenPath(open ? null : item.path);
-              return;
-            }
-            // Expanded + sections: only toggle the accordion — do not land the first leaf.
-            if (expanded && hasSections) {
-              setOpenPath(open ? null : item.path);
-              return;
-            }
-            navigate(firstChildPath(item));
-            if (expanded) {
-              // Direct items collapse any open accordion.
-              setOpenPath(null);
-            }
-          }}
-          className={cn(
-            "flex h-9 shrink-0 items-center gap-2 text-sm outline-none",
-            // Collapsed: the label + gap overflow the icon box, so centering
-            // would pull the icon left. Start-align and let it spill right.
-            // No left padding when expanded: the icon slot must sit at the same
-            // x in both states so nothing shifts while the width animates.
-            expanded
-              ? "min-w-0 flex-1 text-left text-foreground"
-              : "w-9 justify-start overflow-hidden",
-            isActive && expanded && "font-medium"
-          )}
-        >
-          {/* Same 36px slot in both states so glyphs don't resize or slide. */}
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center">
-            {leadingIcon}
-          </span>
-          <span className={labelClass} style={{ transition: revealTransition }}>
-            {item.label}
-          </span>
-        </button>
+        {item.external && !navDisabled ? (
+          <a
+            href=""
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={item.label}
+            className={labelClassName}
+          >
+            {labelInner}
+          </a>
+        ) : (
+          <button
+            type="button"
+            aria-label={item.label}
+            aria-expanded={expandOnly ? flyout?.path === item.path : undefined}
+            onClick={(e) => {
+              if (navDisabled) return;
+              if (tooltipOnly) return;
+              if (expandOnly) {
+                const rowEl = (e.currentTarget as HTMLElement).closest(
+                  "[data-nav-item]"
+                ) as HTMLElement | null;
+                if (rowEl) toggleFlyout(item, rowEl);
+                return;
+              }
+              if (navLocked && item.path === "/home") {
+                navigate(GET_STARTED_PATH);
+                if (expanded) setOpenPath(open ? null : item.path);
+                return;
+              }
+              // Expanded + sections: only toggle the accordion — do not land the first leaf.
+              if (expanded && hasSections) {
+                setOpenPath(open ? null : item.path);
+                return;
+              }
+              navigate(firstChildPath(item));
+              if (expanded) {
+                // Direct items collapse any open accordion.
+                setOpenPath(null);
+              }
+            }}
+            className={labelClassName}
+          >
+            {labelInner}
+          </button>
+        )}
 
         {item.pinnable && (inMore || showUnpin) && (
           <Tooltip.Root>
@@ -835,6 +859,19 @@ export default function ExpandedNav({
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
+        )}
+
+        {item.external && (
+          <span
+            className={cn(
+              chromeClass,
+              "flex size-4 shrink-0 items-center justify-center text-muted-foreground"
+            )}
+            style={{ transition: revealTransition }}
+            aria-hidden
+          >
+            <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.75} />
+          </span>
         )}
 
         {hasSections && !expandOnly && (

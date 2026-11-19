@@ -1,6 +1,6 @@
 /*
- * Change summary: Commerce is hidden from the rail via HIDDEN_NAV_PATHS (used by visibleNav and
- * PINNABLE_PATHS); its routes and pages are unchanged.
+ * Change summary: Commerce is visible on the rail as an external-style row (storefront SVG icon,
+ * blank href, right-side ExternalLink). Sections/routes stay for breadcrumbs and product switcher.
  * Journey analytics, Behaviour analytics and User feedback are products inside one "Analytics"
  * suite item, shown as always-visible nested accordion rows (existing NavLeaf `items` pattern).
  * NavItem `suite` makes the hover flyout two-panel (products left, hovered product's pages right).
@@ -93,10 +93,7 @@ import {
   ShellCalendarBlankFillIcon,
   ShellCalendarBlankIcon,
 } from "@/components/icons/shell/CalendarBlankIcons";
-import {
-  ShellCommerceFillIcon,
-  ShellCommerceIcon,
-} from "@/components/icons/shell/CommerceIcons";
+import { ShellCommerceStorefrontIcon } from "@/components/icons/shell/CommerceIcons";
 import {
   ShellFlaskFillIcon,
   ShellFlaskIcon,
@@ -190,6 +187,11 @@ export type NavItem = {
   initials?: string;
   /** Tooltip only: no navigation on click, no sub-nav flyout on hover. */
   flyoutOnly?: boolean;
+  /**
+   * Rail row opens as an external link (blank href) with a right-side ExternalLink icon.
+   * Sections may still exist for routes / breadcrumbs / product switcher.
+   */
+  external?: boolean;
   hideCreate?: boolean;
   sections?: NavSection[];
   pageGuide?: PageGuide;
@@ -346,7 +348,7 @@ export const NAV: NavItem[] = [
       { label: "Tech Debt", path: "/feature-management/tech-debt", icon: Wrench, hideCreate: true },
     ]},
   ]},
-  { label: "Commerce", path: "/commerce", icon: ShellCommerceIcon as LucideIcon, activeIcon: ShellCommerceFillIcon as LucideIcon, group: 2, pinnable: true, sections: [
+  { label: "Commerce", path: "/commerce", icon: ShellCommerceStorefrontIcon as LucideIcon, activeIcon: ShellCommerceStorefrontIcon as LucideIcon, group: 2, pinnable: true, external: true, sections: [
     { items: [
       { label: "Catalog", path: "/commerce/catalog", icon: BookOpen, hideCreate: true },
     ]},
@@ -1182,7 +1184,7 @@ export function resolveJdSwitcherItem(pathname: string): JdSwitcherItem | undefi
 }
 
 /** Products kept in NAV (routes, breadcrumbs) but hidden from the rail and never pinnable. */
-export const HIDDEN_NAV_PATHS: string[] = ["/commerce"];
+export const HIDDEN_NAV_PATHS: string[] = [];
 
 export const PINNABLE_PATHS = NAV.filter(
   (i) => i.pinnable && !HIDDEN_NAV_PATHS.includes(i.path)
