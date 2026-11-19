@@ -1,5 +1,5 @@
 /*
- * Change summary: Commerce is visible on the rail as an external-style row (storefront SVG icon,
+ * Change summary: Commerce is visible on the rail as an external-style row (storefront PNG icon,
  * blank href, right-side ExternalLink). Sections/routes stay for breadcrumbs and product switcher.
  * Journey analytics, Behaviour analytics and User feedback are products inside one "Analytics"
  * suite item, shown as always-visible nested accordion rows (existing NavLeaf `items` pattern).
