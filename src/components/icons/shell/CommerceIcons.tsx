@@ -3,18 +3,57 @@
  * fill (selected). Drawn on the same 256 grid / 16-unit round stroke as the VWO sprite's
  * phosphor icons (see MegaphoneIcons). Not in the VWO sprite — prototype-only designs.
  *
- *   ShellCommerceIcon / ShellCommerceFillIcon   bag with spark (wired in navigation.ts)
+ *   ShellCommerceStorefrontIcon                 SVG storefront (wired in navigation.ts)
+ *   ShellCommerceIcon / ShellCommerceFillIcon   bag with spark
  *   ShellBagIcon / ShellBagFillIcon             bag, no spark
  *   ShellCartSparkIcon / ShellCartSparkFillIcon cart with spark
  *   ShellCartIcon / ShellCartFillIcon           cart, no spark
  */
 import type { ReactNode, SVGProps } from "react";
+import commerceStorefrontUrl from "@/assets/icons/commerce-storefront.svg";
 import { cn } from "@/lib/utils";
 
 type ShellIconProps = SVGProps<SVGSVGElement> & {
   size?: number | string;
   strokeWidth?: number;
 };
+
+/** Storefront from src/assets/icons/commerce-storefront.svg (mask → currentColor). */
+export function ShellCommerceStorefrontIcon({
+  className,
+  size = 16,
+  strokeWidth: _strokeWidth,
+  ...props
+}: ShellIconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      fill="none"
+      aria-hidden
+      className={cn("h-4 w-4 shrink-0", className)}
+      {...props}
+    >
+      <rect
+        width="16"
+        height="16"
+        fill="currentColor"
+        style={{
+          maskImage: `url(${commerceStorefrontUrl})`,
+          WebkitMaskImage: `url(${commerceStorefrontUrl})`,
+          maskSize: "contain",
+          WebkitMaskSize: "contain",
+          maskRepeat: "no-repeat",
+          WebkitMaskRepeat: "no-repeat",
+          maskPosition: "center",
+          WebkitMaskPosition: "center",
+        }}
+      />
+    </svg>
+  );
+}
 
 const STROKE = {
   stroke: "currentColor",

@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { Eye } from "@/components/icons/protoLucide";
+import { ExternalLink, Eye } from "@/components/icons/protoLucide";
 import { visibleNav } from "../../config/navigation";
 import { firstChildPath } from "../../lib/nav";
 import { useUIStore } from "../../store/ui";
@@ -26,22 +26,43 @@ export default function MorePanel() {
         <div className="flex flex-col px-3">
           {unpinned.map((item, groupIndex) => {
             const Icon = item.icon;
+            const headerClass =
+              "flex min-w-0 flex-1 items-center gap-2.5 px-2 py-2 text-left";
             return (
               <div key={item.path} className="flex flex-col gap-1">
                 {groupIndex > 0 && (
                   <div className="my-4 h-px bg-panel-border" aria-hidden="true" />
                 )}
                 <div className="flex items-center gap-1 rounded-md pr-1 transition-colors hover:bg-muted">
-                  <button
-                    type="button"
-                    onClick={() => navigate(firstChildPath(item))}
-                    className="flex min-w-0 flex-1 items-center gap-2.5 px-2 py-2 text-left"
-                  >
-                    <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="truncate text-sm font-medium text-foreground">
-                      {item.label}
-                    </span>
-                  </button>
+                  {item.external ? (
+                    <a
+                      href=""
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={headerClass}
+                    >
+                      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <span className="truncate text-sm font-medium text-foreground">
+                        {item.label}
+                      </span>
+                      <ExternalLink
+                        className="ml-auto h-3.5 w-3.5 shrink-0 text-muted-foreground"
+                        strokeWidth={1.75}
+                        aria-hidden
+                      />
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => navigate(firstChildPath(item))}
+                      className={headerClass}
+                    >
+                      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <span className="truncate text-sm font-medium text-foreground">
+                        {item.label}
+                      </span>
+                    </button>
+                  )}
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <button
@@ -67,23 +88,24 @@ export default function MorePanel() {
                     </Tooltip.Portal>
                   </Tooltip.Root>
                 </div>
-                {item.sections
-                  ?.flatMap((section) => section.items)
-                  .map((leaf) => (
-                    <NavLink
-                      key={leaf.path}
-                      to={leaf.path}
-                      className={({ isActive }) =>
-                        cn(
-                          "rounded-md py-1.5 pl-[34px] pr-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-                          isActive &&
-                            "bg-accent font-medium text-accent-foreground"
-                        )
-                      }
-                    >
-                      {leaf.label}
-                    </NavLink>
-                  ))}
+                {!item.external &&
+                  item.sections
+                    ?.flatMap((section) => section.items)
+                    .map((leaf) => (
+                      <NavLink
+                        key={leaf.path}
+                        to={leaf.path}
+                        className={({ isActive }) =>
+                          cn(
+                            "rounded-md py-1.5 pl-[34px] pr-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+                            isActive &&
+                              "bg-accent font-medium text-accent-foreground"
+                          )
+                        }
+                      >
+                        {leaf.label}
+                      </NavLink>
+                    ))}
               </div>
             );
           })}
